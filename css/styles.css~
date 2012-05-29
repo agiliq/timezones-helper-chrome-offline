@@ -1,0 +1,299 @@
+            body{
+            
+                background-image: -webkit-gradient(linear,left bottom,left top,color-stop(1, rgb(100,100,50)),color-stop(0, rgb(255,255,200)));
+	            //background-image: -moz-linear-gradient(center bottom,rgb(255,255,255) 100%,rgb(220,220,220) 0%);
+	border-radius: 5px;
+            
+            }
+           
+                
+            #container{
+              width : 85%;
+              position : relative;
+              left : 100px;
+              top : 10px;
+              
+              border : 1px solid pink;
+            }
+                #div_locations_input_box{
+                  float:left;
+                  position : relative;
+                }  
+                    #search_result{
+                        position : absolute;
+                        left : 0px;
+                        top : 30px;
+                        text-align : left;
+                        display:none;
+                        //background-color : #ffffcc;
+                        background-color : #F5FAC9;
+                        border : 1px solid brown;
+                        border-radius : 5px;
+                        width : 400px;
+                        z-index : 99;
+                }
+                #controls{
+                  float:right;
+                }
+                
+                #content{
+                      position : relative;
+                        top : 25px;
+                    
+                }
+                    
+                    #content .row{
+                        display : block;
+                        text-align : left;
+                        border : 1px solid white;
+                        height : 70px;  
+                        background-color : #F8F6F6;
+                        
+                        
+                    }
+                    #content .row:hover {
+                        background-color : #E8DDDD;
+                        //color : red;
+                        opacity : 1;
+                        
+                    }
+                        #content .row .icons_homedelete{
+                            opacity : 0.1;
+                            height : 70px;
+                            width : 45px;
+                            position: absolute;
+                            left : -45px;
+                        }
+                        
+                        #content .row .icons_homedelete:hover{
+                            opacity : 1;
+                        }
+                        
+                        #content .row .icons_homedelete .icon_delete{
+                            
+                            height : 50%;
+                        }
+                        
+                        #content .row .icons_homedelete .icon_home{
+                            background-image : url('images/home18.png');
+                            height : 18px;
+                            width : 18px;
+                        }
+                        
+                        #content .row .icons_homedelete .icon_delete:hover{
+                            cursor : pointer;
+                         
+                        }
+                        
+                        #content .row .icons_homedelete .icon_home:hover{
+                            cursor : pointer;
+
+                        }
+
+                        #content .row .tzdetails{
+                            text-align : left;
+                            color : green;
+                            position: relative;
+                            top : 20px;
+                            background-color : yellow;
+                            width : 300px;
+                            
+                        
+                        } 
+                            
+                            #content .row .tzdetails .offset{
+                                position : absolute;
+                                left : 8px;
+                                top : 5px;
+                                vertical-align : bottom;
+                                color : grey;
+                            }
+                            
+                                #content .row .tzdetails .offset .homeicon{
+                                  background-image : url('images/home18.png');
+                                  background-color : transparent;
+                                  width : 18px;
+                                  height : 18px;
+                                
+                                }
+                                .homedficon{
+                                  background-color :red;
+                                }
+                            
+                            #content .row .tzdetails .location{
+                                position : absolute;
+                                left : 55px;
+                            
+                            }
+                            
+                            #content .row .tzdetails .location .city{
+                                color : black;
+                                font-weight : bold; 
+                                font-size : 14pt;
+                            }
+                            
+                            #content .row .tzdetails .location .country{
+                                color : grey;
+                                font-size : 10pt;
+                            
+                            }
+                            
+                            #content .row .tzdetails .timedata{
+                               position : absolute;
+                               right : 10px;
+                            }
+                                #content .row .tzdetails .timedata .time {
+                                    float : right ;  
+                                    color : black;
+                                    font-weight : bold;
+                                }
+                                
+                                #content .row .tzdetails .timedata .timeextra{
+                                   color : grey;
+                                   font-size : 10pt;
+                                }
+                            
+                             
+                            #content .row .tzdetails div {
+                                vertical-align : bottom;
+                                display : inline-block;
+                                height : 50px;
+                            }
+                            
+                            
+                        
+                        #content .row .dates{
+                           text-align : right;
+                           position : relative;
+                           top : 0px;
+                           left : 280px;
+                        } 
+                        
+                                
+                                #content .row .dates #vband{
+                                    border : 2px solid black;
+                                    border-radius : 5px;
+                                    width : 22px;
+                                    position : absolute;
+                                    top : -2px;
+                                    left : 35px;
+                                    z-index : 88;
+                                
+                                }
+                                
+                                #content .row .dates #selectedband{
+                                    //border : 2px solid black;
+                                    background-color : #FFB9B9;
+                                    border-radius : 5px;
+                                    width : 22px;
+                                    position : absolute;
+                                    top : -2px;
+                                    left : 35px;    
+                                    opacity : 0.4;
+                                
+                                }
+                                
+                                
+                                #content .row .dates .hourline_ul{
+                                 list-style : none;
+                                 position : absolute;
+                                 left : 0px;
+                                 
+                                }
+                                
+                                #content .row .dates .hourline_ul li {
+                                  width : 22px;
+                                  
+                                  text-align : center;
+                                  vertical-align : bottom;
+                                  
+                                  border-radius : 3px;
+                                  display : inline-block;
+                                  height : 70px;
+                                  color : white;
+                                  background-color: red;
+                                  
+                                }
+                                
+                                #content .row .dates .hourline_ul li .idxdetails_li{
+                                  width : 22px;
+                                  height : 800px;
+                                  background-color : green;
+                                  opacity : 0.1;
+                                
+                                }
+                                
+                                #content .row .dates .hourline_ul li div.span_hl{
+                                    height : 30px;
+                                    border : 1px solid #357EC7 ;
+                                    //background-color : #357EC7;
+                                    box-shadow : 3px 3px 3px grey;
+                                    z-index : 99;
+                                }
+                                
+                                #content .row .dates .hourline_ul li div.span_hl .small{
+                                    font-size : 8pt;
+                                    line-height : 15px;
+                                    vertical-align : top;
+                                }
+                                
+                                #content .row .dates .hourline_ul li div.span_hl .medium{
+                                    font-size : 12pt;
+                                    line-height : 15px;
+                                    vertical-align : top;
+                                }
+                                
+                                #content .row .dates .hourline_ul li div.span_hl div.time_30{
+                                    font-size : 8pt;
+                                }
+                                
+                                
+                                
+                                
+                                #content .row .dates .hourline_ul .li_n{
+                                  background-color : #357EC7 ;
+                                
+                                }
+                                #content .row .dates .hourline_ul .li_m{
+                                  color : #357EC7;
+                                  background-color : #C8EAF0;
+                                }
+                                
+                                #content .row .dates .hourline_ul .li_d{
+                                  color : #357EC7;
+                                   
+                                }
+                                
+                                #content .row .dates .hourline_ul .li_e{
+                                  color : #357EC7;
+                                  background-color : #C8EAF0; 
+                                
+                                }
+                                
+                                #content .row .dates .hourline_ul .li_24{
+                                    background-color : #357EC7 ;
+                                }
+                    
+            li.searchresult_li{
+              list-style : none;
+              z-index : 99;
+              width : 350px;
+            }
+            li.searchresult_li:hover{
+              background-color : brown ; 
+              cursor : pointer;
+              color : white;
+            }
+            li.searchresult_li span{
+            
+            }
+            li.searchresult_li span.litz{
+            #min-width : 300px;
+            }
+            
+            li.searchresult_li span.litime{
+               float:right;
+            }    
+                
+                
+        
