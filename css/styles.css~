@@ -82,6 +82,7 @@
                         top : -55px;
                         left : 0px;
                         display : none;
+                        font-weight : strong;
                         vertical-align : bottom;
                     }
                     button#setdate_go{

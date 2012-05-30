@@ -224,28 +224,46 @@
 
   $("#setdate_go").live({
     click: function(e) {
-      var datestr, dd, key, lenofdash, mm, options, year, _i, _len;
+      var datestr, dd, errormsg, key, lenofdash, mm, options, year, _i, _len;
       console.log("clicked");
+      errormsg = "mm-dd-yyyy format only";
       datestr = $("#dateinput").val().trim();
-      if (datestr.length !== 10) return;
+      if (datestr.length !== 10) {
+        $("#error_inputdate").html(errormsg);
+        $("#error_inputdate").show();
+        return;
+      }
       lenofdash = 0;
       for (_i = 0, _len = datestr.length; _i < _len; _i++) {
         key = datestr[_i];
         if (key === "-") lenofdash++;
       }
       console.log(lenofdash);
-      if (lenofdash !== 2) return;
+      if (lenofdash !== 2) {
+        $("#error_inputdate").html(errormsg);
+        $("#error_inputdate").show();
+        return;
+      }
       console.log(datestr.substr(0, 2));
       mm = parseFloat(datestr.substr(0, 2));
       mm = parseInt(mm);
       dd = parseInt(datestr.substr(3, 2));
       year = datestr.substr(6, 4);
-      if (year.length !== 4) return;
+      if (year.length !== 4) {
+        $("#error_inputdate").html(errormsg);
+        $("#error_inputdate").show();
+        return;
+      }
       console.log("---");
       year = parseInt(datestr.substr(6, 4));
       console.log(mm + " : " + dd + " : " + year);
       console.log(mm > 12 || mm < 1 || dd < 0 || dd > 31);
-      if (mm > 12 || mm < 1 || dd < 0 || dd > 31) return;
+      if (mm > 12 || mm < 1 || dd < 0 || dd > 31) {
+        $("#error_inputdate").html(errormsg);
+        $("#error_inputdate").show();
+        return;
+      }
+      $("#error_inputdate").hide();
       console.log("----");
       /*
           selecteddate.m = mm-1
@@ -258,6 +276,15 @@
       options.year = year;
       setSelectedDate(options);
       return alert("success");
+    }
+  });
+
+  $("#error_inputdate").live({
+    click: function() {
+      return $("#error_inputdate").slideUp(500);
+    },
+    focusout: function() {
+      return $("#error_inputdate").hide(500);
     }
   });
 

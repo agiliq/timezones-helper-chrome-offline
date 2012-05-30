@@ -220,8 +220,12 @@ $("#content .row .icons_homedelete .icon_home").live
 $("#setdate_go").live
   click : (e) ->
     console.log "clicked"
+    errormsg = "mm-dd-yyyy format only"
+    
     datestr = $("#dateinput").val().trim()
     unless datestr.length is 10
+      $("#error_inputdate").html errormsg
+      $("#error_inputdate").show()
       return
     lenofdash = 0  
     
@@ -229,6 +233,8 @@ $("#setdate_go").live
       lenofdash++ if key is "-"  
     console.log lenofdash  
     unless lenofdash is 2
+      $("#error_inputdate").html errormsg
+      $("#error_inputdate").show()
       return  
     console.log (datestr.substr(0,2))
     mm = parseFloat datestr.substr(0,2)
@@ -236,13 +242,19 @@ $("#setdate_go").live
     dd = parseInt datestr.substr(3,2)  
     year =  datestr.substr(6,4)
     unless year.length is 4
+      $("#error_inputdate").html errormsg
+      $("#error_inputdate").show()
       return
+      
     console.log "---"  
     year = parseInt datestr.substr(6,4)
     console.log mm+" : "+dd+" : "+year
     console.log (mm >12 or mm<1 or dd<0 or dd>31)  
     if (mm >12 or mm<1 or dd<0 or dd>31)
+      $("#error_inputdate").html errormsg
+      $("#error_inputdate").show()
       return
+    $("#error_inputdate").hide()  
     console.log "----"  
     ###
     selecteddate.m = mm-1
@@ -256,6 +268,11 @@ $("#setdate_go").live
     setSelectedDate options
     alert "success"    
       
+$("#error_inputdate").live
+  click : ->
+    $("#error_inputdate").slideUp(500)
+  focusout : ->
+    $("#error_inputdate").hide(500)
     
 $("lKNHi span").live
   click : (e) ->
