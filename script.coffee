@@ -6,6 +6,8 @@ k=0
 locations=""
 utc = 0
 selecteddate = {}
+rowsortstart = ""
+rowsortstop = ""
 #first set selecteddate to current date, later user can change
 
 $(document).ready ->
@@ -40,7 +42,7 @@ $(document).ready ->
         origcities = cities.toLowerCase()
         #console.log "cities loaded successfully"
       error : (e) ->
-        console.log "Error loading cities"    
+        #console.log "Error loading cities"    
   ###
   
     
@@ -51,10 +53,10 @@ $(document).ready ->
       tzdata = tz
       tzdatalower = tz.toLowerCase()
       
-      console.log "tzdata loaded successfully"
+      #console.log "tzdata loaded successfully"
       renderRows()
     error : (e) ->
-      console.log "Error loading tz data"   
+      #console.log "Error loading tz data"   
   
   
   
@@ -80,7 +82,7 @@ $("#search_input").live
 # add locations to the localStorage
 $("ul.searchresult_ul").live
   click : (e) -> 
-    console.log "-------li---------"
+    #console.log "-------li---------"
     sr_click(e)
  
     
@@ -107,9 +109,10 @@ $("#content .row .dates").live
     
 $("#vband").live
   click : (e) ->
-    console.log e    
+    #console.log e    
     
-    $("#container").css "opacity","0.1"
+    $(".canhide").css "opacity","0.1"
+    
     idx = $(e.target).attr "idx"
     if idx is undefined
       return
@@ -117,9 +120,9 @@ $("#vband").live
     city = new Array()
     country = new Array() 
     yeardetails = new Array()
-    console.log "printing row"
+    #console.log "printing row"
     for ele in $(".row")
-      console.log ele.id
+      #console.log ele.id
       #tinFloat = $("#"+ele.id+" #lihr_"+idx).attr("t")
       tText = convertOffset $("#"+ele.id+" #lihr_"+idx).attr("t")
       t.push tText.substr(1)
@@ -128,8 +131,8 @@ $("#vband").live
       yeardetails.push $("#"+ele.id+" #lihr_"+idx).attr("details")
       
       
-    console.log "prointed"  
-    console.log t+" : "+city+" : "+country
+    #console.log "prointed"  
+    #console.log t+" : "+city+" : "+country
     $("#newevent").show()
     $("#newevent_time").text ""
     $("#newevent_msg").text ""
@@ -148,7 +151,6 @@ $("#vband").live
     $("#newevent_time").attr "yeardetails",yeardetails.join(";")
     #t = $("#content #row_ #lihr_"+idx).attr "t"
     #console.log t+" : "+idx 
-
 
 $("#wrapper button#saveevent").live
   click : (e) ->
@@ -169,6 +171,7 @@ $("#wrapper button#saveevent").live
       len++  
     oldobj[len] = {}  
     oldobj[len].name = evname;
+    oldobj[len].desc = msg
     oldobj[len].city = $("#newevent_time").attr "city"
     oldobj[len].country = $("#newevent_time").attr "country"
     oldobj[len].time = $("#newevent_time").attr "time"
@@ -180,7 +183,7 @@ $("#wrapper button#saveevent").live
 $("#event_close").live
   click : (e) ->
     $("#newevent").hide() 
-    $("#container").css "opacity","1"   
+    $(".canhide").css "opacity","1"   
     
     
 $("#content .row .icons_homedelete .icon_delete").live
@@ -212,14 +215,14 @@ $("#content .row .icons_homedelete .icon_home").live
     localStorage.addedLocations = JSON.stringify oldobj
     renderRows()
     ###
-    console.log rowindex
+    #console.log rowindex
     #ABOVE METHOD ALSO VERY NICE, BUT NOT ACCORDING TO THE SAMPLE SITE
     localStorage.default = rowindex
     renderRows()
     
 $("#setdate_go").live
   click : (e) ->
-    console.log "clicked"
+    #console.log "clicked"
     errormsg = "mm-dd-yyyy format only"
     
     datestr = $("#dateinput").val().trim()
@@ -231,12 +234,12 @@ $("#setdate_go").live
     
     for key in datestr
       lenofdash++ if key is "-"  
-    console.log lenofdash  
+    #console.log lenofdash  
     unless lenofdash is 2
       $("#error_inputdate").html errormsg
       $("#error_inputdate").show()
       return  
-    console.log (datestr.substr(0,2))
+    #console.log (datestr.substr(0,2))
     mm = parseFloat datestr.substr(0,2)
     mm = parseInt mm
     dd = parseInt datestr.substr(3,2)  
@@ -246,16 +249,16 @@ $("#setdate_go").live
       $("#error_inputdate").show()
       return
       
-    console.log "---"  
+    #console.log "---"  
     year = parseInt datestr.substr(6,4)
-    console.log mm+" : "+dd+" : "+year
-    console.log (mm >12 or mm<1 or dd<0 or dd>31)  
+    #console.log mm+" : "+dd+" : "+year
+    #console.log (mm >12 or mm<1 or dd<0 or dd>31)  
     if (mm >12 or mm<1 or dd<0 or dd>31)
       $("#error_inputdate").html errormsg
       $("#error_inputdate").show()
       return
     $("#error_inputdate").hide()  
-    console.log "----"  
+    #console.log "----"  
     ###
     selecteddate.m = mm-1
     selecteddate.d = dd
@@ -266,27 +269,126 @@ $("#setdate_go").live
     options.d = dd
     options.year = year
     setSelectedDate options
-    alert "success"    
       
 $("#error_inputdate").live
   click : ->
     $("#error_inputdate").slideUp(500)
   focusout : ->
     $("#error_inputdate").hide(500)
+
+
+$("#content").live
+  sortstop : (e,ui) ->
+    #console.log "new : "+ui.item.index()
+    #console.log "old : "+$(e.target).attr "rowindex"
+    rowsortstop = ui.item.index()
+    #console.log e.target.id
+    defaultind = localStorage.default
+    #console.log "b4 def : "+defaultind
+    #console.log (defaultind is rowsortstart+"")
+    #console.log (defaultind is rowsortstop+"")
+    if defaultind is rowsortstart+""
+      defaultind = rowsortstop
+     
+    else 
+      if defaultind is rowsortstop+""
+        
+        defaultind = rowsortstart
+    #console.log "After : "+defaultind    
+    oldobj = JSON.parse localStorage.addedLocations
+    tempobj = oldobj[rowsortstart]
+    oldobj[rowsortstart] = oldobj[rowsortstop]
+    oldobj[rowsortstop] = tempobj
+    localStorage.addedLocations = JSON.stringify oldobj
+    localStorage.default = defaultind
+    renderRows()
+    
+  sortstart : (e,ui) ->
+    #console.log "start : "+ui.item.index()  
+    rowsortstart = ui.item.index()
+    
+$("#wrapper #showevents .eventheader").live
+  click : (e) ->
+    #console.log "cloic"
+    prev = $("#wrapper #showevents #showeventbody").css "display"
+    #console.log prev
+    unless prev is "none"
+      #console.log prev+"--"
+      $("#wrapper #showevents #showeventbody").css "display","none"
+      
+      return
+    #console.log prev+" -- should be none"
+    unless "events" of localStorage
+      $("#wrapper #showevents #showeventbody").html "<h3>No events available, add them first by clicking on required dates</h3>"
+      $("#wrapper #showevents #showeventbody").css "display","block"
+      return
+    oldobj = JSON.parse localStorage.events
+    #console.log oldobj
+    data = ""
+    for key of oldobj
+      #console.log oldobj[key]
+      city = new Array()
+      country = new Array()
+      yeardetails = new Array()
+      t = new Array()
+      city = oldobj[key].city.split(",")
+      country  = oldobj[key].country.split(",")
+      t  = oldobj[key].time.split(",")
+      yeardetails  = oldobj[key].yeardetails.split(";")
+      tabl = "<table class='showevent_table'><thead><th>City</th><th>Country</th><th>Time</th></thead><tbody>"
+      for i of city
+        tabl+="<tr><td>"+city[i]+"</td><td>"+country[i]+"</td><td>"+yeardetails[i]+" "+t[i]+"</td></tr>"
+      tabl+="</tbody></table>"   
+      data+= "<h2># "+(parseInt(key)+1)+" "+oldobj[key].name+"<span class='deleteEvent' key='"+key+"'>X</span></h2>"+tabl+"<h3>Description : </h3> "+oldobj[key].desc+"<br><hr class='showevents_hr' />"
+    
+    
+    if data is ""
+      data="<h3>No events available, add them first by clicking on required dates</h3>"
+    $("#wrapper #showevents #showeventbody").html data        
+    $("#wrapper #showevents #showeventbody").css "display","block"
+    
+    
+    
+           
+$(".deleteEvent").live
+  click : (e) ->
+    
+    r = confirm "Do you really want to delete this event ? "
+    unless r is true
+      return 
+    rowindex = parseInt($(e.target).attr("key"))
+    
+    #console.log rowindex
+     
+    oldobj = JSON.parse localStorage.events
+    len = 0
+    for key of oldobj
+      len++
+    
+    unless rowindex is len-1
+      i=rowindex+1
+      while i<len
+        oldobj[i-1] = oldobj[i]
+        i++
+    delete oldobj[rowindex]  
+    localStorage.events = JSON.stringify oldobj 
+    $("#wrapper #showevents #showeventbody").css "display","none"
+    $("#wrapper #showevents .eventheader").trigger "click"
+    
     
 $("lKNHi span").live
   click : (e) ->
-    console.log "--------span------------------"
+    #console.log "--------span------------------"
     #sr_click e
   mouseover : ->
-    console.log "----------" 
+    #console.log "----------" 
 
 $("ulsss").live
   click : (e) ->
-    console.log "-------ul-------------"
+    #console.log "-------ul-------------"
     sr_click e
   mouseover : ->
-    console.log "--"   
+    #console.log "--"   
 
 sr_click = (e) ->
   k = $(e.target).attr "k"
@@ -375,15 +477,15 @@ renderRows = ->
     d = new Date()
     ad_utc = d.getTime() + (d.getTimezoneOffset()*60000)
     ad_offset = (d.getTime()-ad_utc)/3600000
-    console.log "Detected offset  : "+ad_offset+"--"+(ad_offset+"").length
+    #console.log "Detected offset  : "+ad_offset+"--"+(ad_offset+"").length
         
     formattedOffset = convertOffset ad_offset
-    console.log formattedOffset
+    #console.log formattedOffset
     pi = tzdata.indexOf formattedOffset
     #console.log window.ttt.indexOf("+05:30")
-    console.log tzdata.indexOf("+05:30")
-    console.log tzdata.length
-    console.log pi
+    #console.log tzdata.indexOf("+05:30")
+    #console.log tzdata.length
+    #console.log pi
     if pi == -1
       #do something if offset not found in our tz data
       
@@ -394,9 +496,9 @@ renderRows = ->
     prevline = 0 if prevline is -1
     presline = tzdata.indexOf "\n",pi
     req = tzdata.substr prevline+1,presline-prevline-1
-    console.log req
+    #console.log req
     reqArr = req.split ";"
-    console.log reqArr
+    #console.log reqArr
     newobj = {}
     
     newobj[0] = {}
@@ -413,9 +515,9 @@ renderRows = ->
     localStorage.default = "0"
     oldobj = JSON.parse localStorage.addedLocations
     
-    console.log "++++++++++"
+    #console.log "++++++++++"
   #now print old obj
-  console.log "pp"
+  #console.log "pp"
   
   updateUtc()
   
@@ -456,19 +558,19 @@ renderRows = ->
   row = ""
   for ind of oldobj
     floatOffset = parseFloat oldobj[ind].offset
-    console.log floatOffset+" : "+defaultoffset
-    console.log floatOffset-defaultoffset
+    #console.log floatOffset+" : "+defaultoffset
+    #console.log floatOffset-defaultoffset
     #floatOffset = convertOffsetToFloat offset
     timestr = getNewTime floatOffset
     timearr = timestr.split " "
     timearr[4] = timearr[4].substr(0,5)
-    console.log timearr
+    #console.log timearr
     diffoffset = floatOffset-defaultoffset    
     
     #now do hourline operation , and finally add it to "dates"
     diffoffsetstr = diffoffset+""
     hourstart = 1
-    console.log "diffoffsetstr : "+diffoffsetstr
+    #console.log "diffoffsetstr : "+diffoffsetstr
     if diffoffsetstr.indexOf("-") > -1
       diffoffsetstr = diffoffsetstr.substr(1)
       
@@ -478,17 +580,17 @@ renderRows = ->
       #if hourstart is -1
       #  hourstart = 23
       #  console.log "---------------------------------------------------" 
-      console.log "houstart  : "+hourstart
+      #console.log "houstart  : "+hourstart
     else
       #hourstart = parseInt diffoffsetstr
       hourstart = diffoffset
-      console.log "hourstart +  : "+hourstart
+      #console.log "hourstart +  : "+hourstart
     
 
       
     i=hourstart
-    console.log "__-------------------------------___________________"
-    console.log i
+    #console.log "__-------------------------------___________________"
+    #console.log i
 
 
     tempstr = " "
@@ -499,8 +601,8 @@ renderRows = ->
           tempstr="30"
         else
           tempstr=" "
-    console.log "selected date"
-    console.log selecteddate
+    #console.log "selected date"
+    #console.log selecteddate
     selectedDateStr = selecteddate.dayInText+" , "+selecteddate.mText+" "+selecteddate.d+" , "+selecteddate.year
     hourline = "<ul class='hourline_ul'>"
     idx = 0
@@ -556,7 +658,7 @@ renderRows = ->
     
     # third, loop upto hourstart-1
     
-    console.log "Before while : "+i
+    #console.log "Before while : "+i
     while i<parseInt(hourstart)
       if i<6
         cl="li_n"
@@ -570,9 +672,9 @@ renderRows = ->
         cl = "li_n"
       
       
-      console.log i
+      #console.log i
       hourline+=" <li class='"+cl+"' id='lihr_"+idx+"' idx='"+idx+"' t='"+i+"' details='"+nextDayStr+"' ><div class='span_hl' idx='"+idx+"'><span class='medium' idx='"+idx+"'>"+parseInt(i)+"</span><br><span class='small' idx='"+idx+"'>"+tempstr+"</span></div></li>"
-      if tempstr is ""
+      if tempstr is " "
         hourline = hourline.replace "<span class='medium' idx='"+idx+"'>","<span idx='"+idx+"' >"
       i++
       idx++
@@ -598,15 +700,15 @@ renderRows = ->
   left   = $("#content #row_"+defaultind).attr("time") 
   left = left.substr 0,left.indexOf(":")
   left = parseInt left
-  console.log "left : "+left
+  #console.log "left : "+left
   left = left*28
-  console.log left+" : "+height
+  #console.log left+" : "+height
   $("#selectedband").css "height",height
   $("#selectedband").css "left",left
   left = parseInt($("#selectedband").css("left"))
   $("#vband").css "left",(left-2)
   $("#vband").css "height",$("#selectedband").css("height")
-  
+  $("#content").sortable()
     
 convertOffsetToFloat = (str) ->
   first = str.substr(0,str.indexOf(":"))  
@@ -707,7 +809,7 @@ getMonth = (mon,options) ->
 setSelectedDate = (options) ->
 #  HERE IN OPTIONS, SEND MONTH IN ZERO INDEXED FORMAT  
   if options
-    console.log "in setsee..."
+    #console.log "in setsee..."
     selecteddate = options
     selecteddate.mText = getMonth selecteddate.m,{"type":"str"}
     dnew = new Date(selecteddate.m+"-"+selecteddate.d+"-"+selecteddate.year)

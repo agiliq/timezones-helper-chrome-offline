@@ -11,7 +11,7 @@
     <body>
         
         <div id="wrapper">
-                  <div id="container">  
+                  <div id="container" class='canhide'>  
                       <div id='toolbar'>
                         <div id='div_locations_input_box'>
                             <input type='text' id='search_input' placeholder='search city, country...' />
@@ -56,7 +56,16 @@
                                 <button id='saveevent'>Save</button>
                             </div>
                            
-                        </div>
+                        </div> <!- end of newevent -->
+                        
+                        <div id='showevents' class='canhide'>
+                           <h3 class='eventheader'>Events</h3>
+                           <div id='showeventbody'></div> 
+                        
+                        </div> <!-- end of showevents -->
+                        
+                        
+                        
         </div> <!-- end of div wrapper -->
     </body>
 </html>

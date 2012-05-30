@@ -1,5 +1,5 @@
 (function() {
-  var convertOffset, convertOffsetToFloat, convsdfsertOffset, getLocations, getMonth, getNewTime, k, locations, origcities, renderRows, selecteddate, setSelectedDate, sr_click, tzdata, tzdatalower, updateUtc, utc,
+  var convertOffset, convertOffsetToFloat, convsdfsertOffset, getLocations, getMonth, getNewTime, k, locations, origcities, renderRows, rowsortstart, rowsortstop, selecteddate, setSelectedDate, sr_click, tzdata, tzdatalower, updateUtc, utc,
     _this = this;
 
   origcities = "";
@@ -15,6 +15,10 @@
   utc = 0;
 
   selecteddate = {};
+
+  rowsortstart = "";
+
+  rowsortstop = "";
 
   $(document).ready(function() {
     var bombayoff, bt, d, datearr, dstr, localoffset, localtime, nd, ndarr, ndstr;
@@ -38,7 +42,7 @@
             origcities = cities.toLowerCase()
             #console.log "cities loaded successfully"
           error : (e) ->
-            console.log "Error loading cities"
+            #console.log "Error loading cities"
     */
     return $.ajax({
       url: "tz/tz.csv",
@@ -46,12 +50,9 @@
         window.ttt = tz;
         tzdata = tz;
         tzdatalower = tz.toLowerCase();
-        console.log("tzdata loaded successfully");
         return renderRows();
       },
-      error: function(e) {
-        return console.log("Error loading tz data");
-      }
+      error: function(e) {}
     });
   });
 
@@ -79,7 +80,6 @@
 
   $("ul.searchresult_ul").live({
     click: function(e) {
-      console.log("-------li---------");
       return sr_click(e);
     }
   });
@@ -107,27 +107,22 @@
   $("#vband").live({
     click: function(e) {
       var city, country, ele, idx, ind, t, tText, tabl, yeardetails, _i, _len, _ref;
-      console.log(e);
-      $("#container").css("opacity", "0.1");
+      $(".canhide").css("opacity", "0.1");
       idx = $(e.target).attr("idx");
       if (idx === void 0) return;
       t = new Array();
       city = new Array();
       country = new Array();
       yeardetails = new Array();
-      console.log("printing row");
       _ref = $(".row");
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         ele = _ref[_i];
-        console.log(ele.id);
         tText = convertOffset($("#" + ele.id + " #lihr_" + idx).attr("t"));
         t.push(tText.substr(1));
         city.push($("#" + ele.id + " .city").text());
         country.push($("#" + ele.id + " .country").text());
         yeardetails.push($("#" + ele.id + " #lihr_" + idx).attr("details"));
       }
-      console.log("prointed");
-      console.log(t + " : " + city + " : " + country);
       $("#newevent").show();
       $("#newevent_time").text("");
       $("#newevent_msg").text("");
@@ -166,6 +161,7 @@
       }
       oldobj[len] = {};
       oldobj[len].name = evname;
+      oldobj[len].desc = msg;
       oldobj[len].city = $("#newevent_time").attr("city");
       oldobj[len].country = $("#newevent_time").attr("country");
       oldobj[len].time = $("#newevent_time").attr("time");
@@ -178,7 +174,7 @@
   $("#event_close").live({
     click: function(e) {
       $("#newevent").hide();
-      return $("#container").css("opacity", "1");
+      return $(".canhide").css("opacity", "1");
     }
   });
 
@@ -216,7 +212,6 @@
       localStorage.addedLocations = JSON.stringify oldobj
       renderRows()
       */
-      console.log(rowindex);
       localStorage["default"] = rowindex;
       return renderRows();
     }
@@ -225,7 +220,6 @@
   $("#setdate_go").live({
     click: function(e) {
       var datestr, dd, errormsg, key, lenofdash, mm, options, year, _i, _len;
-      console.log("clicked");
       errormsg = "mm-dd-yyyy format only";
       datestr = $("#dateinput").val().trim();
       if (datestr.length !== 10) {
@@ -238,13 +232,11 @@
         key = datestr[_i];
         if (key === "-") lenofdash++;
       }
-      console.log(lenofdash);
       if (lenofdash !== 2) {
         $("#error_inputdate").html(errormsg);
         $("#error_inputdate").show();
         return;
       }
-      console.log(datestr.substr(0, 2));
       mm = parseFloat(datestr.substr(0, 2));
       mm = parseInt(mm);
       dd = parseInt(datestr.substr(3, 2));
@@ -254,17 +246,13 @@
         $("#error_inputdate").show();
         return;
       }
-      console.log("---");
       year = parseInt(datestr.substr(6, 4));
-      console.log(mm + " : " + dd + " : " + year);
-      console.log(mm > 12 || mm < 1 || dd < 0 || dd > 31);
       if (mm > 12 || mm < 1 || dd < 0 || dd > 31) {
         $("#error_inputdate").html(errormsg);
         $("#error_inputdate").show();
         return;
       }
       $("#error_inputdate").hide();
-      console.log("----");
       /*
           selecteddate.m = mm-1
           selecteddate.d = dd
@@ -274,8 +262,7 @@
       options.m = mm - 1;
       options.d = dd;
       options.year = year;
-      setSelectedDate(options);
-      return alert("success");
+      return setSelectedDate(options);
     }
   });
 
@@ -288,23 +275,103 @@
     }
   });
 
-  $("lKNHi span").live({
-    click: function(e) {
-      return console.log("--------span------------------");
+  $("#content").live({
+    sortstop: function(e, ui) {
+      var defaultind, oldobj, tempobj;
+      rowsortstop = ui.item.index();
+      defaultind = localStorage["default"];
+      if (defaultind === rowsortstart + "") {
+        defaultind = rowsortstop;
+      } else {
+        if (defaultind === rowsortstop + "") defaultind = rowsortstart;
+      }
+      oldobj = JSON.parse(localStorage.addedLocations);
+      tempobj = oldobj[rowsortstart];
+      oldobj[rowsortstart] = oldobj[rowsortstop];
+      oldobj[rowsortstop] = tempobj;
+      localStorage.addedLocations = JSON.stringify(oldobj);
+      localStorage["default"] = defaultind;
+      return renderRows();
     },
-    mouseover: function() {
-      return console.log("----------");
+    sortstart: function(e, ui) {
+      return rowsortstart = ui.item.index();
     }
+  });
+
+  $("#wrapper #showevents .eventheader").live({
+    click: function(e) {
+      var city, country, data, i, key, oldobj, prev, t, tabl, yeardetails;
+      prev = $("#wrapper #showevents #showeventbody").css("display");
+      if (prev !== "none") {
+        $("#wrapper #showevents #showeventbody").css("display", "none");
+        return;
+      }
+      if (!("events" in localStorage)) {
+        $("#wrapper #showevents #showeventbody").html("<h3>No events available, add them first by clicking on required dates</h3>");
+        $("#wrapper #showevents #showeventbody").css("display", "block");
+        return;
+      }
+      oldobj = JSON.parse(localStorage.events);
+      data = "";
+      for (key in oldobj) {
+        city = new Array();
+        country = new Array();
+        yeardetails = new Array();
+        t = new Array();
+        city = oldobj[key].city.split(",");
+        country = oldobj[key].country.split(",");
+        t = oldobj[key].time.split(",");
+        yeardetails = oldobj[key].yeardetails.split(";");
+        tabl = "<table class='showevent_table'><thead><th>City</th><th>Country</th><th>Time</th></thead><tbody>";
+        for (i in city) {
+          tabl += "<tr><td>" + city[i] + "</td><td>" + country[i] + "</td><td>" + yeardetails[i] + " " + t[i] + "</td></tr>";
+        }
+        tabl += "</tbody></table>";
+        data += "<h2># " + (parseInt(key) + 1) + " " + oldobj[key].name + "<span class='deleteEvent' key='" + key + "'>X</span></h2>" + tabl + "<h3>Description : </h3> " + oldobj[key].desc + "<br><hr class='showevents_hr' />";
+      }
+      if (data === "") {
+        data = "<h3>No events available, add them first by clicking on required dates</h3>";
+      }
+      $("#wrapper #showevents #showeventbody").html(data);
+      return $("#wrapper #showevents #showeventbody").css("display", "block");
+    }
+  });
+
+  $(".deleteEvent").live({
+    click: function(e) {
+      var i, key, len, oldobj, r, rowindex;
+      r = confirm("Do you really want to delete this event ? ");
+      if (r !== true) return;
+      rowindex = parseInt($(e.target).attr("key"));
+      oldobj = JSON.parse(localStorage.events);
+      len = 0;
+      for (key in oldobj) {
+        len++;
+      }
+      if (rowindex !== len - 1) {
+        i = rowindex + 1;
+        while (i < len) {
+          oldobj[i - 1] = oldobj[i];
+          i++;
+        }
+      }
+      delete oldobj[rowindex];
+      localStorage.events = JSON.stringify(oldobj);
+      $("#wrapper #showevents #showeventbody").css("display", "none");
+      return $("#wrapper #showevents .eventheader").trigger("click");
+    }
+  });
+
+  $("lKNHi span").live({
+    click: function(e) {},
+    mouseover: function() {}
   });
 
   $("ulsss").live({
     click: function(e) {
-      console.log("-------ul-------------");
       return sr_click(e);
     },
-    mouseover: function() {
-      return console.log("--");
-    }
+    mouseover: function() {}
   });
 
   sr_click = function(e) {
@@ -384,22 +451,15 @@
       d = new Date();
       ad_utc = d.getTime() + (d.getTimezoneOffset() * 60000);
       ad_offset = (d.getTime() - ad_utc) / 3600000;
-      console.log("Detected offset  : " + ad_offset + "--" + (ad_offset + "").length);
       formattedOffset = convertOffset(ad_offset);
-      console.log(formattedOffset);
       pi = tzdata.indexOf(formattedOffset);
-      console.log(tzdata.indexOf("+05:30"));
-      console.log(tzdata.length);
-      console.log(pi);
       if (pi === -1) return;
       subTillPi = tzdata.substr(0, pi);
       prevline = subTillPi.lastIndexOf("\n");
       if (prevline === -1) prevline = 0;
       presline = tzdata.indexOf("\n", pi);
       req = tzdata.substr(prevline + 1, presline - prevline - 1);
-      console.log(req);
       reqArr = req.split(";");
-      console.log(reqArr);
       newobj = {};
       newobj[0] = {};
       newobj[0].city = reqArr[0];
@@ -414,9 +474,7 @@
       localStorage.addedLocations = JSON.stringify(newobj);
       localStorage["default"] = "0";
       oldobj = JSON.parse(localStorage.addedLocations);
-      console.log("++++++++++");
     }
-    console.log("pp");
     updateUtc();
     /*
       floatOffset = oldobj[0].offset
@@ -453,27 +511,19 @@
     row = "";
     for (ind in oldobj) {
       floatOffset = parseFloat(oldobj[ind].offset);
-      console.log(floatOffset + " : " + defaultoffset);
-      console.log(floatOffset - defaultoffset);
       timestr = getNewTime(floatOffset);
       timearr = timestr.split(" ");
       timearr[4] = timearr[4].substr(0, 5);
-      console.log(timearr);
       diffoffset = floatOffset - defaultoffset;
       diffoffsetstr = diffoffset + "";
       hourstart = 1;
-      console.log("diffoffsetstr : " + diffoffsetstr);
       if (diffoffsetstr.indexOf("-") > -1) {
         diffoffsetstr = diffoffsetstr.substr(1);
         hourstart = 24 + diffoffset;
-        console.log("houstart  : " + hourstart);
       } else {
         hourstart = diffoffset;
-        console.log("hourstart +  : " + hourstart);
       }
       i = hourstart;
-      console.log("__-------------------------------___________________");
-      console.log(i);
       tempstr = " ";
       if ((i + "").indexOf(".") > -1) {
         tempstr = (i + "").substr((i + "").indexOf(".") + 1);
@@ -484,8 +534,6 @@
           tempstr = " ";
         }
       }
-      console.log("selected date");
-      console.log(selecteddate);
       selectedDateStr = selecteddate.dayInText + " , " + selecteddate.mText + " " + selecteddate.d + " , " + selecteddate.year;
       hourline = "<ul class='hourline_ul'>";
       idx = 0;
@@ -534,7 +582,6 @@
         i = 1;
         idx++;
       }
-      console.log("Before while : " + i);
       while (i < parseInt(hourstart)) {
         if (i < 6) {
           cl = "li_n";
@@ -547,9 +594,8 @@
         } else {
           cl = "li_n";
         }
-        console.log(i);
         hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='" + i + "' details='" + nextDayStr + "' ><div class='span_hl' idx='" + idx + "'><span class='medium' idx='" + idx + "'>" + parseInt(i) + "</span><br><span class='small' idx='" + idx + "'>" + tempstr + "</span></div></li>";
-        if (tempstr === "") {
+        if (tempstr === " ") {
           hourline = hourline.replace("<span class='medium' idx='" + idx + "'>", "<span idx='" + idx + "' >");
         }
         i++;
@@ -570,14 +616,13 @@
     left = $("#content #row_" + defaultind).attr("time");
     left = left.substr(0, left.indexOf(":"));
     left = parseInt(left);
-    console.log("left : " + left);
     left = left * 28;
-    console.log(left + " : " + height);
     $("#selectedband").css("height", height);
     $("#selectedband").css("left", left);
     left = parseInt($("#selectedband").css("left"));
     $("#vband").css("left", left - 2);
-    return $("#vband").css("height", $("#selectedband").css("height"));
+    $("#vband").css("height", $("#selectedband").css("height"));
+    return $("#content").sortable();
   };
 
   convertOffsetToFloat = function(str) {
@@ -687,7 +732,6 @@
   setSelectedDate = function(options) {
     var d, dnew, dnewarr;
     if (options) {
-      console.log("in setsee...");
       selecteddate = options;
       selecteddate.mText = getMonth(selecteddate.m, {
         "type": "str"
