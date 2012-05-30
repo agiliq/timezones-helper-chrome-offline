@@ -1,13 +1,14 @@
 {
-  "name": "Time Zone Convertor",
+  "name": "time zone convertor",
   "version": "1.0",
-  "manifest_version": 2,
+  "manifest_version": 1,
   "description": "Time zone convertor ",
   "app" : {
     "launch" : {
       "local_path" : "index.html"
     }
   },
+  
   "icons" : {"16" : "clock.png","48" : "clock.png","128" : "clock.png"},
   "permissions": ["tz/tz.csv","tz/cities.csv"]
 }

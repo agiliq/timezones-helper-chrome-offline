@@ -5,6 +5,8 @@ tzdatalower = ""
 k=0
 locations=""
 utc = 0
+selecteddate = {}
+#first set selecteddate to current date, later user can change
 
 $(document).ready ->
   #console.log "ready"
@@ -29,7 +31,9 @@ $(document).ready ->
   #ndarr = new Array()
   ndarr = ndstr.split(" ")
   #console.log ndarr[4].substr(0,5)
+  setSelectedDate()
   
+  ###
   $.ajax
       url : "tz/cities.csv"
       success : (cities) ->
@@ -37,6 +41,8 @@ $(document).ready ->
         #console.log "cities loaded successfully"
       error : (e) ->
         console.log "Error loading cities"    
+  ###
+  
     
   $.ajax
     url : "tz/tz.csv"
@@ -82,14 +88,16 @@ $("ul.searchresult_ul").live
     
 $("#content .row .dates ul li").live
   mouseenter : (e) ->
+    
     #console.log e
     $(".row .dates li").first().css "position","relative"
     #console.log $(e.target).attr("idx")    
     idx = $(e.target).attr("idx")
+    $("#vband").attr "idx",idx
     $("#vband").css "height",parseInt($("#content .row").length)*72-41
     left = parseInt(idx)*28 
     $("#vband").css "left",left-2
-    console.log left+" : "+idx
+    #console.log left+" : "+idx
     #console.log $("#vband")
 
 $("#content .row .dates").live  
@@ -97,6 +105,82 @@ $("#content .row .dates").live
     left = parseInt($("#selectedband").css("left"))
     $("#vband").css "left",(left-2) 
     
+$("#vband").live
+  click : (e) ->
+    console.log e    
+    
+    $("#container").css "opacity","0.1"
+    idx = $(e.target).attr "idx"
+    if idx is undefined
+      return
+    t = new Array()
+    city = new Array()
+    country = new Array() 
+    yeardetails = new Array()
+    console.log "printing row"
+    for ele in $(".row")
+      console.log ele.id
+      #tinFloat = $("#"+ele.id+" #lihr_"+idx).attr("t")
+      tText = convertOffset $("#"+ele.id+" #lihr_"+idx).attr("t")
+      t.push tText.substr(1)
+      city.push $("#"+ele.id+" .city").text()
+      country.push $("#"+ele.id+" .country").text()
+      yeardetails.push $("#"+ele.id+" #lihr_"+idx).attr("details")
+      
+      
+    console.log "prointed"  
+    console.log t+" : "+city+" : "+country
+    $("#newevent").show()
+    $("#newevent_time").text ""
+    $("#newevent_msg").text ""
+    $("#event_name").text ""
+    tabl = "<table id='newevent_table' ><thead><th>city</th><th>country</th><th>Time</th></thead>"
+    
+    for ind of t
+      
+      #$("#newevent_time").append "\n"+city[ind]+" : "+country[ind]+" : "+t[ind]
+      tabl+="<tr><td>"+city[ind]+"</td><td>"+country[ind]+"</td><td>"+yeardetails[ind]+" , "+t[ind]+"</td></tr>"
+    tabl+="</table>"
+    $("#newevent_time").html tabl
+    $("#newevent_time").attr "city",city
+    $("#newevent_time").attr "country",country
+    $("#newevent_time").attr "time",t
+    $("#newevent_time").attr "yeardetails",yeardetails.join(";")
+    #t = $("#content #row_ #lihr_"+idx).attr "t"
+    #console.log t+" : "+idx 
+
+
+$("#wrapper button#saveevent").live
+  click : (e) ->
+    msg= $("#wrapper #newevent #newevent_msg").val().trim()
+    evname =  $("#wrapper #newevent #event_name").val().trim()
+    if msg.length<1
+      alert "Please enter some message"
+      return  
+    if evname.length<1
+      alert "please enter event name"
+      return  
+      
+    oldobj = {}  
+    if "events" of localStorage
+      oldobj = JSON.parse localStorage.events
+    len=0  
+    for key of oldobj
+      len++  
+    oldobj[len] = {}  
+    oldobj[len].name = evname;
+    oldobj[len].city = $("#newevent_time").attr "city"
+    oldobj[len].country = $("#newevent_time").attr "country"
+    oldobj[len].time = $("#newevent_time").attr "time"
+    oldobj[len].yeardetails = $("#newevent_time").attr "yeardetails"
+    localStorage.events = JSON.stringify oldobj
+    $("#event_close").trigger 'click'
+
+
+$("#event_close").live
+  click : (e) ->
+    $("#newevent").hide() 
+    $("#container").css "opacity","1"   
     
     
 $("#content .row .icons_homedelete .icon_delete").live
@@ -133,8 +217,45 @@ $("#content .row .icons_homedelete .icon_home").live
     localStorage.default = rowindex
     renderRows()
     
+$("#setdate_go").live
+  click : (e) ->
+    console.log "clicked"
+    datestr = $("#dateinput").val().trim()
+    unless datestr.length is 10
+      return
+    lenofdash = 0  
     
-    
+    for key in datestr
+      lenofdash++ if key is "-"  
+    console.log lenofdash  
+    unless lenofdash is 2
+      return  
+    console.log (datestr.substr(0,2))
+    mm = parseFloat datestr.substr(0,2)
+    mm = parseInt mm
+    dd = parseInt datestr.substr(3,2)  
+    year =  datestr.substr(6,4)
+    unless year.length is 4
+      return
+    console.log "---"  
+    year = parseInt datestr.substr(6,4)
+    console.log mm+" : "+dd+" : "+year
+    console.log (mm >12 or mm<1 or dd<0 or dd>31)  
+    if (mm >12 or mm<1 or dd<0 or dd>31)
+      return
+    console.log "----"  
+    ###
+    selecteddate.m = mm-1
+    selecteddate.d = dd
+    selecteddate.year = year  
+    ###
+    options = {}
+    options.m = mm-1
+    options.d = dd
+    options.year = year
+    setSelectedDate options
+    alert "success"    
+      
     
 $("lKNHi span").live
   click : (e) ->
@@ -353,23 +474,24 @@ renderRows = ->
     console.log i
 
 
-    tempstr = ""
+    tempstr = " "
     if (i+"").indexOf(".") > -1
         tempstr = (i+"").substr((i+"").indexOf(".")+1)
         tempstr = parseFloat tempstr
         if tempstr >= 0.5
           tempstr="30"
         else
-          tempstr=""
-    
-    
+          tempstr=" "
+    console.log "selected date"
+    console.log selecteddate
+    selectedDateStr = selecteddate.dayInText+" , "+selecteddate.mText+" "+selecteddate.d+" , "+selecteddate.year
     hourline = "<ul class='hourline_ul'>"
     idx = 0
     if i is 0
       i = 1
       
       cl = "li_24"
-      hourline+=" <li class='"+cl+"' id='lihr_0' idx='"+idx+"' t='0' ><div class='span_hl' idx='"+idx+"'><span idx='"+idx+"' class='small' >"+timearr[1]+"</span><br><span idx='"+idx+"' class='small' >"+timearr[2]+"</span></div></li>"
+      hourline+=" <li class='"+cl+"' id='lihr_"+idx+"' idx='"+idx+"' t='0' details='"+selectedDateStr+"' ><div class='span_hl' idx='"+idx+"'><span idx='"+idx+"' class='small' >"+selecteddate.mText+"</span><br><span idx='"+idx+"' class='small' >"+selecteddate.d+"</span></div></li>"
       idx++
     #first loop, till 24-1
     
@@ -387,9 +509,9 @@ renderRows = ->
        
         
         
-      hourline+=" <li class='"+cl+"' id='lihr_"+i+"' idx='"+idx+"' t='"+i+"' ><div class='span_hl' idx='"+idx+"'><span class='medium' idx='"+idx+"'>"+parseInt(i)+"</span><br><span class='small' idx='"+idx+"'>"+tempstr+"</span></div></li>"  
+      hourline+=" <li class='"+cl+"' id='lihr_"+idx+"' idx='"+idx+"' t='"+i+"' details='"+selectedDateStr+"'><div class='span_hl' idx='"+idx+"'><span class='medium' idx='"+idx+"'>"+parseInt(i)+"</span><br><span class='small' idx='"+idx+"'>"+tempstr+"</span></div></li>"  
       
-      if tempstr is ""
+      if tempstr is " "
         hourline = hourline.replace "<span class='medium' idx='"+idx+"'>","<span idx='"+idx+"' >"
       idx++
       i++
@@ -399,20 +521,25 @@ renderRows = ->
     unless hourstart is 0
       monInNum = getMonth timearr[1],{"type":"num"}
       d = new Date()
-      d.setFullYear timearr[3],monInNum,timearr[2]
+      #d.setFullYear timearr[3],monInNum,timearr[2]
+      d.setFullYear selecteddate.year,selecteddate.m,selecteddate.d
       d.setTime d.getTime()+86400000
       d = d.toLocaleString()
       nextdayarr = d.split " "
-      
+      nextDayStr = nextdayarr[0]+" , "+nextdayarr[1]+" "+nextdayarr[2]+" , "+nextdayarr[3]
       
       cl = "li_24"
-      hourline+=" <li class='"+cl+"' id='lihr_0' idx='"+idx+"' t='0'><div class='span_hl' idx='"+idx+"'><span idx='"+idx+"'  class='small'> "+nextdayarr[1]+"</span><br><span idx='"+idx+"' class='small' >"+nextdayarr[2]+"</span></div></li>"
-      i=1
+      hourline+=" <li class='"+cl+"' id='lihr_"+idx+"' idx='"+idx+"' t='0' details='"+nextDayStr+"' ><div class='span_hl' idx='"+idx+"'><span idx='"+idx+"'  class='small'> "+nextdayarr[1]+"</span><br><span idx='"+idx+"' class='small' >"+nextdayarr[2]+"</span></div></li>"
+      if timestr is " "
+        i=1
+      else 
+        i=1.5  
+      i=1  
       idx++
     
     # third, loop upto hourstart-1
     
-    
+    console.log "Before while : "+i
     while i<parseInt(hourstart)
       if i<6
         cl="li_n"
@@ -426,8 +553,8 @@ renderRows = ->
         cl = "li_n"
       
       
-      
-      hourline+=" <li class='"+cl+"' id='lihr_"+i+"' idx='"+idx+"' t='"+i+"'><div class='span_hl' idx='"+idx+"'><span class='medium' idx='"+idx+"'>"+parseInt(i)+"</span><br><span class='small' idx='"+idx+"'>"+tempstr+"</span></div></li>"
+      console.log i
+      hourline+=" <li class='"+cl+"' id='lihr_"+idx+"' idx='"+idx+"' t='"+i+"' details='"+nextDayStr+"' ><div class='span_hl' idx='"+idx+"'><span class='medium' idx='"+idx+"'>"+parseInt(i)+"</span><br><span class='small' idx='"+idx+"'>"+tempstr+"</span></div></li>"
       if tempstr is ""
         hourline = hourline.replace "<span class='medium' idx='"+idx+"'>","<span idx='"+idx+"' >"
       i++
@@ -541,18 +668,18 @@ convsdfsertOffset = (offset) ->
 
 getMonth = (mon,options) -> 
   month = new Array()
-  month[0]="January"
-  month[1]="February"
-  month[2]="March"
-  month[3]="April"
+  month[0]="Jan"
+  month[1]="Feb"
+  month[2]="Mar"
+  month[3]="Apr"
   month[4]="May"
-  month[5]="June"
-  month[6]="July"
-  month[7]="August"
-  month[8]="September"
-  month[9]="October"
-  month[10]="November"
-  month[11]="December"
+  month[5]="Jun"
+  month[6]="Jul"
+  month[7]="Aug"
+  month[8]="Sep"
+  month[9]="Oct"
+  month[10]="Nov"
+  month[11]="Dec"
   if options.type is "num"
     for m of month
       if month[m] is mon
@@ -560,10 +687,30 @@ getMonth = (mon,options) ->
   else if options.type is "str"
     return month[mon]
     
-  
-  
-  
-  
+setSelectedDate = (options) ->
+#  HERE IN OPTIONS, SEND MONTH IN ZERO INDEXED FORMAT  
+  if options
+    console.log "in setsee..."
+    selecteddate = options
+    selecteddate.mText = getMonth selecteddate.m,{"type":"str"}
+    dnew = new Date(selecteddate.m+"-"+selecteddate.d+"-"+selecteddate.year)
+    dnew = dnew.toLocaleString()
+    dnewarr = dnew.split " "
+    selecteddate.dayInText = dnewarr[0]
+    
+    
+  else 
+    d = new Date()
+    selecteddate.m = d.getMonth()
+    selecteddate.d = d.getDate()
+    selecteddate.year = d.getYear()+1900
+    selecteddate.mText = getMonth selecteddate.m,{"type":"str"} 
+    dnew = new Date((parseInt(selecteddate.m+1))+"-"+selecteddate.d+"-"+selecteddate.year)
+    dnew = dnew.toLocaleString()
+    dnewarr = dnew.split " "
+    selecteddate.dayInText = dnewarr[0] 
+  renderRows()  
+      
 updateUtc = ->
   d = new Date()
   dstr=d.toLocaleString()

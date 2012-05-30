@@ -1,5 +1,5 @@
 (function() {
-  var convertOffset, convertOffsetToFloat, convsdfsertOffset, getLocations, getMonth, getNewTime, k, locations, origcities, renderRows, sr_click, tzdata, tzdatalower, updateUtc, utc,
+  var convertOffset, convertOffsetToFloat, convsdfsertOffset, getLocations, getMonth, getNewTime, k, locations, origcities, renderRows, selecteddate, setSelectedDate, sr_click, tzdata, tzdatalower, updateUtc, utc,
     _this = this;
 
   origcities = "";
@@ -13,6 +13,8 @@
   locations = "";
 
   utc = 0;
+
+  selecteddate = {};
 
   $(document).ready(function() {
     var bombayoff, bt, d, datearr, dstr, localoffset, localtime, nd, ndarr, ndstr;
@@ -28,15 +30,16 @@
     nd = new Date(bt);
     ndstr = nd.toLocaleString();
     ndarr = ndstr.split(" ");
-    $.ajax({
-      url: "tz/cities.csv",
-      success: function(cities) {
-        return origcities = cities.toLowerCase();
-      },
-      error: function(e) {
-        return console.log("Error loading cities");
-      }
-    });
+    setSelectedDate();
+    /*
+      $.ajax
+          url : "tz/cities.csv"
+          success : (cities) ->
+            origcities = cities.toLowerCase()
+            #console.log "cities loaded successfully"
+          error : (e) ->
+            console.log "Error loading cities"
+    */
     return $.ajax({
       url: "tz/tz.csv",
       success: function(tz) {
@@ -86,10 +89,10 @@
       var idx, left;
       $(".row .dates li").first().css("position", "relative");
       idx = $(e.target).attr("idx");
+      $("#vband").attr("idx", idx);
       $("#vband").css("height", parseInt($("#content .row").length) * 72 - 41);
       left = parseInt(idx) * 28;
-      $("#vband").css("left", left - 2);
-      return console.log(left + " : " + idx);
+      return $("#vband").css("left", left - 2);
     }
   });
 
@@ -98,6 +101,84 @@
       var left;
       left = parseInt($("#selectedband").css("left"));
       return $("#vband").css("left", left - 2);
+    }
+  });
+
+  $("#vband").live({
+    click: function(e) {
+      var city, country, ele, idx, ind, t, tText, tabl, yeardetails, _i, _len, _ref;
+      console.log(e);
+      $("#container").css("opacity", "0.1");
+      idx = $(e.target).attr("idx");
+      if (idx === void 0) return;
+      t = new Array();
+      city = new Array();
+      country = new Array();
+      yeardetails = new Array();
+      console.log("printing row");
+      _ref = $(".row");
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        ele = _ref[_i];
+        console.log(ele.id);
+        tText = convertOffset($("#" + ele.id + " #lihr_" + idx).attr("t"));
+        t.push(tText.substr(1));
+        city.push($("#" + ele.id + " .city").text());
+        country.push($("#" + ele.id + " .country").text());
+        yeardetails.push($("#" + ele.id + " #lihr_" + idx).attr("details"));
+      }
+      console.log("prointed");
+      console.log(t + " : " + city + " : " + country);
+      $("#newevent").show();
+      $("#newevent_time").text("");
+      $("#newevent_msg").text("");
+      $("#event_name").text("");
+      tabl = "<table id='newevent_table' ><thead><th>city</th><th>country</th><th>Time</th></thead>";
+      for (ind in t) {
+        tabl += "<tr><td>" + city[ind] + "</td><td>" + country[ind] + "</td><td>" + yeardetails[ind] + " , " + t[ind] + "</td></tr>";
+      }
+      tabl += "</table>";
+      $("#newevent_time").html(tabl);
+      $("#newevent_time").attr("city", city);
+      $("#newevent_time").attr("country", country);
+      $("#newevent_time").attr("time", t);
+      return $("#newevent_time").attr("yeardetails", yeardetails.join(";"));
+    }
+  });
+
+  $("#wrapper button#saveevent").live({
+    click: function(e) {
+      var evname, key, len, msg, oldobj;
+      msg = $("#wrapper #newevent #newevent_msg").val().trim();
+      evname = $("#wrapper #newevent #event_name").val().trim();
+      if (msg.length < 1) {
+        alert("Please enter some message");
+        return;
+      }
+      if (evname.length < 1) {
+        alert("please enter event name");
+        return;
+      }
+      oldobj = {};
+      if ("events" in localStorage) oldobj = JSON.parse(localStorage.events);
+      len = 0;
+      for (key in oldobj) {
+        len++;
+      }
+      oldobj[len] = {};
+      oldobj[len].name = evname;
+      oldobj[len].city = $("#newevent_time").attr("city");
+      oldobj[len].country = $("#newevent_time").attr("country");
+      oldobj[len].time = $("#newevent_time").attr("time");
+      oldobj[len].yeardetails = $("#newevent_time").attr("yeardetails");
+      localStorage.events = JSON.stringify(oldobj);
+      return $("#event_close").trigger('click');
+    }
+  });
+
+  $("#event_close").live({
+    click: function(e) {
+      $("#newevent").hide();
+      return $("#container").css("opacity", "1");
     }
   });
 
@@ -138,6 +219,45 @@
       console.log(rowindex);
       localStorage["default"] = rowindex;
       return renderRows();
+    }
+  });
+
+  $("#setdate_go").live({
+    click: function(e) {
+      var datestr, dd, key, lenofdash, mm, options, year, _i, _len;
+      console.log("clicked");
+      datestr = $("#dateinput").val().trim();
+      if (datestr.length !== 10) return;
+      lenofdash = 0;
+      for (_i = 0, _len = datestr.length; _i < _len; _i++) {
+        key = datestr[_i];
+        if (key === "-") lenofdash++;
+      }
+      console.log(lenofdash);
+      if (lenofdash !== 2) return;
+      console.log(datestr.substr(0, 2));
+      mm = parseFloat(datestr.substr(0, 2));
+      mm = parseInt(mm);
+      dd = parseInt(datestr.substr(3, 2));
+      year = datestr.substr(6, 4);
+      if (year.length !== 4) return;
+      console.log("---");
+      year = parseInt(datestr.substr(6, 4));
+      console.log(mm + " : " + dd + " : " + year);
+      console.log(mm > 12 || mm < 1 || dd < 0 || dd > 31);
+      if (mm > 12 || mm < 1 || dd < 0 || dd > 31) return;
+      console.log("----");
+      /*
+          selecteddate.m = mm-1
+          selecteddate.d = dd
+          selecteddate.year = year
+      */
+      options = {};
+      options.m = mm - 1;
+      options.d = dd;
+      options.year = year;
+      setSelectedDate(options);
+      return alert("success");
     }
   });
 
@@ -229,7 +349,7 @@
   };
 
   renderRows = function() {
-    var ad_offset, ad_utc, cl, d, defaultind, defaultobj, defaultoffset, diffoffset, diffoffsetstr, floatOffset, formattedOffset, height, hourline, hourstart, i, icons_homedelete, idx, ind, left, monInNum, newobj, nextdayarr, oldobj, pi, presline, prevline, req, reqArr, row, subTillPi, tempstr, timearr, timestr;
+    var ad_offset, ad_utc, cl, d, defaultind, defaultobj, defaultoffset, diffoffset, diffoffsetstr, floatOffset, formattedOffset, height, hourline, hourstart, i, icons_homedelete, idx, ind, left, monInNum, newobj, nextDayStr, nextdayarr, oldobj, pi, presline, prevline, req, reqArr, row, selectedDateStr, subTillPi, tempstr, timearr, timestr;
     oldobj = {};
     if ("addedLocations" in localStorage && "default" in localStorage) {
       oldobj = JSON.parse(localStorage.addedLocations);
@@ -327,22 +447,25 @@
       i = hourstart;
       console.log("__-------------------------------___________________");
       console.log(i);
-      tempstr = "";
+      tempstr = " ";
       if ((i + "").indexOf(".") > -1) {
         tempstr = (i + "").substr((i + "").indexOf(".") + 1);
         tempstr = parseFloat(tempstr);
         if (tempstr >= 0.5) {
           tempstr = "30";
         } else {
-          tempstr = "";
+          tempstr = " ";
         }
       }
+      console.log("selected date");
+      console.log(selecteddate);
+      selectedDateStr = selecteddate.dayInText + " , " + selecteddate.mText + " " + selecteddate.d + " , " + selecteddate.year;
       hourline = "<ul class='hourline_ul'>";
       idx = 0;
       if (i === 0) {
         i = 1;
         cl = "li_24";
-        hourline += " <li class='" + cl + "' id='lihr_0' idx='" + idx + "' t='0' ><div class='span_hl' idx='" + idx + "'><span idx='" + idx + "' class='small' >" + timearr[1] + "</span><br><span idx='" + idx + "' class='small' >" + timearr[2] + "</span></div></li>";
+        hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='0' details='" + selectedDateStr + "' ><div class='span_hl' idx='" + idx + "'><span idx='" + idx + "' class='small' >" + selecteddate.mText + "</span><br><span idx='" + idx + "' class='small' >" + selecteddate.d + "</span></div></li>";
         idx++;
       }
       while (i < 24) {
@@ -357,8 +480,8 @@
         } else {
           cl = "li_n";
         }
-        hourline += " <li class='" + cl + "' id='lihr_" + i + "' idx='" + idx + "' t='" + i + "' ><div class='span_hl' idx='" + idx + "'><span class='medium' idx='" + idx + "'>" + parseInt(i) + "</span><br><span class='small' idx='" + idx + "'>" + tempstr + "</span></div></li>";
-        if (tempstr === "") {
+        hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='" + i + "' details='" + selectedDateStr + "'><div class='span_hl' idx='" + idx + "'><span class='medium' idx='" + idx + "'>" + parseInt(i) + "</span><br><span class='small' idx='" + idx + "'>" + tempstr + "</span></div></li>";
+        if (tempstr === " ") {
           hourline = hourline.replace("<span class='medium' idx='" + idx + "'>", "<span idx='" + idx + "' >");
         }
         idx++;
@@ -369,15 +492,22 @@
           "type": "num"
         });
         d = new Date();
-        d.setFullYear(timearr[3], monInNum, timearr[2]);
+        d.setFullYear(selecteddate.year, selecteddate.m, selecteddate.d);
         d.setTime(d.getTime() + 86400000);
         d = d.toLocaleString();
         nextdayarr = d.split(" ");
+        nextDayStr = nextdayarr[0] + " , " + nextdayarr[1] + " " + nextdayarr[2] + " , " + nextdayarr[3];
         cl = "li_24";
-        hourline += " <li class='" + cl + "' id='lihr_0' idx='" + idx + "' t='0'><div class='span_hl' idx='" + idx + "'><span idx='" + idx + "'  class='small'> " + nextdayarr[1] + "</span><br><span idx='" + idx + "' class='small' >" + nextdayarr[2] + "</span></div></li>";
+        hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='0' details='" + nextDayStr + "' ><div class='span_hl' idx='" + idx + "'><span idx='" + idx + "'  class='small'> " + nextdayarr[1] + "</span><br><span idx='" + idx + "' class='small' >" + nextdayarr[2] + "</span></div></li>";
+        if (timestr === " ") {
+          i = 1;
+        } else {
+          i = 1.5;
+        }
         i = 1;
         idx++;
       }
+      console.log("Before while : " + i);
       while (i < parseInt(hourstart)) {
         if (i < 6) {
           cl = "li_n";
@@ -390,7 +520,8 @@
         } else {
           cl = "li_n";
         }
-        hourline += " <li class='" + cl + "' id='lihr_" + i + "' idx='" + idx + "' t='" + i + "'><div class='span_hl' idx='" + idx + "'><span class='medium' idx='" + idx + "'>" + parseInt(i) + "</span><br><span class='small' idx='" + idx + "'>" + tempstr + "</span></div></li>";
+        console.log(i);
+        hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='" + i + "' details='" + nextDayStr + "' ><div class='span_hl' idx='" + idx + "'><span class='medium' idx='" + idx + "'>" + parseInt(i) + "</span><br><span class='small' idx='" + idx + "'>" + tempstr + "</span></div></li>";
         if (tempstr === "") {
           hourline = hourline.replace("<span class='medium' idx='" + idx + "'>", "<span idx='" + idx + "' >");
         }
@@ -505,18 +636,18 @@
   getMonth = function(mon, options) {
     var m, month;
     month = new Array();
-    month[0] = "January";
-    month[1] = "February";
-    month[2] = "March";
-    month[3] = "April";
+    month[0] = "Jan";
+    month[1] = "Feb";
+    month[2] = "Mar";
+    month[3] = "Apr";
     month[4] = "May";
-    month[5] = "June";
-    month[6] = "July";
-    month[7] = "August";
-    month[8] = "September";
-    month[9] = "October";
-    month[10] = "November";
-    month[11] = "December";
+    month[5] = "Jun";
+    month[6] = "Jul";
+    month[7] = "Aug";
+    month[8] = "Sep";
+    month[9] = "Oct";
+    month[10] = "Nov";
+    month[11] = "Dec";
     if (options.type === "num") {
       for (m in month) {
         if (month[m] === mon) return m;
@@ -524,6 +655,34 @@
     } else if (options.type === "str") {
       return month[mon];
     }
+  };
+
+  setSelectedDate = function(options) {
+    var d, dnew, dnewarr;
+    if (options) {
+      console.log("in setsee...");
+      selecteddate = options;
+      selecteddate.mText = getMonth(selecteddate.m, {
+        "type": "str"
+      });
+      dnew = new Date(selecteddate.m + "-" + selecteddate.d + "-" + selecteddate.year);
+      dnew = dnew.toLocaleString();
+      dnewarr = dnew.split(" ");
+      selecteddate.dayInText = dnewarr[0];
+    } else {
+      d = new Date();
+      selecteddate.m = d.getMonth();
+      selecteddate.d = d.getDate();
+      selecteddate.year = d.getYear() + 1900;
+      selecteddate.mText = getMonth(selecteddate.m, {
+        "type": "str"
+      });
+      dnew = new Date((parseInt(selecteddate.m + 1)) + "-" + selecteddate.d + "-" + selecteddate.year);
+      dnew = dnew.toLocaleString();
+      dnewarr = dnew.split(" ");
+      selecteddate.dayInText = dnewarr[0];
+    }
+    return renderRows();
   };
 
   updateUtc = function() {
