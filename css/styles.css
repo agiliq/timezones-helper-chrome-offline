@@ -82,6 +82,13 @@
                    right  :10px;
                    background-color :transparent;
                 }
+                
+                    #date_help_click {
+                        font-size : 12pt;
+                        font-weight : bold;
+                        color : white;
+                    }
+                    
                     #dateinput{
                         height  : 30px;
                         width  : 150px;
@@ -102,6 +109,19 @@
                         display : none;
                         vertical-align : bottom;
                     }
+                    
+                    #date_help{
+                        background-image: -webkit-gradient(linear,left bottom,left top,color-stop(1, pink),color-stop(0, violet)); 
+                        color : black;
+                        width  :200px;
+                        height : 35px;
+                        border-radius : 3px;
+                        position : absolute;
+                        top : -55px;
+                        left : 0px;
+                        display : none;
+                    }
+                    
                     button#setdate_go{
                         color : blue;
                         width : 50px;
@@ -170,6 +190,23 @@
                                 position : absolute;
                                 left : 0px;
                                 top : 0px;
+                            }
+                            
+                            #wrapper #event_help{
+                                position : absolute;
+                                top : 50px;
+                                left : 500px;
+                                z-index : 100;
+                                background-image: -webkit-gradient(linear,left bottom,left top,color-stop(1, pink),color-stop(0, violet)); 
+                                width : 300px;
+                                height : 45px;
+                                
+                                border-radius : 5px;
+                            }
+                            #wrapper #event_help span{
+                               margin-top : 10px;
+                               margin-left : 10px;
+                               line-height : 45px;
                             }
                             #wrapper #showeventbody{
                                display : none;

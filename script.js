@@ -118,6 +118,7 @@
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         ele = _ref[_i];
         tText = convertOffset($("#" + ele.id + " #lihr_" + idx).attr("t"));
+        console.log(tText);
         t.push(tText.substr(1));
         city.push($("#" + ele.id + " .city").text());
         country.push($("#" + ele.id + " .country").text());
@@ -214,6 +215,17 @@
       */
       localStorage["default"] = rowindex;
       return renderRows();
+    }
+  });
+
+  $("#dateinput").live({
+    mouseenter: function(e) {
+      if ($("#error_inputdate").css("display") === "none") {
+        return $("#date_help").show();
+      }
+    },
+    mouseleave: function() {
+      return $("#date_help").hide();
     }
   });
 
@@ -334,6 +346,12 @@
       }
       $("#wrapper #showevents #showeventbody").html(data);
       return $("#wrapper #showevents #showeventbody").css("display", "block");
+    },
+    mouseenter: function(e) {
+      return $("#event_help").show(75);
+    },
+    mouseleave: function(e) {
+      return $("#event_help").hide(75);
     }
   });
 
@@ -443,7 +461,7 @@
   };
 
   renderRows = function() {
-    var ad_offset, ad_utc, cl, d, defaultind, defaultobj, defaultoffset, diffoffset, diffoffsetstr, floatOffset, formattedOffset, height, hourline, hourstart, i, icons_homedelete, idx, ind, left, monInNum, newobj, nextDayStr, nextdayarr, oldobj, pi, presline, prevline, req, reqArr, row, selectedDateStr, subTillPi, tempstr, timearr, timeextrastr, timestr;
+    var ad_offset, ad_utc, cl, d, defaultind, defaultobj, defaultoffset, diffoffset, diffoffsetstr, floatOffset, formattedOffset, height, hourline, hourstart, i, icons_homedelete, idx, ind, iorig, left, monInNum, newobj, nextDayStr, nextdayarr, oldobj, pi, presline, prevline, req, reqArr, row, selectedDateStr, subTillPi, tempstr, timearr, timeextrastr, timestr, tval;
     oldobj = {};
     if ("addedLocations" in localStorage && "default" in localStorage) {
       oldobj = JSON.parse(localStorage.addedLocations);
@@ -517,6 +535,7 @@
       diffoffset = floatOffset - defaultoffset;
       diffoffsetstr = diffoffset + "";
       hourstart = 1;
+      console.log("diffoffsetstr : " + diffoffsetstr);
       if (diffoffsetstr.indexOf("-") > -1) {
         diffoffsetstr = diffoffsetstr.substr(1);
         hourstart = 24 + diffoffset;
@@ -524,6 +543,7 @@
         hourstart = diffoffset;
       }
       i = hourstart;
+      console.log(i);
       tempstr = " ";
       if ((i + "").indexOf(".") > -1) {
         tempstr = (i + "").substr((i + "").indexOf(".") + 1);
@@ -538,10 +558,11 @@
       timeextrastr = selecteddate.dayInText + " , " + selecteddate.mText + " " + selecteddate.d + "  " + selecteddate.year;
       hourline = "<ul class='hourline_ul'>";
       idx = 0;
+      iorig = i;
       if (i === 0 || i === 0.5) {
-        i = 1;
         cl = "li_24";
-        hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='0' details='" + selectedDateStr + "' ><div class='span_hl' idx='" + idx + "'><span idx='" + idx + "' class='small' >" + selecteddate.mText + "</span><br><span idx='" + idx + "' class='small' >" + selecteddate.d + "</span></div></li>";
+        hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='" + i + "' details='" + selectedDateStr + "' ><div class='span_hl' idx='" + idx + "'><span idx='" + idx + "' class='small' >" + selecteddate.mText + "</span><br><span idx='" + idx + "' class='small' >" + selecteddate.d + "</span></div></li>";
+        i = 1;
         idx++;
       }
       while (i < 24) {
@@ -556,7 +577,9 @@
         } else {
           cl = "li_n";
         }
-        hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='" + i + "' details='" + selectedDateStr + "'><div class='span_hl' idx='" + idx + "'><span class='medium' idx='" + idx + "'>" + parseInt(i) + "</span><br><span class='small' idx='" + idx + "'>" + tempstr + "</span></div></li>";
+        tval = convertOffsetToFloat(parseInt(i) + ":" + tempstr);
+        console.log("tval : " + tval + " ------- " + tempstr);
+        hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='" + tval + "'  details='" + selectedDateStr + "'><div class='span_hl' idx='" + idx + "'><span class='medium' idx='" + idx + "'>" + parseInt(i) + "</span><br><span class='small' idx='" + idx + "'>" + tempstr + "</span></div></li>";
         if (tempstr === " ") {
           hourline = hourline.replace("<span class='medium' idx='" + idx + "'>", "<span idx='" + idx + "' >");
         }
@@ -574,8 +597,8 @@
         nextdayarr = d.split(" ");
         nextDayStr = nextdayarr[0] + " , " + nextdayarr[1] + " " + nextdayarr[2] + " , " + nextdayarr[3];
         cl = "li_24";
-        if (i !== 24) {
-          hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='0' details='" + nextDayStr + "' ><div class='span_hl' idx='" + idx + "'><span idx='" + idx + "'  class='small'> " + nextdayarr[1] + "</span><br><span idx='" + idx + "' class='small' >" + nextdayarr[2] + "</span></div></li>";
+        if (iorig !== 0.5) {
+          hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='" + iorig + "' details='" + nextDayStr + "' ><div class='span_hl' idx='" + idx + "'><span idx='" + idx + "'  class='small'> " + nextdayarr[1] + "</span><br><span idx='" + idx + "' class='small' >" + nextdayarr[2] + "</span></div></li>";
         }
         if (timestr === " ") {
           i = 1;
@@ -597,7 +620,9 @@
         } else {
           cl = "li_n";
         }
-        hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='" + i + "' details='" + nextDayStr + "' ><div class='span_hl' idx='" + idx + "'><span class='medium' idx='" + idx + "'>" + parseInt(i) + "</span><br><span class='small' idx='" + idx + "'>" + tempstr + "</span></div></li>";
+        tval = convertOffsetToFloat(parseInt(i) + ":" + tempstr);
+        console.log("tval : " + tval + " ------- " + tempstr);
+        hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='" + tval + "' details='" + nextDayStr + "' ><div class='span_hl' idx='" + idx + "'><span class='medium' idx='" + idx + "'>" + parseInt(i) + "</span><br><span class='small' idx='" + idx + "'>" + tempstr + "</span></div></li>";
         if (tempstr === " ") {
           hourline = hourline.replace("<span class='medium' idx='" + idx + "'>", "<span idx='" + idx + "' >");
         }
