@@ -124,7 +124,7 @@ $("#vband").live
       #console.log ele.id
       #tinFloat = $("#"+ele.id+" #lihr_"+idx).attr("t")
       tText = convertOffset $("#"+ele.id+" #lihr_"+idx).attr("t")
-      console.log tText
+      #console.log tText
       t.push tText.substr(1)
       city.push $("#"+ele.id+" .city").text()
       country.push $("#"+ele.id+" .country").text()
@@ -584,7 +584,7 @@ renderRows = ->
     #now do hourline operation , and finally add it to "dates"
     diffoffsetstr = diffoffset+""
     hourstart = 1
-    console.log "diffoffsetstr : "+diffoffsetstr
+    #console.log "diffoffsetstr : "+diffoffsetstr
     if diffoffsetstr.indexOf("-") > -1
       diffoffsetstr = diffoffsetstr.substr(1)
       
@@ -604,7 +604,7 @@ renderRows = ->
       
     i=hourstart
     #console.log "__-------------------------------___________________"
-    console.log i
+    #console.log i
 
 
     tempstr = " "
@@ -734,7 +734,12 @@ renderRows = ->
       tval = convertOffsetToFloat(parseInt(i)+":"+tempstr)
       #console.log "tval : "+tval+" ------- "+tempstr
       
-      hourline+=" <li class='"+cl+"' id='lihr_"+idx+"' idx='"+idx+"' t='"+tval+"' details='"+nextDayStr+"' ><div class='span_hl' idx='"+idx+"'><span class='medium' idx='"+idx+"'>"+parseInt(i)+"</span><br><span class='small' idx='"+idx+"'>"+tempstr+"</span></div></li>"
+      if diffoffset >=0
+        datedetailstr = nextDayStr
+      else
+        datedetailstr =  presdatestr 
+      
+      hourline+=" <li class='"+cl+"' id='lihr_"+idx+"' idx='"+idx+"' t='"+tval+"' details='"+datedetailstr+"' ><div class='span_hl' idx='"+idx+"'><span class='medium' idx='"+idx+"'>"+parseInt(i)+"</span><br><span class='small' idx='"+idx+"'>"+tempstr+"</span></div></li>"
       if tempstr is " "
         hourline = hourline.replace "<span class='medium' idx='"+idx+"'>","<span idx='"+idx+"' >"
       i++

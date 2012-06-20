@@ -118,7 +118,6 @@
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         ele = _ref[_i];
         tText = convertOffset($("#" + ele.id + " #lihr_" + idx).attr("t"));
-        console.log(tText);
         t.push(tText.substr(1));
         city.push($("#" + ele.id + " .city").text());
         country.push($("#" + ele.id + " .country").text());
@@ -535,7 +534,6 @@
       diffoffset = floatOffset - defaultoffset;
       diffoffsetstr = diffoffset + "";
       hourstart = 1;
-      console.log("diffoffsetstr : " + diffoffsetstr);
       if (diffoffsetstr.indexOf("-") > -1) {
         diffoffsetstr = diffoffsetstr.substr(1);
         hourstart = 24 + diffoffset;
@@ -543,7 +541,6 @@
         hourstart = diffoffset;
       }
       i = hourstart;
-      console.log(i);
       tempstr = " ";
       if ((i + "").indexOf(".") > -1) {
         tempstr = (i + "").substr((i + "").indexOf(".") + 1);
@@ -640,7 +637,12 @@
           cl = "li_n";
         }
         tval = convertOffsetToFloat(parseInt(i) + ":" + tempstr);
-        hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='" + tval + "' details='" + nextDayStr + "' ><div class='span_hl' idx='" + idx + "'><span class='medium' idx='" + idx + "'>" + parseInt(i) + "</span><br><span class='small' idx='" + idx + "'>" + tempstr + "</span></div></li>";
+        if (diffoffset >= 0) {
+          datedetailstr = nextDayStr;
+        } else {
+          datedetailstr = presdatestr;
+        }
+        hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='" + tval + "' details='" + datedetailstr + "' ><div class='span_hl' idx='" + idx + "'><span class='medium' idx='" + idx + "'>" + parseInt(i) + "</span><br><span class='small' idx='" + idx + "'>" + tempstr + "</span></div></li>";
         if (tempstr === " ") {
           hourline = hourline.replace("<span class='medium' idx='" + idx + "'>", "<span idx='" + idx + "' >");
         }

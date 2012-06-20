@@ -1,6 +1,6 @@
 {
   "name": "time zone convertor",
-  "version": "1.0",
+  "version": "1.2",
   "manifest_version": 1,
   "description": "Time zone convertor ",
   "app" : {
