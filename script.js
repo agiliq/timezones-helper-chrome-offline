@@ -537,7 +537,7 @@
       selectedDateStr = selecteddate.dayInText + " , " + selecteddate.mText + " " + selecteddate.d + " , " + selecteddate.year;
       hourline = "<ul class='hourline_ul'>";
       idx = 0;
-      if (i === 0) {
+      if (i === 0 || i === 0.5) {
         i = 1;
         cl = "li_24";
         hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='0' details='" + selectedDateStr + "' ><div class='span_hl' idx='" + idx + "'><span idx='" + idx + "' class='small' >" + selecteddate.mText + "</span><br><span idx='" + idx + "' class='small' >" + selecteddate.d + "</span></div></li>";
@@ -573,7 +573,9 @@
         nextdayarr = d.split(" ");
         nextDayStr = nextdayarr[0] + " , " + nextdayarr[1] + " " + nextdayarr[2] + " , " + nextdayarr[3];
         cl = "li_24";
-        hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='0' details='" + nextDayStr + "' ><div class='span_hl' idx='" + idx + "'><span idx='" + idx + "'  class='small'> " + nextdayarr[1] + "</span><br><span idx='" + idx + "' class='small' >" + nextdayarr[2] + "</span></div></li>";
+        if (i !== 24) {
+          hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='0' details='" + nextDayStr + "' ><div class='span_hl' idx='" + idx + "'><span idx='" + idx + "'  class='small'> " + nextdayarr[1] + "</span><br><span idx='" + idx + "' class='small' >" + nextdayarr[2] + "</span></div></li>";
+        }
         if (timestr === " ") {
           i = 1;
         } else {
