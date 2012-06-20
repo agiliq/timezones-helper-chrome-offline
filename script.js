@@ -443,7 +443,7 @@
   };
 
   renderRows = function() {
-    var ad_offset, ad_utc, cl, d, defaultind, defaultobj, defaultoffset, diffoffset, diffoffsetstr, floatOffset, formattedOffset, height, hourline, hourstart, i, icons_homedelete, idx, ind, left, monInNum, newobj, nextDayStr, nextdayarr, oldobj, pi, presline, prevline, req, reqArr, row, selectedDateStr, subTillPi, tempstr, timearr, timestr;
+    var ad_offset, ad_utc, cl, d, defaultind, defaultobj, defaultoffset, diffoffset, diffoffsetstr, floatOffset, formattedOffset, height, hourline, hourstart, i, icons_homedelete, idx, ind, left, monInNum, newobj, nextDayStr, nextdayarr, oldobj, pi, presline, prevline, req, reqArr, row, selectedDateStr, subTillPi, tempstr, timearr, timeextrastr, timestr;
     oldobj = {};
     if ("addedLocations" in localStorage && "default" in localStorage) {
       oldobj = JSON.parse(localStorage.addedLocations);
@@ -535,6 +535,7 @@
         }
       }
       selectedDateStr = selecteddate.dayInText + " , " + selecteddate.mText + " " + selecteddate.d + " , " + selecteddate.year;
+      timeextrastr = selecteddate.dayInText + " , " + selecteddate.mText + " " + selecteddate.d + "  " + selecteddate.year;
       hourline = "<ul class='hourline_ul'>";
       idx = 0;
       if (i === 0 || i === 0.5) {
@@ -604,7 +605,7 @@
         idx++;
       }
       hourline += "</ul>";
-      row += "<div class='row' id='row_" + ind + "' rowindex='" + ind + "' time='" + timearr[4] + "' ><div class='tzdetails'><div class='offset'>" + (floatOffset - defaultoffset) + "</div><div class='location'><span class='city'>" + oldobj[ind].city + "</span><br><span class='country'>" + oldobj[ind].country + "</span></div><div class='timedata'><span class='time'>" + timearr[4] + "</span><br><span class='timeextra'>" + timearr[0] + " , " + timearr[1] + " " + timearr[2] + " " + timearr[3] + "</span></div></div><div class='dates'>" + hourline + "</div></div> ";
+      row += "<div class='row' id='row_" + ind + "' rowindex='" + ind + "' time='" + timearr[4] + "' ><div class='tzdetails'><div class='offset'>" + (floatOffset - defaultoffset) + "</div><div class='location'><span class='city'>" + oldobj[ind].city + "</span><br><span class='country'>" + oldobj[ind].country + "</span></div><div class='timedata'><span class='time'>" + timearr[4] + "</span><br><span class='timeextra'>" + timeextrastr + "</span></div></div><div class='dates'>" + hourline + "</div></div> ";
     }
     $("#content").html(row);
     $("#content .row .dates li").first().append("<div id='vband'></div><div id='selectedband'></div>");

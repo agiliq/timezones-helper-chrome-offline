@@ -12,7 +12,6 @@ rowsortstop = ""
 
 $(document).ready ->
   #console.log "ready"
-  
   updateUtc()
   d = new Date()
   #console.log d
@@ -604,9 +603,10 @@ renderRows = ->
     #console.log "selected date"
     #console.log selecteddate
     selectedDateStr = selecteddate.dayInText+" , "+selecteddate.mText+" "+selecteddate.d+" , "+selecteddate.year
+    timeextrastr = selecteddate.dayInText+" , "+selecteddate.mText+" "+selecteddate.d+"  "+selecteddate.year
     hourline = "<ul class='hourline_ul'>"
     idx = 0
-    if i is 0
+    if i is 0 or i is 0.5
       i = 1
       
       cl = "li_24"
