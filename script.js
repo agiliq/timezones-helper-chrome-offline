@@ -461,7 +461,7 @@
   };
 
   renderRows = function() {
-    var ad_offset, ad_utc, cl, d, defaultind, defaultobj, defaultoffset, diffoffset, diffoffsetstr, floatOffset, formattedOffset, height, hourline, hourstart, i, icons_homedelete, idx, ind, iorig, left, monInNum, newobj, nextDayStr, nextdayarr, oldobj, pi, presline, prevline, req, reqArr, row, selectedDateStr, subTillPi, sym, tempstr, timearr, timeextrastr, timestr, tval;
+    var ad_offset, ad_utc, cl, d, datedetailstr, dayusedarr, dayusedstr, defaultind, defaultobj, defaultoffset, diffoffset, diffoffsetstr, floatOffset, formattedOffset, height, hourline, hourstart, i, icons_homedelete, idx, ind, iorig, left, monInNum, newobj, nextDayStr, nextdayarr, oldobj, pi, presdate, presdatearr, presdatestr, presline, prevdate, prevdatearr, prevdatestr, prevline, req, reqArr, row, selectedDateStr, subTillPi, sym, tempstr, timearr, timeextrastr, timestr, tval;
     oldobj = {};
     if ("addedLocations" in localStorage && "default" in localStorage) {
       oldobj = JSON.parse(localStorage.addedLocations);
@@ -565,6 +565,35 @@
         i = 1;
         idx++;
       }
+      monInNum = getMonth(timearr[1], {
+        "type": "num"
+      });
+      d = new Date();
+      d.setFullYear(selecteddate.year, selecteddate.m, selecteddate.d);
+      presdate = d.toLocaleString();
+      presdatearr = presdate.split(" ");
+      presdatestr = presdatearr[0] + " , " + presdatearr[1] + " " + presdatearr[2] + " , " + presdatearr[3];
+      prevdate = new Date();
+      prevdate.setFullYear(selecteddate.year, selecteddate.m, selecteddate.d);
+      prevdate.setTime(prevdate.getTime() - 86400000);
+      prevdate = prevdate.toLocaleString();
+      prevdatearr = prevdate.split(" ");
+      prevdatestr = prevdatearr[0] + " , " + prevdatearr[1] + " " + prevdatearr[2] + " , " + prevdatearr[3];
+      d.setTime(d.getTime() + 86400000);
+      d = d.toLocaleString();
+      nextdayarr = d.split(" ");
+      nextDayStr = nextdayarr[0] + " , " + nextdayarr[1] + " " + nextdayarr[2] + " , " + nextdayarr[3];
+      dayusedarr = [];
+      dayusedstr = "";
+      if (diffoffset >= 0) {
+        dayusedarr = nextdayarr;
+        dayusedstr = nextDayStr;
+        datedetailstr = presdatestr;
+      } else {
+        dayusedarr = presdatearr;
+        dayusedstr = presdatestr;
+        datedetailstr = prevdatestr;
+      }
       while (i < 24) {
         if (i < 6) {
           cl = "li_n";
@@ -578,8 +607,7 @@
           cl = "li_n";
         }
         tval = convertOffsetToFloat(parseInt(i) + ":" + tempstr);
-        console.log("tval : " + tval + " ------- " + tempstr);
-        hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='" + tval + "'  details='" + selectedDateStr + "'><div class='span_hl' idx='" + idx + "'><span class='medium' idx='" + idx + "'>" + parseInt(i) + "</span><br><span class='small' idx='" + idx + "'>" + tempstr + "</span></div></li>";
+        hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='" + tval + "'  details='" + datedetailstr + "'><div class='span_hl' idx='" + idx + "'><span class='medium' idx='" + idx + "'>" + parseInt(i) + "</span><br><span class='small' idx='" + idx + "'>" + tempstr + "</span></div></li>";
         if (tempstr === " ") {
           hourline = hourline.replace("<span class='medium' idx='" + idx + "'>", "<span idx='" + idx + "' >");
         }
@@ -587,18 +615,9 @@
         i++;
       }
       if (hourstart !== 0) {
-        monInNum = getMonth(timearr[1], {
-          "type": "num"
-        });
-        d = new Date();
-        d.setFullYear(selecteddate.year, selecteddate.m, selecteddate.d);
-        d.setTime(d.getTime() + 86400000);
-        d = d.toLocaleString();
-        nextdayarr = d.split(" ");
-        nextDayStr = nextdayarr[0] + " , " + nextdayarr[1] + " " + nextdayarr[2] + " , " + nextdayarr[3];
         cl = "li_24";
         if (iorig !== 0.5) {
-          hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='" + iorig + "' details='" + nextDayStr + "' ><div class='span_hl' idx='" + idx + "'><span idx='" + idx + "'  class='small'> " + nextdayarr[1] + "</span><br><span idx='" + idx + "' class='small' >" + nextdayarr[2] + "</span></div></li>";
+          hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='" + iorig + "' details='" + dayusedstr + "' ><div class='span_hl' idx='" + idx + "'><span idx='" + idx + "'  class='small'> " + dayusedarr[1] + "</span><br><span idx='" + idx + "' class='small' >" + dayusedarr[2] + "</span></div></li>";
         }
         if (timestr === " ") {
           i = 1;
@@ -621,7 +640,6 @@
           cl = "li_n";
         }
         tval = convertOffsetToFloat(parseInt(i) + ":" + tempstr);
-        console.log("tval : " + tval + " ------- " + tempstr);
         hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='" + tval + "' details='" + nextDayStr + "' ><div class='span_hl' idx='" + idx + "'><span class='medium' idx='" + idx + "'>" + parseInt(i) + "</span><br><span class='small' idx='" + idx + "'>" + tempstr + "</span></div></li>";
         if (tempstr === " ") {
           hourline = hourline.replace("<span class='medium' idx='" + idx + "'>", "<span idx='" + idx + "' >");

@@ -182,7 +182,7 @@
                     
                             #wrapper .eventheader{
                                 color : white;
-                                background-color : green;
+                                background-image: -webkit-gradient(linear,left bottom,left top,color-stop(1, #4AA02C),color-stop(0, green));
                                 text-align : center;
                                 width : 80%;
                                 border-radius : 5px;
@@ -407,7 +407,9 @@
                                 }
                                 
                                 .small{
-                                
+                                    font-size : 8pt;
+                                    line-height : 15px;
+                                    vertical-align : top;
                                 }
                                 #content .row .dates .hourline_ul li div.span_hl .small{
                                     font-size : 8pt;

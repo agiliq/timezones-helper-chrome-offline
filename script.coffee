@@ -633,6 +633,46 @@ renderRows = ->
       idx++
     #first loop, till 24-1
     
+    
+    monInNum = getMonth timearr[1],{"type":"num"}
+    d = new Date()
+    #d.setFullYear timearr[3],monInNum,timearr[2]
+    d.setFullYear selecteddate.year,selecteddate.m,selecteddate.d
+    presdate = d.toLocaleString()
+    
+    presdatearr = presdate.split " "
+    presdatestr = presdatearr[0]+" , "+presdatearr[1]+" "+presdatearr[2]+" , "+presdatearr[3]
+    
+    prevdate = new Date()
+    prevdate.setFullYear selecteddate.year,selecteddate.m,selecteddate.d
+    
+    prevdate.setTime prevdate.getTime() - 86400000
+    prevdate = prevdate.toLocaleString()
+    prevdatearr = prevdate.split " "
+    prevdatestr = prevdatearr[0]+" , "+prevdatearr[1]+" "+prevdatearr[2]+" , "+prevdatearr[3]
+    
+    
+    d.setTime d.getTime()+86400000
+    
+    d = d.toLocaleString()
+    nextdayarr = d.split " "
+    nextDayStr = nextdayarr[0]+" , "+nextdayarr[1]+" "+nextdayarr[2]+" , "+nextdayarr[3]
+    
+    
+    dayusedarr = []
+    dayusedstr = ""
+    
+    if diffoffset >= 0
+      dayusedarr = nextdayarr
+      dayusedstr = nextDayStr
+      datedetailstr = presdatestr
+    else
+      dayusedarr = presdatearr
+      dayusedstr = presdatestr
+      datedetailstr = prevdatestr
+    
+    
+    
     while i<24
       if i<6
         cl="li_n"
@@ -647,10 +687,10 @@ renderRows = ->
        
       
       tval = convertOffsetToFloat(parseInt(i)+":"+tempstr)
-      console.log "tval : "+tval+" ------- "+tempstr
+      #console.log "tval : "+tval+" ------- "+tempstr
       
         
-      hourline+=" <li class='"+cl+"' id='lihr_"+idx+"' idx='"+idx+"' t='"+tval+"'  details='"+selectedDateStr+"'><div class='span_hl' idx='"+idx+"'><span class='medium' idx='"+idx+"'>"+parseInt(i)+"</span><br><span class='small' idx='"+idx+"'>"+tempstr+"</span></div></li>"  
+      hourline+=" <li class='"+cl+"' id='lihr_"+idx+"' idx='"+idx+"' t='"+tval+"'  details='"+datedetailstr+"'><div class='span_hl' idx='"+idx+"'><span class='medium' idx='"+idx+"'>"+parseInt(i)+"</span><br><span class='small' idx='"+idx+"'>"+tempstr+"</span></div></li>"  
       
       if tempstr is " "
         hourline = hourline.replace "<span class='medium' idx='"+idx+"'>","<span idx='"+idx+"' >"
@@ -659,19 +699,14 @@ renderRows = ->
     
       
     #second, directly put date
+    
     unless hourstart is 0
-      monInNum = getMonth timearr[1],{"type":"num"}
-      d = new Date()
-      #d.setFullYear timearr[3],monInNum,timearr[2]
-      d.setFullYear selecteddate.year,selecteddate.m,selecteddate.d
-      d.setTime d.getTime()+86400000
-      d = d.toLocaleString()
-      nextdayarr = d.split " "
-      nextDayStr = nextdayarr[0]+" , "+nextdayarr[1]+" "+nextdayarr[2]+" , "+nextdayarr[3]
+        
+      
       
       cl = "li_24"
       if iorig != 0.5
-        hourline+=" <li class='"+cl+"' id='lihr_"+idx+"' idx='"+idx+"' t='"+iorig+"' details='"+nextDayStr+"' ><div class='span_hl' idx='"+idx+"'><span idx='"+idx+"'  class='small'> "+nextdayarr[1]+"</span><br><span idx='"+idx+"' class='small' >"+nextdayarr[2]+"</span></div></li>"
+        hourline+=" <li class='"+cl+"' id='lihr_"+idx+"' idx='"+idx+"' t='"+iorig+"' details='"+dayusedstr+"' ><div class='span_hl' idx='"+idx+"'><span idx='"+idx+"'  class='small'> "+dayusedarr[1]+"</span><br><span idx='"+idx+"' class='small' >"+dayusedarr[2]+"</span></div></li>"
       if timestr is " "
         i=1
       else 
@@ -697,7 +732,7 @@ renderRows = ->
       
       #console.log i
       tval = convertOffsetToFloat(parseInt(i)+":"+tempstr)
-      console.log "tval : "+tval+" ------- "+tempstr
+      #console.log "tval : "+tval+" ------- "+tempstr
       
       hourline+=" <li class='"+cl+"' id='lihr_"+idx+"' idx='"+idx+"' t='"+tval+"' details='"+nextDayStr+"' ><div class='span_hl' idx='"+idx+"'><span class='medium' idx='"+idx+"'>"+parseInt(i)+"</span><br><span class='small' idx='"+idx+"'>"+tempstr+"</span></div></li>"
       if tempstr is " "

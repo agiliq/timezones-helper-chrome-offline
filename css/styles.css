@@ -182,7 +182,7 @@
                     
                             #wrapper .eventheader{
                                 color : white;
-                                background-color : green;
+                                background-image: -webkit-gradient(linear,left bottom,left top,color-stop(1, #4CC417),color-stop(0, green));
                                 text-align : center;
                                 width : 80%;
                                 border-radius : 5px;
