@@ -706,7 +706,13 @@ renderRows = ->
       idx++
       
     hourline+="</ul>"
-    row+= "<div class='row' id='row_"+ind+"' rowindex='"+ind+"' time='"+timearr[4]+"' ><div class='tzdetails'><div class='offset'>"+(floatOffset-defaultoffset)+"</div><div class='location'><span class='city'>"+oldobj[ind].city+"</span><br><span class='country'>"+oldobj[ind].country+"</span></div><div class='timedata'><span class='time'>"+timearr[4]+"</span><br><span class='timeextra'>"+timeextrastr+"</span></div></div><div class='dates'>"+hourline+"</div></div> "
+    
+    sym = ""
+    if diffoffset > 0
+      sym = "+"
+      
+    
+    row+= "<div class='row' id='row_"+ind+"' rowindex='"+ind+"' time='"+timearr[4]+"' ><div class='tzdetails'><div class='offset'>"+sym+(floatOffset-defaultoffset)+"<br><span class='small' >Hours</span></div><div class='location'><span class='city'>"+oldobj[ind].city+"</span><br><span class='country'>"+oldobj[ind].country+"</span></div><div class='timedata'><span class='time'>"+timearr[4]+"</span><br><span class='timeextra'>"+timeextrastr+"</span></div></div><div class='dates'>"+hourline+"</div></div> "
     
   $("#content").html row
   $("#content .row .dates li").first().append "<div id='vband'></div><div id='selectedband'></div>"

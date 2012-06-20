@@ -406,6 +406,9 @@
                                     z-index : 99;
                                 }
                                 
+                                .small{
+                                
+                                }
                                 #content .row .dates .hourline_ul li div.span_hl .small{
                                     font-size : 8pt;
                                     line-height : 15px;
