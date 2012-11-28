@@ -204,13 +204,13 @@
     click: function(e) {
       var rowindex;
       rowindex = parseInt($(e.target).parent().parent().attr("rowindex"));
-      /*  
-      oldobj = JSON.parse localStorage.addedLocations
-      tempobj = oldobj[rowindex]
-      oldobj[rowindex] = oldobj[0]
-      oldobj[0] = tempobj
-      localStorage.addedLocations = JSON.stringify oldobj
-      renderRows()
+      /*
+          oldobj = JSON.parse localStorage.addedLocations
+          tempobj = oldobj[rowindex]
+          oldobj[rowindex] = oldobj[0]
+          oldobj[0] = tempobj
+          localStorage.addedLocations = JSON.stringify oldobj
+          renderRows()
       */
       localStorage["default"] = rowindex;
       return renderRows();
@@ -499,7 +499,7 @@
       timestr = getNewTime floatOffset
       timearr = timestr.split " "
       timearr[4] = timearr[4].substr(0,5)
-      
+    
       hourline = "<ul class='hourline_ul'>"
       i=0
       cl = ""
@@ -511,15 +511,15 @@
         else if i>7 and i<19
           cl = "li_d"
         else if i>18 and i<22
-          cl = "li_e"      
-        else 
+          cl = "li_e"
+        else
           cl = "li_n"
         i++
-        hourline+="<span class='smallspace'></span> <li class='"+cl+"'>"+i+"</li>"  
-      hourline+="</ul>"    
-      
-      
-      row = "<div class='row'><div class='tzdetails'><div class='offset'><img class='homeicon' /> </div><div class='location'><span class='city'>"+oldobj[0].city+"</span><br><span class='country'>"+oldobj[0].country+"</span></div><div class='timedata'><span class='time'>"+timearr[4]+"</span><br><span class='timeextra'>"+timearr[0]+" , "+timearr[1]+" "+timearr[2]+" "+timearr[3]+"</span></div></div><div class='dates'>"+hourline+"</div></div>"     
+        hourline+="<span class='smallspace'></span> <li class='"+cl+"'>"+i+"</li>"
+      hourline+="</ul>"
+    
+    
+      row = "<div class='row'><div class='tzdetails'><div class='offset'><img class='homeicon' /> </div><div class='location'><span class='city'>"+oldobj[0].city+"</span><br><span class='country'>"+oldobj[0].country+"</span></div><div class='timedata'><span class='time'>"+timearr[4]+"</span><br><span class='timeextra'>"+timearr[0]+" , "+timearr[1]+" "+timearr[2]+" "+timearr[3]+"</span></div></div><div class='dates'>"+hourline+"</div></div>"
       $("#content").html row
     */
     defaultind = localStorage["default"];
