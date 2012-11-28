@@ -62,7 +62,7 @@
       st = $(e.target).val().trim();
       st.toLowerCase();
       if (st.length < 1) {
-        $("#search_result").hide(200);
+        $("#search_result").slideUp();
         return;
       }
       locations = "<br><ul class='searchresult_ul'>";
@@ -70,11 +70,11 @@
       $("#search_result").html("");
       updateUtc();
       getLocations(0, st);
-      $("#search_result").show();
-      return $("#search_result").html(locations);
+      $("#search_result").html(locations);
+      return $("#search_result").slideDown();
     },
     focusout: function() {
-      return $("#search_result").hide(1000);
+      return $("#search_result").slideUp();
     }
   });
 

@@ -65,17 +65,19 @@ $("#search_input").live
     st = $(e.target).val().trim()
     st.toLowerCase()
     if st.length < 1
-      $("#search_result").hide(200)
+      #$("#search_result").hide(200)
+      $("#search_result").slideUp()
       return
     locations = "<br><ul class='searchresult_ul'>"
     k = 0
     $("#search_result").html ""
     updateUtc()
     getLocations 0,st
-    $("#search_result").show()
     $("#search_result").html locations
+    $("#search_result").slideDown()
   focusout : ->
-    $("#search_result").hide(1000)
+    #$("#search_result").hide(1000)
+    $("#search_result").slideUp()
 
 
 # add locations to the localStorage
