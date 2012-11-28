@@ -89,19 +89,16 @@ $("ul.searchresult_ul").live
 
 $("#content .row .dates ul li").live
   mouseenter : (e) ->
-
-    #console.log e
     $(".row .dates li").first().css "position","relative"
-    #console.log $(e.target).attr("idx")
     idx = $(e.target).attr("idx")
-    $("#vband").attr "idx",idx
-    $("#vband").css "height",parseInt($("#content .row").length)*72-41
-    left = parseInt(idx)*28
-    $("#vband").css "left",left-2
-    #console.log left+" : "+idx
-    #console.log $("#vband")
+    if typeof(idx) != "undefined"
+      $("#vband").attr "idx",idx
+      $("#vband").css "height",parseInt($("#content .row").length)*72-41
+      left = parseInt(idx)*28 + 320
+      $("#vband").css "left",left
 
-$("#content .row .dates").live
+#$("#content .row .dates").live
+$("#content").live
   mouseleave : (e) ->
     left = parseInt($("#selectedband").css("left"))
     $("#vband").css "left",(left-2)
@@ -754,8 +751,10 @@ renderRows = ->
 
     row+= "<div class='row' id='row_"+ind+"' rowindex='"+ind+"' time='"+timearr[4]+"' ><div class='tzdetails'><div class='offset'>"+sym+(floatOffset-defaultoffset)+"<br><span class='small' >Hours</span></div><div class='location'><span class='city'>"+oldobj[ind].city+"</span><br><span class='country'>"+oldobj[ind].country+"</span></div><div class='timedata'><span class='time'>"+timearr[4]+"</span><br><span class='timeextra'>"+timeextrastr+"</span></div></div><div class='dates'>"+hourline+"</div></div> "
 
+  #$("#content").html "<div id='vband'></div><div id='selectedband'></div>"
   $("#content").html row
-  $("#content .row .dates li").first().append "<div id='vband'></div><div id='selectedband'></div>"
+  #$("#content .row .dates li").first().append "<div id='vband'></div><div id='selectedband'></div>"
+  $("#content").prepend "<div id='vband'></div><div id='selectedband'></div>"
   #home, delete icons
   icons_homedelete = "<div class='icons_homedelete'><div class='icon_delete'>x</div><div class='icon_home'  ></div></div>"
   $("#content .row").append icons_homedelete
@@ -773,7 +772,7 @@ renderRows = ->
   left = left.substr 0,left.indexOf(":")
   left = parseInt left
   #console.log "left : "+left
-  left = left*28
+  left = left*28 + 322
   #console.log left+" : "+height
   $("#selectedband").css "height",height
   $("#selectedband").css "left",left

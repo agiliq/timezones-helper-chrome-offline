@@ -228,12 +228,14 @@
                         z-index : -99;
 
                     }
+                    /*
                     #content .row:hover {
                         background-color : #E8DDDD;
                         //color : red;
                         opacity : 1;
 
                     }
+                    */
                         #content .row .icons_homedelete{
                             opacity : 0.1;
                             height : 70px;
@@ -348,24 +350,24 @@
                         }
 
 
-                                #content .row .dates #vband{
+                                #content  #vband{
                                     border : 2px solid black;
                                     border-radius : 5px;
                                     width : 22px;
                                     position : absolute;
-                                    top : -2px;
+                                    top : 15px;
                                     left : 35px;
                                     z-index : 88;
 
                                 }
 
-                                #content .row .dates #selectedband{
+                                #content #selectedband{
                                     //border : 2px solid black;
                                     background-color : #FFB9B9;
                                     border-radius : 5px;
                                     width : 22px;
                                     position : absolute;
-                                    top : -2px;
+                                    top : 15px;
                                     left : 35px;
                                     opacity : 0.4;
 
