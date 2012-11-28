@@ -413,7 +413,9 @@ sr_click = (e) ->
   #botharr[1] city
   oldobj = JSON.parse localStorage.addedLocations
   len = 0
-  for key of oldobj
+  for key, val of oldobj
+    if val['city'].trim() == botharr[1].trim()  and val['country'].trim() == botharr[0].trim()
+      return
     len++
   oldobj[len] = {}
   oldobj[len].country = botharr[0]

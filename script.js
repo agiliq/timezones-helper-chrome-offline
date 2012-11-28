@@ -394,7 +394,7 @@
   });
 
   sr_click = function(e) {
-    var both, botharr, key, len, offset, oldobj, timestr;
+    var both, botharr, key, len, offset, oldobj, timestr, val;
     k = $(e.target).attr("k");
     offset = $("#lisr_" + k).attr("offset");
     timestr = $("#lisr_" + k).attr("timestr");
@@ -403,6 +403,10 @@
     oldobj = JSON.parse(localStorage.addedLocations);
     len = 0;
     for (key in oldobj) {
+      val = oldobj[key];
+      if (val['city'].trim() === botharr[1].trim() && val['country'].trim() === botharr[0].trim()) {
+        return;
+      }
       len++;
     }
     oldobj[len] = {};
