@@ -129,7 +129,7 @@
       $("#newevent_time").text("");
       $("#newevent_msg").text("");
       $("#event_name").text("");
-      tabl = "<table id='newevent_table' ><thead><th>city</th><th>country</th><th>Time</th></thead>";
+      tabl = "<table id='newevent_table' class='table table-striped' ><thead><th>City</th><th>Country</th><th>Time</th></thead>";
       for (ind in t) {
         tabl += "<tr><td>" + city[ind] + "</td><td>" + country[ind] + "</td><td>" + yeardetails[ind] + " , " + t[ind] + "</td></tr>";
       }
@@ -177,6 +177,15 @@
     click: function(e) {
       $("#newevent").hide();
       return $(".canhide").css("opacity", "1");
+    }
+  });
+
+  $("body").live({
+    keydown: function(e) {
+      if (e.keyCode === 27) {
+        $("#newevent").hide();
+        return $(".canhide").css("opacity", "1");
+      }
     }
   });
 
@@ -316,12 +325,13 @@
       var city, country, data, i, key, oldobj, prev, t, tabl, yeardetails;
       prev = $("#wrapper #showevents #showeventbody").css("display");
       if (prev !== "none") {
-        $("#wrapper #showevents #showeventbody").css("display", "none");
+        $("#wrapper #showevents #showeventbody").slideUp();
         return;
       }
       if (!("events" in localStorage)) {
         $("#wrapper #showevents #showeventbody").html("<h3>No events available, add them first by clicking on required dates</h3>");
-        $("#wrapper #showevents #showeventbody").css("display", "block");
+        $("#wrapper #showevents #showeventbody").slideDown();
+        $("body").scrollTo(".showevents");
         return;
       }
       oldobj = JSON.parse(localStorage.events);
@@ -335,18 +345,19 @@
         country = oldobj[key].country.split(",");
         t = oldobj[key].time.split(",");
         yeardetails = oldobj[key].yeardetails.split(";");
-        tabl = "<table class='showevent_table'><thead><th>City</th><th>Country</th><th>Time</th></thead><tbody>";
+        tabl = "<table class='showevent_table table table-striped'><thead><th>City</th><th>Country</th><th>Time</th></thead><tbody>";
         for (i in city) {
           tabl += "<tr><td>" + city[i] + "</td><td>" + country[i] + "</td><td>" + yeardetails[i] + " " + t[i] + "</td></tr>";
         }
         tabl += "</tbody></table>";
-        data += "<h2># " + (parseInt(key) + 1) + " " + oldobj[key].name + "<span class='deleteEvent' key='" + key + "'>X</span></h2>" + tabl + "<h3>Description : </h3> " + oldobj[key].desc + "<br><hr class='showevents_hr' />";
+        data += "<h2># " + (parseInt(key) + 1) + " " + oldobj[key].name + "<span class='deleteEvent' key='" + key + "'>X</span></h2>" + tabl + "<h3>Description : </h3><p style='padding-left:15px;padding-right:15px;'> " + oldobj[key].desc + "</p><br><hr class='showevents_hr' />";
       }
       if (data === "") {
         data = "<h3>No events available, add them first by clicking on required dates</h3>";
       }
       $("#wrapper #showevents #showeventbody").html(data);
-      return $("#wrapper #showevents #showeventbody").css("display", "block");
+      $("#wrapper #showevents #showeventbody").slideDown();
+      return $("body").scrollTo("#showevents");
     },
     mouseenter: function(e) {
       return $("#event_help").show(75);

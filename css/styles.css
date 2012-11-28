@@ -1,35 +1,48 @@
             body{
 
-                background-image: -webkit-gradient(linear,left bottom,left top,color-stop(1, rgb(100,100,50)),color-stop(0, rgb(255,255,200)));
+            /*    background-image: -webkit-gradient(linear,left bottom,left top,color-stop(1, rgb(100,100,50)),color-stop(0, rgb(255,255,200)));
 
 	           background-repeat:repeat-y;
+	           */
+	            background-color: #AAAA71;
+	            font-family: arial;
 
             }
 
 
            #wrapper table#newevent_table{
-               border : 1px solid black;
+            /*   border : 1px solid black; */
 
            }
            #wrapper table#newevent_table th{
+               /*
                background-color : violet;
                box-shadow : 3px 3px 5px grey;
+               */
            }
 
            #wrapper table#newevent_table td{
+               /*
                box-shadow : 3px 3px 1px grey;
+               */
            }
             #wrapper table.showevent_table{
+                /*
                border : 1px solid black;
+               */
 
            }
            #wrapper table.showevent_table th{
+               /*
                background-color : violet;
                box-shadow : 3px 3px 5px grey;
+               */
            }
 
            #wrapper table.showevent_table td{
+               /*
                box-shadow : 3px 3px 5px darkgreen;
+               */
            }
 
 
@@ -158,8 +171,9 @@
                         top : 15%;
                         left : 25%;
                         z-index : 99;
-                        background-color : #E6F2B5;
-                        height : 650px;
+                       /* background-color : #E6F2B5;*/
+                        background-color: white;
+                        min-height : 650px;
                         width : 650px;
                         padding : 16px;
                         border-radius : 10px;
@@ -194,7 +208,7 @@
 
                             #wrapper #event_help{
                                 position : absolute;
-                                top : 50px;
+                                top : -50px;
                                 left : 500px;
                                 z-index : 100;
                                 background-image: -webkit-gradient(linear,left bottom,left top,color-stop(1, pink),color-stop(0, violet));
@@ -216,6 +230,7 @@
                                border : 1px solid green;
                                border-radius : 5px;
                                width : 80%;
+                               background-color: white;
 
                             }
 
@@ -237,7 +252,7 @@
                     }
                     */
                         #content .row .icons_homedelete{
-                            opacity : 0.1;
+                            opacity : 0.3;
                             height : 70px;
                             width : 45px;
                             position: absolute;
@@ -420,7 +435,7 @@
                                 }
 
                                 #content .row .dates .hourline_ul li div.span_hl .medium{
-                                    font-size : 12pt;
+                                    font-size : 10pt;
                                     line-height : 15px;
                                     vertical-align : top;
                                 }
@@ -479,3 +494,13 @@
 
 
 
+            .backcolor {
+                background-color: #DBD3D3;
+            }
+
+            #event_name { 
+                height: 36px;
+                width:310px;
+                border-radius: 25px;
+
+            }

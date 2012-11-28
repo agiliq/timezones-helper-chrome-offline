@@ -136,7 +136,7 @@ $("#vband").live
     $("#newevent_time").text ""
     $("#newevent_msg").text ""
     $("#event_name").text ""
-    tabl = "<table id='newevent_table' ><thead><th>city</th><th>country</th><th>Time</th></thead>"
+    tabl = "<table id='newevent_table' class='table table-striped' ><thead><th>City</th><th>Country</th><th>Time</th></thead>"
 
     for ind of t
 
@@ -169,7 +169,7 @@ $("#wrapper button#saveevent").live
     for key of oldobj
       len++
     oldobj[len] = {}
-    oldobj[len].name = evname;
+    oldobj[len].name = evname
     oldobj[len].desc = msg
     oldobj[len].city = $("#newevent_time").attr "city"
     oldobj[len].country = $("#newevent_time").attr "country"
@@ -183,6 +183,14 @@ $("#event_close").live
   click : (e) ->
     $("#newevent").hide()
     $(".canhide").css "opacity","1"
+
+$("body").live
+  keydown: (e) ->
+    if e.keyCode == 27
+      $("#newevent").hide()
+      $(".canhide").css "opacity","1"
+
+
 
 
 $("#content .row .icons_homedelete .icon_delete").live
@@ -324,13 +332,17 @@ $("#wrapper #showevents .eventheader").live
     #console.log prev
     unless prev is "none"
       #console.log prev+"--"
-      $("#wrapper #showevents #showeventbody").css "display","none"
+      #$("#wrapper #showevents #showeventbody").css "display","none"
+      $("#wrapper #showevents #showeventbody").slideUp()
 
       return
     #console.log prev+" -- should be none"
     unless "events" of localStorage
       $("#wrapper #showevents #showeventbody").html "<h3>No events available, add them first by clicking on required dates</h3>"
-      $("#wrapper #showevents #showeventbody").css "display","block"
+      #$("#wrapper #showevents #showeventbody").css "display","block"
+      $("#wrapper #showevents #showeventbody").slideDown()
+      $("body").scrollTo(".showevents")
+
       return
     oldobj = JSON.parse localStorage.events
     #console.log oldobj
@@ -345,17 +357,19 @@ $("#wrapper #showevents .eventheader").live
       country  = oldobj[key].country.split(",")
       t  = oldobj[key].time.split(",")
       yeardetails  = oldobj[key].yeardetails.split(";")
-      tabl = "<table class='showevent_table'><thead><th>City</th><th>Country</th><th>Time</th></thead><tbody>"
+      tabl = "<table class='showevent_table table table-striped'><thead><th>City</th><th>Country</th><th>Time</th></thead><tbody>"
       for i of city
         tabl+="<tr><td>"+city[i]+"</td><td>"+country[i]+"</td><td>"+yeardetails[i]+" "+t[i]+"</td></tr>"
       tabl+="</tbody></table>"
-      data+= "<h2># "+(parseInt(key)+1)+" "+oldobj[key].name+"<span class='deleteEvent' key='"+key+"'>X</span></h2>"+tabl+"<h3>Description : </h3> "+oldobj[key].desc+"<br><hr class='showevents_hr' />"
+      data+= "<h2># "+(parseInt(key)+1)+" "+oldobj[key].name+"<span class='deleteEvent' key='"+key+"'>X</span></h2>"+tabl+"<h3>Description : </h3><p style='padding-left:15px;padding-right:15px;'> "+oldobj[key].desc+"</p><br><hr class='showevents_hr' />"
 
 
     if data is ""
       data="<h3>No events available, add them first by clicking on required dates</h3>"
     $("#wrapper #showevents #showeventbody").html data
-    $("#wrapper #showevents #showeventbody").css "display","block"
+    #$("#wrapper #showevents #showeventbody").css "display","block"
+    $("#wrapper #showevents #showeventbody").slideDown()
+    $("body").scrollTo("#showevents")
 
   mouseenter : (e) ->
     $("#event_help").show(75)
