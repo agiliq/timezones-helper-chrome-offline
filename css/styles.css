@@ -1,102 +1,102 @@
             body{
-            
+
                 background-image: -webkit-gradient(linear,left bottom,left top,color-stop(1, rgb(100,100,50)),color-stop(0, rgb(255,255,200)));
-	            
+
 	           background-repeat:repeat-y;
-            
+
             }
-           
-           
+
+
            #wrapper table#newevent_table{
                border : 1px solid black;
-               
+
            }
            #wrapper table#newevent_table th{
                background-color : violet;
                box-shadow : 3px 3px 5px grey;
            }
-           
+
            #wrapper table#newevent_table td{
                box-shadow : 3px 3px 1px grey;
            }
             #wrapper table.showevent_table{
                border : 1px solid black;
-               
+
            }
            #wrapper table.showevent_table th{
                background-color : violet;
                box-shadow : 3px 3px 5px grey;
            }
-           
+
            #wrapper table.showevent_table td{
                box-shadow : 3px 3px 5px darkgreen;
            }
-          
-           
+
+
            #wrapper .deleteEvent{
                float : right;
-                
+
            }
             #controls{
                 z-index : 9999;
                 background-color : white;
                 opacity : 1;
                 float:right;
-            
-            }    
-           
-            
-           
+
+            }
+
+
+
             #container{
               width : 80%;
               position : relative;
               left : 170px;
               top : 70px;
-              
+
               border : 1px solid pink;
             }
-               
+
                #toolbar{
                     background-image: -webkit-gradient(linear,left bottom,left top,color-stop(1, skyblue),color-stop(0, blue));
                     height : 35px;
-               
+
                }
-               
+
                 #div_locations_input_box{
                   float:left;
                   position : relative;
-                }  
-                
+                }
+
                 input#search_input{
                   position : absolute;
                   left : 10px;
                   height : 30px;
                   width : 250px;
                   border-radius : 5px;
-                
+
                 }
-                
-                
+
+
                 #controls{
                    position: absolute;
                    right  :10px;
                    background-color :transparent;
                 }
-                
+
                     #date_help_click {
                         font-size : 12pt;
                         font-weight : bold;
                         color : white;
                     }
-                    
+
                     #dateinput{
                         height  : 30px;
                         width  : 150px;
                         border-radius : 5px;
-                
-                
-                    }   
-                    
+
+
+                    }
+
                     #error_inputdate{
                         background-color : #FDCCCC;
                         color : red;
@@ -109,9 +109,9 @@
                         display : none;
                         vertical-align : bottom;
                     }
-                    
+
                     #date_help{
-                        background-image: -webkit-gradient(linear,left bottom,left top,color-stop(1, pink),color-stop(0, violet)); 
+                        background-image: -webkit-gradient(linear,left bottom,left top,color-stop(1, pink),color-stop(0, violet));
                         color : black;
                         width  :200px;
                         height : 35px;
@@ -121,7 +121,7 @@
                         left : 0px;
                         display : none;
                     }
-                    
+
                     button#setdate_go{
                         color : blue;
                         width : 50px;
@@ -129,10 +129,10 @@
                        background-image: -webkit-gradient(linear,left bottom,left top,color-stop(1, rgb(100,100,50)),color-stop(0, rgb(255,255,200)));
                        border-radius : 5px;
                     }
-                
-                
-                  
-                  
+
+
+
+
                     #search_result{
                         position : absolute;
                         left : 0px;
@@ -146,12 +146,12 @@
                         width : 400px;
                         z-index : 99;
                 }
-                
-                
+
+
                 #content{
                       position : relative;
                         top : 0px;
-                    
+
                 }
                     #wrapper #newevent{
                         position : absolute;
@@ -163,23 +163,23 @@
                         width : 650px;
                         padding : 16px;
                         border-radius : 10px;
-                        
+
                     }
                     #wrapper #newevent #event_close{
                         position : absolute;
                         right : 10px;
                         top:10px;
-                    
+
                     }
-                    
+
                     #wrapper #showevents{
                         position : relative ;
                         left : 170px;
                         top : 70px;
-                        
-                    
+
+
                     }
-                    
+
                             #wrapper .eventheader{
                                 color : white;
                                 background-image: -webkit-gradient(linear,left bottom,left top,color-stop(1, #4CC417),color-stop(0, green));
@@ -191,16 +191,16 @@
                                 left : 0px;
                                 top : 0px;
                             }
-                            
+
                             #wrapper #event_help{
                                 position : absolute;
                                 top : 50px;
                                 left : 500px;
                                 z-index : 100;
-                                background-image: -webkit-gradient(linear,left bottom,left top,color-stop(1, pink),color-stop(0, violet)); 
+                                background-image: -webkit-gradient(linear,left bottom,left top,color-stop(1, pink),color-stop(0, violet));
                                 width : 300px;
                                 height : 45px;
-                                
+
                                 border-radius : 5px;
                             }
                             #wrapper #event_help span{
@@ -216,23 +216,23 @@
                                border : 1px solid green;
                                border-radius : 5px;
                                width : 80%;
-                            
+
                             }
-                    
+
                     #content .row{
                         display : block;
                         text-align : left;
                         border : 1px solid white;
-                        height : 70px;  
+                        height : 70px;
                         background-color : #F8F6F6;
                         z-index : -99;
-                        
+
                     }
                     #content .row:hover {
                         background-color : #E8DDDD;
                         //color : red;
                         opacity : 1;
-                        
+
                     }
                         #content .row .icons_homedelete{
                             opacity : 0.1;
@@ -241,27 +241,27 @@
                             position: absolute;
                             left : -45px;
                         }
-                        
+
                         #content .row .icons_homedelete:hover{
                             opacity : 1;
                         }
-                        
+
                         #content .row .icons_homedelete .icon_delete{
-                            
+
                             height : 50%;
                         }
-                        
+
                         #content .row .icons_homedelete .icon_home{
                             background-image : url('images/home18.png');
                             height : 18px;
                             width : 18px;
                         }
-                        
+
                         #content .row .icons_homedelete .icon_delete:hover{
                             cursor : pointer;
-                         
+
                         }
-                        
+
                         #content .row .icons_homedelete .icon_home:hover{
                             cursor : pointer;
 
@@ -275,10 +275,10 @@
                             background-color : yellow;
                             width : 300px;
                             cursor : move;
-                            
-                        
-                        } 
-                            
+
+
+                        }
+
                             #content .row .tzdetails .offset{
                                 position : absolute;
                                 left : 8px;
@@ -286,68 +286,68 @@
                                 vertical-align : bottom;
                                 color : grey;
                             }
-                            
+
                                 #content .row .tzdetails .offset .homeicon{
                                   background-image : url('images/home18.png');
                                   background-color : transparent;
                                   width : 18px;
                                   height : 18px;
-                                
+
                                 }
                                 .homedficon{
                                   background-color :red;
                                 }
-                            
+
                             #content .row .tzdetails .location{
                                 position : absolute;
                                 left : 55px;
-                            
+
                             }
-                            
+
                             #content .row .tzdetails .location .city{
                                 color : black;
-                                font-weight : bold; 
+                                font-weight : bold;
                                 font-size : 14pt;
                             }
-                            
+
                             #content .row .tzdetails .location .country{
                                 color : grey;
                                 font-size : 10pt;
-                            
+
                             }
-                            
+
                             #content .row .tzdetails .timedata{
                                position : absolute;
                                right : 10px;
                             }
                                 #content .row .tzdetails .timedata .time {
-                                    float : right ;  
+                                    float : right ;
                                     color : black;
                                     font-weight : bold;
                                 }
-                                
+
                                 #content .row .tzdetails .timedata .timeextra{
                                    color : grey;
                                    font-size : 10pt;
                                 }
-                            
-                             
+
+
                             #content .row .tzdetails div {
                                 vertical-align : bottom;
                                 display : inline-block;
                                 height : 50px;
                             }
-                            
-                            
-                        
+
+
+
                         #content .row .dates{
                            text-align : right;
                            position : relative;
                            top : 0px;
                            left : 280px;
-                        } 
-                        
-                                
+                        }
+
+
                                 #content .row .dates #vband{
                                     border : 2px solid black;
                                     border-radius : 5px;
@@ -356,9 +356,9 @@
                                     top : -2px;
                                     left : 35px;
                                     z-index : 88;
-                                
+
                                 }
-                                
+
                                 #content .row .dates #selectedband{
                                     //border : 2px solid black;
                                     background-color : #FFB9B9;
@@ -366,19 +366,19 @@
                                     width : 22px;
                                     position : absolute;
                                     top : -2px;
-                                    left : 35px;    
+                                    left : 35px;
                                     opacity : 0.4;
-                                
+
                                 }
-                                
-                                
+
+
                                 #content .row .dates .hourline_ul{
                                  list-style : none;
                                  position : absolute;
                                  left : 0px;
-                                 
+
                                 }
-                                
+
                                 #content .row .dates .hourline_ul li {
                                   width : 22px;
                                   line-height : 30px;
@@ -388,24 +388,24 @@
                                   border-radius : 3px;
                                   display : inline-block;
                                   color : white;
-                                  
+
                                 }
-                                
+
                                 #content .row .dates .hourline_ul li .idxdetails_li{
                                   width : 22px;
                                   height : 800px;
                                   background-color : green;
                                   opacity : 0.1;
-                                
+
                                 }
-                                
+
                                 #content .row .dates .hourline_ul li div.span_hl{
                                     height : 30px;
                                     //background-color : #357EC7;
                                     box-shadow : 3px 3px 3px grey;
                                     z-index : 99;
                                 }
-                                
+
                                 .small{
                                     font-size : 8pt;
                                     line-height : 15px;
@@ -416,64 +416,64 @@
                                     line-height : 15px;
                                     vertical-align : top;
                                 }
-                                
+
                                 #content .row .dates .hourline_ul li div.span_hl .medium{
                                     font-size : 12pt;
                                     line-height : 15px;
                                     vertical-align : top;
                                 }
-                                
+
                                 #content .row .dates .hourline_ul li div.span_hl div.time_30{
                                     font-size : 8pt;
                                 }
-                                
-                                
-                                
-                                
+
+
+
+
                                 #content .row .dates .hourline_ul .li_n{
                                   background-color : #357EC7 ;
-                                
+
                                 }
                                 #content .row .dates .hourline_ul .li_m{
                                   color : #357EC7;
                                   background-color : #C8EAF0;
                                 }
-                                
+
                                 #content .row .dates .hourline_ul .li_d{
                                   color : #357EC7;
-                                   
+
                                 }
-                                
+
                                 #content .row .dates .hourline_ul .li_e{
                                   color : #357EC7;
-                                  background-color : #C8EAF0; 
-                                
+                                  background-color : #C8EAF0;
+
                                 }
-                                
+
                                 #content .row .dates .hourline_ul .li_24{
                                     background-color : #357EC7 ;
                                 }
-                    
+
             li.searchresult_li{
               list-style : none;
               z-index : 99;
               width : 350px;
             }
             li.searchresult_li:hover{
-              background-color : brown ; 
+              background-color : brown ;
               cursor : pointer;
               color : white;
             }
             li.searchresult_li span{
-            
+
             }
             li.searchresult_li span.litz{
             #min-width : 300px;
             }
-            
+
             li.searchresult_li span.litime{
                float:right;
-            }    
-                
-                
-        
+            }
+
+
+
