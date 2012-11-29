@@ -1,8 +1,8 @@
 {
-  "name": "time zone convertor",
-  "version": "1.4",
+  "name": "Time zone convertor",
+  "version": "1.5",
   "manifest_version": 1,
-  "description": "Time zone convertor ",
+  "description": "Time zone convertor - Compare different timezones, schedule events.",
   "app" : {
     "launch" : {
       "local_path" : "index.html"
