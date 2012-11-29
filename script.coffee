@@ -62,6 +62,40 @@ $(document).ready ->
 
 $("#search_input").live
   keyup : (e) ->
+    $(".searchresult_li").removeClass("temp_active")
+    if e.keyCode == 13
+      k = $(".searchresult_li.active_search").attr "k"
+      console.log k+" --attr"
+      sr_click(e, k)
+      $("#search_result").hide()
+      return
+    if e.keyCode == 40
+      console.log "down"
+      if $(".searchresult_li").length == 0
+        return
+      if $(".searchresult_li.active_search").length > 0
+        if $(".searchresult_li.active_search").next().length > 0
+          $(".searchresult_li.active_search").addClass("temp_active")
+          $(".searchresult_li").removeClass("active_search")
+          $(".searchresult_li.temp_active").next().addClass("active_search")
+        else
+          $(".searchresult_li").removeClass("active_search").first().addClass("active_search")
+      else
+        $(".searchresult_li").first().addClass("active_search")
+      return
+    if e.keyCode == 38
+      if $(".searchresult_li").length == 0
+        return
+      if $(".searchresult_li.active_search").length > 0
+        if $(".searchresult_li.active_search").prev().length > 0
+          $(".searchresult_li.active_search").addClass("temp_active")
+          $(".searchresult_li").removeClass("active_search")
+          $(".searchresult_li.temp_active").prev().addClass("active_search")
+        else
+          $(".searchresult_li").removeClass("active_search").last().addClass("active_search")
+      else
+        $(".searchresult_li").first().addClass("active_search")
+      return
     st = $(e.target).val().trim().toLowerCase()
     st.toLowerCase()
     if st.length < 1
@@ -74,17 +108,23 @@ $("#search_input").live
     updateUtc()
     getLocations 0,st
     $("#search_result").html locations
-    $("#search_result").slideDown()
+    if $("#search_result").css("display") == "none"
+      $("#search_result").slideDown()
+
   focusout : ->
     #$("#search_result").hide(1000)
     $("#search_result").slideUp()
 
 
 # add locations to the localStorage
-$("ul.searchresult_ul").live
+$(".searchresult_li").live
   click : (e) ->
     #console.log "-------li---------"
     sr_click(e)
+
+$(".searchresult_ul").live
+  mouseenter: () ->
+    $(".searchresult_li").removeClass("active_search")
 
 
 
@@ -105,7 +145,20 @@ $("#content").live
     left = parseInt($("#selectedband").css("left"))
     $("#vband").css "left",(left-2)
 
+
+$("#selectedband").live
+  mouseenter: (e) ->
+    $("#content").sortable('disable')
+  mouseout: (e) ->
+    $("#content").sortable('enable')
+
+
 $("#vband").live
+  mouseenter: (e) ->
+    $("#content").sortable('disable')
+  mouseout: (e) ->
+    $("#content").sortable('enable')
+
   click : (e) ->
     #console.log e
 
@@ -417,8 +470,10 @@ $("ulsss").live
   mouseover : ->
     #console.log "--"
 
-sr_click = (e) ->
-  k = $(e.target).attr "k"
+sr_click = (e, k) ->
+  if typeof(k) == "undefined"
+    k = $(e.target).attr "k"
+  console.log k
   offset = $("#lisr_"+k).attr "offset"
   timestr = $("#lisr_"+k).attr "timestr"
   both = $("#lisr_"+k+" span").text()
@@ -427,10 +482,11 @@ sr_click = (e) ->
   #botharr[1] city
   oldobj = JSON.parse localStorage.addedLocations
   len = 0
+  for key of oldobj
+    len++
   for key, val of oldobj
     if val['city'].trim() == botharr[1].trim()  and val['country'].trim() == botharr[0].trim()
       return
-    len++
   oldobj[len] = {}
   oldobj[len].country = botharr[0]
   oldobj[len].city = botharr[1]

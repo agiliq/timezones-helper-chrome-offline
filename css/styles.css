@@ -481,6 +481,14 @@
               cursor : pointer;
               color : white;
             }
+
+            .searchresult_li.active_search {
+              background-color : brown ;
+              cursor : pointer;
+              color : white;
+
+            }
+
             li.searchresult_li span{
 
             }
