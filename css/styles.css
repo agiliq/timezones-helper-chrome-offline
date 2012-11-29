@@ -133,6 +133,8 @@
                         top : -55px;
                         left : 0px;
                         display : none;
+                        padding: 5px;
+                        font-size: 10pt;
                     }
 
                     button#setdate_go{
@@ -210,7 +212,7 @@
                                 position : absolute;
                                 top : -50px;
                                 left : 500px;
-                                z-index : 100;
+                                z-index : 10000;
                                 background-image: -webkit-gradient(linear,left bottom,left top,color-stop(1, pink),color-stop(0, violet));
                                 width : 300px;
                                 height : 45px;
@@ -356,11 +358,9 @@
                             }
 
 
-
                         #content .row .dates{
                            text-align : right;
-                           position : relative;
-                           top : 0px;
+                           position : absolute;
                            left : 280px;
                         }
 
@@ -372,7 +372,7 @@
                                     position : absolute;
                                     top : 15px;
                                     left : 35px;
-                                    z-index : 88;
+                                    z-index : 9999;
 
                                 }
 
@@ -391,7 +391,7 @@
 
                                 #content .row .dates .hourline_ul{
                                  list-style : none;
-                                 position : absolute;
+                                 position : relative;
                                  left : 0px;
 
                                 }
@@ -470,6 +470,9 @@
                                 #content .row .dates .hourline_ul .li_24{
                                     background-color : #357EC7 ;
                                 }
+
+
+                                
 
             li.searchresult_li{
               list-style : none;

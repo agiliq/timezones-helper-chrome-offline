@@ -754,7 +754,9 @@
     left = parseInt($("#selectedband").css("left"));
     $("#vband").css("left", left - 2);
     $("#vband").css("height", $("#selectedband").css("height"));
-    return $("#content").sortable();
+    return $("#content").sortable({
+      'containment': 'parent'
+    });
   };
 
   convertOffsetToFloat = function(str) {

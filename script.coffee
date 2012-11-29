@@ -853,7 +853,7 @@ renderRows = ->
   left = parseInt($("#selectedband").css("left"))
   $("#vband").css "left",(left-2)
   $("#vband").css "height",$("#selectedband").css("height")
-  $("#content").sortable()
+  $("#content").sortable({'containment':'parent'})
 
 convertOffsetToFloat = (str) ->
   first = str.substr(0,str.indexOf(":"))
