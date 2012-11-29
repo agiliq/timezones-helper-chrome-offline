@@ -59,7 +59,7 @@
   $("#search_input").live({
     keyup: function(e) {
       var st;
-      st = $(e.target).val().trim();
+      st = $(e.target).val().trim().toLowerCase();
       st.toLowerCase();
       if (st.length < 1) {
         $("#search_result").slideUp();

@@ -62,7 +62,7 @@ $(document).ready ->
 
 $("#search_input").live
   keyup : (e) ->
-    st = $(e.target).val().trim()
+    st = $(e.target).val().trim().toLowerCase()
     st.toLowerCase()
     if st.length < 1
       #$("#search_result").hide(200)
