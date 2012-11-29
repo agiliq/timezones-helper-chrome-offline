@@ -253,22 +253,30 @@
 
   $("#content .row .icons_homedelete .icon_delete").live({
     click: function(e) {
-      var defaultind, i, key, len, oldobj, rowindex;
+      var defaultidx, i, key, len, newobj, oldobj, rowindex, val;
       rowindex = parseInt($(e.target).parent().parent().attr("rowindex"));
+      oldobj = JSON.parse(localStorage.addedLocations);
       oldobj = JSON.parse(localStorage.addedLocations);
       len = 0;
       for (key in oldobj) {
         len++;
       }
-      i = rowindex + 1;
-      while (i < len) {
-        oldobj[i - 1] = oldobj[i];
-        i++;
+      defaultidx = Number(localStorage["default"]);
+      if (defaultidx > rowindex) defaultidx--;
+      delete oldobj[rowindex];
+      i = 0;
+      newobj = {};
+      for (key in oldobj) {
+        val = oldobj[key];
+        key = Number(key);
+        if (key > rowindex) {
+          newobj[key - 1] = val;
+        } else {
+          newobj[key] = val;
+        }
       }
-      delete oldobj[i - 1];
-      localStorage.addedLocations = JSON.stringify(oldobj);
-      defaultind = parseInt(localStorage["default"]);
-      if (defaultind === (i - 1)) localStorage["default"] = defaultind - 1;
+      localStorage["default"] = defaultidx;
+      localStorage.addedLocations = JSON.stringify(newobj);
       return renderRows();
     }
   });
@@ -361,24 +369,44 @@
 
   $("#content").live({
     sortstop: function(e, ui) {
-      var defaultind, oldobj, tempobj;
-      rowsortstop = ui.item.index();
-      defaultind = localStorage["default"];
-      if (defaultind === rowsortstart + "") {
-        defaultind = rowsortstop;
-      } else {
-        if (defaultind === rowsortstop + "") defaultind = rowsortstart;
-      }
+      var defaultind, i, key, oldobj, startobj, val;
+      rowsortstop = ui.item.index() - 2;
+      if (rowsortstart === rowsortstop) return;
       oldobj = JSON.parse(localStorage.addedLocations);
-      tempobj = oldobj[rowsortstart];
-      oldobj[rowsortstart] = oldobj[rowsortstop];
-      oldobj[rowsortstop] = tempobj;
-      localStorage.addedLocations = JSON.stringify(oldobj);
+      startobj = oldobj[rowsortstart];
+      for (key in oldobj) {
+        val = oldobj[key];
+        if (rowsortstart < rowsortstop) {
+          if (key > rowsortstart && key <= rowsortstop) oldobj[key - 1] = val;
+        }
+      }
+      if (rowsortstart > rowsortstop) {
+        i = rowsortstart;
+        while (i > rowsortstop) {
+          oldobj[i] = oldobj[i - 1];
+          i--;
+        }
+      }
+      oldobj[rowsortstop] = startobj;
+      defaultind = Number(localStorage["default"]);
+      console.log("Defa : " + defaultind);
+      console.log("RStart : " + rowsortstart);
+      console.log("RStop : " + rowsortstop);
+      if (defaultind <= rowsortstop && defaultind > rowsortstart) {
+        console.log("dec");
+        defaultind--;
+      } else if (defaultind < rowsortstart && defaultind >= rowsortstop) {
+        console.log("inc");
+        defaultind++;
+      } else if (defaultind === rowsortstart) {
+        defaultind = rowsortstop;
+      }
       localStorage["default"] = defaultind;
+      localStorage.addedLocations = JSON.stringify(oldobj);
       return renderRows();
     },
     sortstart: function(e, ui) {
-      return rowsortstart = ui.item.index();
+      return rowsortstart = ui.item.index() - 2;
     }
   });
 
@@ -391,7 +419,7 @@
         return;
       }
       if (!("events" in localStorage)) {
-        $("#wrapper #showevents #showeventbody").html("<h3>No events available, add them first by clicking on required dates</h3>");
+        $("#wrapper #showevents #showeventbody").html("<h3>No events available, add them first by clicking on the boxes showing time.</h3>");
         $("#wrapper #showevents #showeventbody").slideDown();
         $("body").scrollTo(".showevents");
         return;
@@ -415,7 +443,7 @@
         data += "<h2># " + (parseInt(key) + 1) + " " + oldobj[key].name + "<span class='deleteEvent' key='" + key + "'>X</span></h2>" + tabl + "<h3>Description : </h3><p style='padding-left:15px;padding-right:15px;'> " + oldobj[key].desc + "</p><br><hr class='showevents_hr' />";
       }
       if (data === "") {
-        data = "<h3>No events available, add them first by clicking on required dates</h3>";
+        data = "<h3>No events available, add them first by clicking on the boxes showing time.</h3>";
       }
       $("#wrapper #showevents #showeventbody").html(data);
       $("#wrapper #showevents #showeventbody").slideDown();
@@ -467,7 +495,7 @@
   });
 
   sr_click = function(e, k) {
-    var both, botharr, key, len, offset, oldobj, timestr, val;
+    var both, botharr, key, key_arr, len, newobj, offset, oldobj, timestr, val;
     if (typeof k === "undefined") k = $(e.target).attr("k");
     console.log(k);
     offset = $("#lisr_" + k).attr("offset");
@@ -476,7 +504,9 @@
     botharr = both.split(",");
     oldobj = JSON.parse(localStorage.addedLocations);
     len = 0;
+    key_arr = [];
     for (key in oldobj) {
+      key_arr += key;
       len++;
     }
     for (key in oldobj) {
@@ -485,6 +515,7 @@
         return;
       }
     }
+    newobj = {};
     oldobj[len] = {};
     oldobj[len].country = botharr[0];
     oldobj[len].city = botharr[1];
@@ -755,7 +786,8 @@
     $("#vband").css("left", left - 2);
     $("#vband").css("height", $("#selectedband").css("height"));
     return $("#content").sortable({
-      'containment': 'parent'
+      'containment': 'parent',
+      'items': '.row'
     });
   };
 

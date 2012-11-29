@@ -250,18 +250,39 @@ $("#content .row .icons_homedelete .icon_delete").live
   click : (e) ->
     rowindex = parseInt($(e.target).parent().parent().attr("rowindex"))
     oldobj = JSON.parse localStorage.addedLocations
+    #len = 0
+    #for key of oldobj
+    #  len++
+    #i = rowindex+1
+    #while i<len
+    #  oldobj[i-1] = oldobj[i]
+    #  i++
+    #delete oldobj[i-1]
+    #localStorage.addedLocations = JSON.stringify oldobj
+    #defaultind = parseInt localStorage.default
+    #if defaultind is (i-1)
+    #  localStorage.default = (defaultind-1)
+
+    oldobj = JSON.parse localStorage.addedLocations
     len = 0
     for key of oldobj
       len++
-    i = rowindex+1
-    while i<len
-      oldobj[i-1] = oldobj[i]
-      i++
-    delete oldobj[i-1]
-    localStorage.addedLocations = JSON.stringify oldobj
-    defaultind = parseInt localStorage.default
-    if defaultind is (i-1)
-      localStorage.default = (defaultind-1)
+    defaultidx = Number localStorage.default
+    if defaultidx > rowindex
+      defaultidx--
+    delete oldobj[rowindex]
+    i = 0
+    newobj = {}
+    for key, val of oldobj
+      key = Number key
+      if key > rowindex
+        newobj[key-1] = val
+      else
+        newobj[key] = val
+
+    localStorage.default = defaultidx
+    localStorage.addedLocations = JSON.stringify newobj
+
     renderRows()
 
 $("#content .row .icons_homedelete .icon_home").live
@@ -349,33 +370,49 @@ $("#error_inputdate").live
 
 $("#content").live
   sortstop : (e,ui) ->
-    #console.log "new : "+ui.item.index()
-    #console.log "old : "+$(e.target).attr "rowindex"
-    rowsortstop = ui.item.index()
-    #console.log e.target.id
-    defaultind = localStorage.default
-    #console.log "b4 def : "+defaultind
-    #console.log (defaultind is rowsortstart+"")
-    #console.log (defaultind is rowsortstop+"")
-    if defaultind is rowsortstart+""
+    rowsortstop = ui.item.index() - 2
+    if rowsortstart == rowsortstop
+      return
+    oldobj = JSON.parse localStorage.addedLocations
+
+    startobj = oldobj[rowsortstart]
+
+    for key, val of oldobj
+      if rowsortstart < rowsortstop
+        if key > rowsortstart and key <= rowsortstop
+          oldobj[key-1] = val
+
+    if rowsortstart > rowsortstop
+      i=rowsortstart
+      while i > rowsortstop
+        oldobj[i] = oldobj[i-1]
+        i--
+
+
+    oldobj[rowsortstop] = startobj
+
+    defaultind = Number localStorage.default
+    console.log "Defa : "+defaultind
+    console.log "RStart : "+rowsortstart
+    console.log "RStop : "+rowsortstop
+    if (defaultind <= rowsortstop and defaultind > rowsortstart) 
+      console.log "dec"
+      defaultind--
+    else if  (defaultind <rowsortstart and defaultind >= rowsortstop )
+      console.log "inc"
+      defaultind++
+
+    else if defaultind == rowsortstart
       defaultind = rowsortstop
 
-    else
-      if defaultind is rowsortstop+""
-
-        defaultind = rowsortstart
-    #console.log "After : "+defaultind
-    oldobj = JSON.parse localStorage.addedLocations
-    tempobj = oldobj[rowsortstart]
-    oldobj[rowsortstart] = oldobj[rowsortstop]
-    oldobj[rowsortstop] = tempobj
-    localStorage.addedLocations = JSON.stringify oldobj
     localStorage.default = defaultind
+    localStorage.addedLocations = JSON.stringify oldobj
     renderRows()
 
-  sortstart : (e,ui) ->
-    #console.log "start : "+ui.item.index()
-    rowsortstart = ui.item.index()
+  sortstart: (e, ui) ->
+    rowsortstart = ui.item.index() - 2
+
+  
 
 $("#wrapper #showevents .eventheader").live
 
@@ -391,7 +428,7 @@ $("#wrapper #showevents .eventheader").live
       return
     #console.log prev+" -- should be none"
     unless "events" of localStorage
-      $("#wrapper #showevents #showeventbody").html "<h3>No events available, add them first by clicking on required dates</h3>"
+      $("#wrapper #showevents #showeventbody").html "<h3>No events available, add them first by clicking on the boxes showing time.</h3>"
       #$("#wrapper #showevents #showeventbody").css "display","block"
       $("#wrapper #showevents #showeventbody").slideDown()
       $("body").scrollTo(".showevents")
@@ -418,7 +455,7 @@ $("#wrapper #showevents .eventheader").live
 
 
     if data is ""
-      data="<h3>No events available, add them first by clicking on required dates</h3>"
+      data="<h3>No events available, add them first by clicking on the boxes showing time.</h3>"
     $("#wrapper #showevents #showeventbody").html data
     #$("#wrapper #showevents #showeventbody").css "display","block"
     $("#wrapper #showevents #showeventbody").slideDown()
@@ -482,11 +519,26 @@ sr_click = (e, k) ->
   #botharr[1] city
   oldobj = JSON.parse localStorage.addedLocations
   len = 0
+  key_arr = []
   for key of oldobj
+    key_arr += key
     len++
+
   for key, val of oldobj
     if val['city'].trim() == botharr[1].trim()  and val['country'].trim() == botharr[0].trim()
       return
+
+  newobj = {}
+  #i = 0
+  #for key, val of oldobj
+  #  newobj[i] = val
+  #  i += 1
+  #console.log JSON.stringify newobj
+  #newobj[i] = {}
+  #newobj[i].country = botharr[0]
+  #newobj[i].city = botharr[1]
+  #newobj[i].offset = offset
+  #localStorage.addedLocations = JSON.stringify newobj
   oldobj[len] = {}
   oldobj[len].country = botharr[0]
   oldobj[len].city = botharr[1]
@@ -853,7 +905,7 @@ renderRows = ->
   left = parseInt($("#selectedband").css("left"))
   $("#vband").css "left",(left-2)
   $("#vband").css "height",$("#selectedband").css("height")
-  $("#content").sortable({'containment':'parent'})
+  $("#content").sortable({'containment':'parent', 'items':'.row'})
 
 convertOffsetToFloat = (str) ->
   first = str.substr(0,str.indexOf(":"))
