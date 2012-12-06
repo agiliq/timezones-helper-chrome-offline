@@ -65,12 +65,10 @@ $("#search_input").live
     $(".searchresult_li").removeClass("temp_active")
     if e.keyCode == 13
       k = $(".searchresult_li.active_search").attr "k"
-      console.log k+" --attr"
       sr_click(e, k)
       $("#search_result").hide()
       return
     if e.keyCode == 40
-      console.log "down"
       if $(".searchresult_li").length == 0
         return
       if $(".searchresult_li.active_search").length > 0
@@ -113,13 +111,18 @@ $("#search_input").live
 
   focusout : ->
     #$("#search_result").hide(1000)
-    $("#search_result").slideUp()
+    setTimeout (->
+      $("#search_result").slideUp()
+    ), 300
 
 
 # add locations to the localStorage
-$(".searchresult_li").live
+#$("#search_result").on "click", {}, (e) ->
+#   console.log "------clicked-----"
+#   sr_click(e)
+$("li.searchresult_li").live
   click : (e) ->
-    #console.log "-------li---------"
+    console.log "-------li---------"
     sr_click(e)
 
 $(".searchresult_ul").live
@@ -317,6 +320,7 @@ $("#setdate_go").live
     errormsg = "mm-dd-yyyy format only"
 
     datestr = $("#dateinput").val().trim()
+    window.da = datestr
     unless datestr.length is 10
       $("#error_inputdate").html errormsg
       $("#error_inputdate").show()
@@ -331,9 +335,9 @@ $("#setdate_go").live
       $("#error_inputdate").show()
       return
     #console.log (datestr.substr(0,2))
-    mm = parseFloat datestr.substr(0,2)
-    mm = parseInt mm
-    dd = parseInt datestr.substr(3,2)
+    mm = Number datestr.substr(0,2)
+    dd = Number datestr.substr(3,2)
+    
     year =  datestr.substr(6,4)
     unless year.length is 4
       $("#error_inputdate").html errormsg
@@ -341,7 +345,7 @@ $("#setdate_go").live
       return
 
     #console.log "---"
-    year = parseInt datestr.substr(6,4)
+    year = Number datestr.substr(6,4)
     #console.log mm+" : "+dd+" : "+year
     #console.log (mm >12 or mm<1 or dd<0 or dd>31)
     if (mm >12 or mm<1 or dd<0 or dd>31)
@@ -363,7 +367,7 @@ $("#setdate_go").live
 
 $("#error_inputdate").live
   click : ->
-    $("#error_inputdate").slideUp(500)
+    $("#error_inputdate").slideUp(50)
   focusout : ->
     $("#error_inputdate").hide(500)
 
@@ -392,14 +396,9 @@ $("#content").live
     oldobj[rowsortstop] = startobj
 
     defaultind = Number localStorage.default
-    console.log "Defa : "+defaultind
-    console.log "RStart : "+rowsortstart
-    console.log "RStop : "+rowsortstop
     if (defaultind <= rowsortstop and defaultind > rowsortstart) 
-      console.log "dec"
       defaultind--
     else if  (defaultind <rowsortstart and defaultind >= rowsortstop )
-      console.log "inc"
       defaultind++
 
     else if defaultind == rowsortstart
@@ -451,7 +450,7 @@ $("#wrapper #showevents .eventheader").live
       for i of city
         tabl+="<tr><td>"+city[i]+"</td><td>"+country[i]+"</td><td>"+yeardetails[i]+" "+t[i]+"</td></tr>"
       tabl+="</tbody></table>"
-      data+= "<h2># "+(parseInt(key)+1)+" "+oldobj[key].name+"<span class='deleteEvent' key='"+key+"'>X</span></h2>"+tabl+"<h3>Description : </h3><p style='padding-left:15px;padding-right:15px;'> "+oldobj[key].desc+"</p><br><hr class='showevents_hr' />"
+      data+= "<h2># "+(parseInt(key)+1)+" "+oldobj[key].name+"<span class='deleteEvent' key='"+key+"'>X&nbsp;</span></h2>"+tabl+"<h3>Description : </h3><p style='padding-left:15px;padding-right:15px;'> "+oldobj[key].desc+"</p><br><hr class='showevents_hr' />"
 
 
     if data is ""
@@ -510,7 +509,6 @@ $("ulsss").live
 sr_click = (e, k) ->
   if typeof(k) == "undefined"
     k = $(e.target).attr "k"
-  console.log k
   offset = $("#lisr_"+k).attr "offset"
   timestr = $("#lisr_"+k).attr "timestr"
   both = $("#lisr_"+k+" span").text()
@@ -739,15 +737,14 @@ renderRows = ->
         else
           tempstr=" "
     #console.log "selected date"
-    #console.log selecteddate
     selectedDateStr = selecteddate.dayInText+" , "+selecteddate.mText+" "+selecteddate.d+" , "+selecteddate.year
+
     timeextrastr = selecteddate.dayInText+" , "+selecteddate.mText+" "+selecteddate.d+"  "+selecteddate.year
     hourline = "<ul class='hourline_ul'>"
     idx = 0
 
     iorig = i
     if i is 0 or i is 0.5
-
 
       cl = "li_24"
       hourline+=" <li class='"+cl+"' id='lihr_"+idx+"' idx='"+idx+"' t='"+i+"' details='"+selectedDateStr+"' ><div class='span_hl' idx='"+idx+"'><span idx='"+idx+"' class='small' >"+selecteddate.mText+"</span><br><span idx='"+idx+"' class='small' >"+selecteddate.d+"</span></div></li>"
@@ -761,7 +758,8 @@ renderRows = ->
     d = new Date()
     #d.setFullYear timearr[3],monInNum,timearr[2]
     d.setFullYear selecteddate.year,selecteddate.m,selecteddate.d
-    presdate = d.toLocaleString()
+    #presdate = d.toLocaleString()
+    presdate = d+""
 
     presdatearr = presdate.split " "
     presdatestr = presdatearr[0]+" , "+presdatearr[1]+" "+presdatearr[2]+" , "+presdatearr[3]
@@ -770,14 +768,16 @@ renderRows = ->
     prevdate.setFullYear selecteddate.year,selecteddate.m,selecteddate.d
 
     prevdate.setTime prevdate.getTime() - 86400000
-    prevdate = prevdate.toLocaleString()
+    #prevdate = prevdate.toLocaleString()
+    prevdate = prevdate+""
     prevdatearr = prevdate.split " "
     prevdatestr = prevdatearr[0]+" , "+prevdatearr[1]+" "+prevdatearr[2]+" , "+prevdatearr[3]
 
 
     d.setTime d.getTime()+86400000
 
-    d = d.toLocaleString()
+    #d = d.toLocaleString()
+    d = d+""
     nextdayarr = d.split " "
     nextDayStr = nextdayarr[0]+" , "+nextdayarr[1]+" "+nextdayarr[2]+" , "+nextdayarr[3]
 
@@ -1006,13 +1006,17 @@ getMonth = (mon,options) ->
 setSelectedDate = (options) ->
 #  HERE IN OPTIONS, SEND MONTH IN ZERO INDEXED FORMAT
   if options
-    #console.log "in setsee..."
     selecteddate = options
     selecteddate.mText = getMonth selecteddate.m,{"type":"str"}
-    dnew = new Date(selecteddate.m+"-"+selecteddate.d+"-"+selecteddate.year)
+    #dnew = new Date(selecteddate.m+"-"+selecteddate.d+"-"+selecteddate.year)
+    dnew = new Date()
+    dnew.setMonth(selecteddate.m)
+    dnew.setDate(selecteddate.d)
+    dnew.setFullYear(selecteddate.year) 
     dnew = dnew.toLocaleString()
     dnewarr = dnew.split " "
     selecteddate.dayInText = dnewarr[0]
+    
 
 
   else
@@ -1021,7 +1025,11 @@ setSelectedDate = (options) ->
     selecteddate.d = d.getDate()
     selecteddate.year = d.getYear()+1900
     selecteddate.mText = getMonth selecteddate.m,{"type":"str"}
-    dnew = new Date((parseInt(selecteddate.m+1))+"-"+selecteddate.d+"-"+selecteddate.year)
+    #dnew = new Date((parseInt(selecteddate.m+1))+"-"+selecteddate.d+"-"+selecteddate.year)
+    dnew = new Date()
+    dnew.setMonth(selecteddate.m)
+    dnew.setDate(selecteddate.d)
+    dnew.setFullYear(selecteddate.year) 
     dnew = dnew.toLocaleString()
     dnewarr = dnew.split " "
     selecteddate.dayInText = dnewarr[0]

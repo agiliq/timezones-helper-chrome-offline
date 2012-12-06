@@ -7,25 +7,38 @@
         <script src="lib/scrollto-plugin.js" type="text/javascript" ></script>
         <script src="script.js" type="text/javascript" ></script>
 
+        <link href="css/bootstrap.css" rel="stylesheet" />
         <link rel="stylesheet" href="css/styles.css" type='text/css' />
+        <link href="css/jquery-ui.css" rel="stylesheet" type='text/css' />
+        <!--
         <link rel="stylesheet" href="css/bootstrap-table.css" type='text/css' />
         <link rel="stylesheet" href="css/bootstrap-button.css" type='text/css' />
+        -->
+        <script type='text/javascript'>
+         $(function() {
+                 $( "#dateinput" ).datepicker({ dateFormat: 'mm-dd-yy'});
+            });
+        </script>
     </head>
     <body>
 
         <div id="wrapper">
                   <div id="container" class='canhide'>
-                      <div id='toolbar'>
-                        <div id='div_locations_input_box'>
+                      <div id='toolbar' class='well well-small'>
+                        <div id='div_locations_input_box' class='pull-left'>
                             <input type='text' id='search_input' placeholder='search city, country...' autocomplete='off' />
                              <div id="search_result">
 
                              </div> <!-- end of div search_result -->
                         </div> <!-- end of div div_locations_input_box -->
-                        <div id='controls'>
-                             <div id='error_inputdate'></div>
-                             <div id='date_help'>Enter the date on which you wish to schedule</div>
-                             <input type='text' placeholder='mm-dd-yyyy' id='dateinput'  maxlength=10 /><span style=';display:inline-block;width : 10px' ></span><button id='setdate_go'>Go</button><span class='seldate1'></span><span class='seldate2'></span><span class='seldate3'></span><span class='seldate4'></span><span class='seldate5'></span>
+                        <div id='controls' class='pull-right'>
+                             <div id='error_inputdate' class='well well-small'></div>
+                             <div id='date_help' class='well'>Enter the date on which you wish to schedule</div>
+                             <input type='text' placeholder='mm-dd-yyyy' id='dateinput'  maxlength=10 /><span style=';display:inline-block;width : 10px' ></span>
+                             <button id='setdate_go' class='btn'>Go</button>
+                             <span class='seldate1'></span><span class='seldate2'></span>
+                             <span class='seldate3'></span><span class='seldate4'></span>
+                             <span class='seldate5'></span>
                         </div> <!-- end of div controls -->
                       </div> <!-- end of div toolbar -->
                         <div id="content">
@@ -62,7 +75,7 @@
 
                         <div id='showevents' class='canhide'>
                            <h3 class='eventheader'>Events</h3>
-                           <div id='event_help' style='display:none'><span>Click to display the list of events</span></div>
+                           <div id='event_help' class='well well-small' style='display:none'><span>Click to display the list of events</span></div>
                            <div id='showeventbody'></div>
 
 

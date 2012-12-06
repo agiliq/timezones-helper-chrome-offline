@@ -62,13 +62,11 @@
       $(".searchresult_li").removeClass("temp_active");
       if (e.keyCode === 13) {
         k = $(".searchresult_li.active_search").attr("k");
-        console.log(k + " --attr");
         sr_click(e, k);
         $("#search_result").hide();
         return;
       }
       if (e.keyCode === 40) {
-        console.log("down");
         if ($(".searchresult_li").length === 0) return;
         if ($(".searchresult_li.active_search").length > 0) {
           if ($(".searchresult_li.active_search").next().length > 0) {
@@ -115,12 +113,15 @@
       }
     },
     focusout: function() {
-      return $("#search_result").slideUp();
+      return setTimeout((function() {
+        return $("#search_result").slideUp();
+      }), 300);
     }
   });
 
-  $(".searchresult_li").live({
+  $("li.searchresult_li").live({
     click: function(e) {
+      console.log("-------li---------");
       return sr_click(e);
     }
   });
@@ -314,6 +315,7 @@
       var datestr, dd, errormsg, key, lenofdash, mm, options, year, _i, _len;
       errormsg = "mm-dd-yyyy format only";
       datestr = $("#dateinput").val().trim();
+      window.da = datestr;
       if (datestr.length !== 10) {
         $("#error_inputdate").html(errormsg);
         $("#error_inputdate").show();
@@ -329,16 +331,15 @@
         $("#error_inputdate").show();
         return;
       }
-      mm = parseFloat(datestr.substr(0, 2));
-      mm = parseInt(mm);
-      dd = parseInt(datestr.substr(3, 2));
+      mm = Number(datestr.substr(0, 2));
+      dd = Number(datestr.substr(3, 2));
       year = datestr.substr(6, 4);
       if (year.length !== 4) {
         $("#error_inputdate").html(errormsg);
         $("#error_inputdate").show();
         return;
       }
-      year = parseInt(datestr.substr(6, 4));
+      year = Number(datestr.substr(6, 4));
       if (mm > 12 || mm < 1 || dd < 0 || dd > 31) {
         $("#error_inputdate").html(errormsg);
         $("#error_inputdate").show();
@@ -360,7 +361,7 @@
 
   $("#error_inputdate").live({
     click: function() {
-      return $("#error_inputdate").slideUp(500);
+      return $("#error_inputdate").slideUp(50);
     },
     focusout: function() {
       return $("#error_inputdate").hide(500);
@@ -389,14 +390,9 @@
       }
       oldobj[rowsortstop] = startobj;
       defaultind = Number(localStorage["default"]);
-      console.log("Defa : " + defaultind);
-      console.log("RStart : " + rowsortstart);
-      console.log("RStop : " + rowsortstop);
       if (defaultind <= rowsortstop && defaultind > rowsortstart) {
-        console.log("dec");
         defaultind--;
       } else if (defaultind < rowsortstart && defaultind >= rowsortstop) {
-        console.log("inc");
         defaultind++;
       } else if (defaultind === rowsortstart) {
         defaultind = rowsortstop;
@@ -440,7 +436,7 @@
           tabl += "<tr><td>" + city[i] + "</td><td>" + country[i] + "</td><td>" + yeardetails[i] + " " + t[i] + "</td></tr>";
         }
         tabl += "</tbody></table>";
-        data += "<h2># " + (parseInt(key) + 1) + " " + oldobj[key].name + "<span class='deleteEvent' key='" + key + "'>X</span></h2>" + tabl + "<h3>Description : </h3><p style='padding-left:15px;padding-right:15px;'> " + oldobj[key].desc + "</p><br><hr class='showevents_hr' />";
+        data += "<h2># " + (parseInt(key) + 1) + " " + oldobj[key].name + "<span class='deleteEvent' key='" + key + "'>X&nbsp;</span></h2>" + tabl + "<h3>Description : </h3><p style='padding-left:15px;padding-right:15px;'> " + oldobj[key].desc + "</p><br><hr class='showevents_hr' />";
       }
       if (data === "") {
         data = "<h3>No events available, add them first by clicking on the boxes showing time.</h3>";
@@ -497,7 +493,6 @@
   sr_click = function(e, k) {
     var both, botharr, key, key_arr, len, newobj, offset, oldobj, timestr, val;
     if (typeof k === "undefined") k = $(e.target).attr("k");
-    console.log(k);
     offset = $("#lisr_" + k).attr("offset");
     timestr = $("#lisr_" + k).attr("timestr");
     both = $("#lisr_" + k + " span").text();
@@ -680,17 +675,17 @@
       });
       d = new Date();
       d.setFullYear(selecteddate.year, selecteddate.m, selecteddate.d);
-      presdate = d.toLocaleString();
+      presdate = d + "";
       presdatearr = presdate.split(" ");
       presdatestr = presdatearr[0] + " , " + presdatearr[1] + " " + presdatearr[2] + " , " + presdatearr[3];
       prevdate = new Date();
       prevdate.setFullYear(selecteddate.year, selecteddate.m, selecteddate.d);
       prevdate.setTime(prevdate.getTime() - 86400000);
-      prevdate = prevdate.toLocaleString();
+      prevdate = prevdate + "";
       prevdatearr = prevdate.split(" ");
       prevdatestr = prevdatearr[0] + " , " + prevdatearr[1] + " " + prevdatearr[2] + " , " + prevdatearr[3];
       d.setTime(d.getTime() + 86400000);
-      d = d.toLocaleString();
+      d = d + "";
       nextdayarr = d.split(" ");
       nextDayStr = nextdayarr[0] + " , " + nextdayarr[1] + " " + nextdayarr[2] + " , " + nextdayarr[3];
       dayusedarr = [];
@@ -902,7 +897,10 @@
       selecteddate.mText = getMonth(selecteddate.m, {
         "type": "str"
       });
-      dnew = new Date(selecteddate.m + "-" + selecteddate.d + "-" + selecteddate.year);
+      dnew = new Date();
+      dnew.setMonth(selecteddate.m);
+      dnew.setDate(selecteddate.d);
+      dnew.setFullYear(selecteddate.year);
       dnew = dnew.toLocaleString();
       dnewarr = dnew.split(" ");
       selecteddate.dayInText = dnewarr[0];
@@ -914,7 +912,10 @@
       selecteddate.mText = getMonth(selecteddate.m, {
         "type": "str"
       });
-      dnew = new Date((parseInt(selecteddate.m + 1)) + "-" + selecteddate.d + "-" + selecteddate.year);
+      dnew = new Date();
+      dnew.setMonth(selecteddate.m);
+      dnew.setDate(selecteddate.d);
+      dnew.setFullYear(selecteddate.year);
       dnew = dnew.toLocaleString();
       dnewarr = dnew.split(" ");
       selecteddate.dayInText = dnewarr[0];
