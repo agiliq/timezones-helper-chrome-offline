@@ -1,5 +1,5 @@
 (function() {
-  var convertOffset, convertOffsetToFloat, convsdfsertOffset, getLocations, getMonth, getNewTime, k, locations, origcities, renderRows, rowsortstart, rowsortstop, selecteddate, setSelectedDate, sr_click, tzdata, tzdatalower, updateUtc, utc,
+  var convertOffset, convertOffsetToFloat, domain_name, generate_meeting_link, getLocations, getMonth, getNewTime, hide_meeting_details, k, locations, origcities, remove_key, renderRows, rowsortstart, rowsortstop, selecteddate, setSelectedDate, sr_click, tzdata, tzdatalower, updateUtc, utc,
     _this = this;
 
   origcities = "";
@@ -20,6 +20,8 @@
 
   rowsortstop = "";
 
+  domain_name = "http://533f.localtunnel.com/timezoneconvertor";
+
   $(document).ready(function() {
     var bombayoff, bt, d, datearr, dstr, localoffset, localtime, nd, ndarr, ndstr;
     updateUtc();
@@ -35,26 +37,106 @@
     ndstr = nd.toLocaleString();
     ndarr = ndstr.split(" ");
     setSelectedDate();
-    /*
-      $.ajax
-          url : "tz/cities.csv"
-          success : (cities) ->
-            origcities = cities.toLowerCase()
-            #console.log "cities loaded successfully"
-          error : (e) ->
-            #console.log "Error loading cities"
-    */
     return $.ajax({
       url: "tz/tz.csv",
       success: function(tz) {
         window.ttt = tz;
         tzdata = tz;
         tzdatalower = tz.toLowerCase();
-        return renderRows();
+        renderRows();
+        if (window.location.search !== "") {
+          return renderRows(generate_meeting_link);
+        }
       },
       error: function(e) {}
     });
   });
+
+  generate_meeting_link = function() {
+    var duplicate_keys, html, i, j, key, keys, old_keys, oldobj, original_param_obj, param_keys, param_obj, params_arr, search, temp, temp_arr, temp_obj, temp_param_obj, time_arr, val, _i, _j, _len, _len2;
+    console.log("Genrat meeting lik starte");
+    search = decodeURI(window.location.search);
+    search = search.substr(1, search.length);
+    params_arr = search.split("&");
+    time_arr = params_arr.pop();
+    param_obj = {};
+    for (_i = 0, _len = params_arr.length; _i < _len; _i++) {
+      key = params_arr[_i];
+      temp = key.split("=");
+      param_obj[temp[0]] = temp[1];
+    }
+    oldobj = JSON.parse(localStorage.addedLocations);
+    console.log(JSON.stringify(oldobj));
+    keys = Object.keys;
+    old_keys = keys(oldobj);
+    param_keys = keys(param_obj);
+    duplicate_keys = [];
+    i = 0;
+    original_param_obj = {};
+    while (i < param_keys.length) {
+      temp_arr = param_obj[i].split(";");
+      temp_obj = {
+        'city': temp_arr[0],
+        'country': temp_arr[1],
+        'offset': temp_arr[2],
+        'time': temp_arr[3]
+      };
+      param_obj[i] = temp_obj;
+      original_param_obj[i] = temp_obj;
+      j = 0;
+      while (j < old_keys.length) {
+        if (param_obj[i].city.trim() === oldobj[j].city.trim() && param_obj[i].country.trim() === oldobj[j].country.trim()) {
+          duplicate_keys += [i];
+          break;
+        }
+        j++;
+      }
+      i++;
+    }
+    for (_j = 0, _len2 = duplicate_keys.length; _j < _len2; _j++) {
+      key = duplicate_keys[_j];
+      delete param_obj[key];
+    }
+    temp_param_obj = {};
+    i = 0;
+    for (key in param_obj) {
+      val = param_obj[key];
+      temp_param_obj[i] = val;
+      i++;
+    }
+    param_obj = temp_param_obj;
+    param_keys = keys(param_obj);
+    i = old_keys.length;
+    j = 0;
+    while (j < param_keys.length) {
+      oldobj[i] = param_obj[j];
+      i++;
+      j++;
+    }
+    localStorage.addedLocations = JSON.stringify(oldobj);
+    renderRows();
+    html = "<table class='table table-striped'>";
+    for (key in original_param_obj) {
+      val = original_param_obj[key];
+      html += "<tr><td>" + val.city + "</td><td>" + val.country + "</td><td>" + val.time + "</td></tr>";
+    }
+    $("#meeting_details .modal-body").html(html).parent().show();
+    return $("#meeting_details").draggable({
+      handle: '.meeting_details_move'
+    });
+  };
+
+  remove_key = function(obj, pos) {
+    var i, len;
+    i = pos;
+    len = Object.keys(obj).length;
+    while (i < len - 1) {
+      obj[i] = obj[i + 1];
+      i++;
+    }
+    delete obj[len - 1];
+    return obj;
+  };
 
   $("#search_input").live({
     keyup: function(e) {
@@ -121,7 +203,6 @@
 
   $("li.searchresult_li").live({
     click: function(e) {
-      console.log("-------li---------");
       return sr_click(e);
     }
   });
@@ -171,7 +252,7 @@
       return $("#content").sortable('enable');
     },
     click: function(e) {
-      var city, country, ele, idx, ind, t, tText, tabl, yeardetails, _i, _len, _ref;
+      var city, country, ele, i, idx, ind, param_string, t, tText, tabl, yeardetails, _i, _len, _ref;
       $(".canhide").css("opacity", "0.1");
       idx = $(e.target).attr("idx");
       if (idx === void 0) return;
@@ -179,6 +260,8 @@
       city = new Array();
       country = new Array();
       yeardetails = new Array();
+      param_string = "?";
+      i = 0;
       _ref = $(".row");
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         ele = _ref[_i];
@@ -187,8 +270,13 @@
         city.push($("#" + ele.id + " .city").text());
         country.push($("#" + ele.id + " .country").text());
         yeardetails.push($("#" + ele.id + " #lihr_" + idx).attr("details"));
+        param_string += i + "=" + city[i] + ";" + country[i] + ";" + $("#" + ele.id).attr('original_offset') + ";" + yeardetails[i] + ", " + t[i] + "&";
+        i++;
       }
+      param_string += "time=" + $($('.row')[0]).attr('original_offset') + ";" + t[0];
+      param_string = encodeURI(param_string);
       $("#newevent").show();
+      $(".meeting_link").html("<a href='" + domain_name + param_string + "'><strong>Link</strong></a>");
       $("#newevent_time").text("");
       $("#newevent_msg").text("");
       $("#event_name").text("");
@@ -243,6 +331,33 @@
     }
   });
 
+  $("#meeting_details .close").live({
+    click: function() {
+      return hide_meeting_details();
+    }
+  });
+
+  $("body").live({
+    keyup: function(e) {
+      if (e.keyCode === 27) return hide_meeting_details();
+    }
+  });
+
+  hide_meeting_details = function() {
+    $("#meeting_details").slideUp();
+    $(".show_meeting_modal").show();
+    $(".help_meeting_schedule").show();
+    return setTimeout((function() {
+      return $(".help_meeting_schedule").fadeOut(4000);
+    }), 4000);
+  };
+
+  $(".show_meeting_modal span").live({
+    click: function() {
+      return $("#meeting_details").slideDown();
+    }
+  });
+
   $("body").live({
     keydown: function(e) {
       if (e.keyCode === 27) {
@@ -286,14 +401,6 @@
     click: function(e) {
       var rowindex;
       rowindex = parseInt($(e.target).parent().parent().attr("rowindex"));
-      /*
-          oldobj = JSON.parse localStorage.addedLocations
-          tempobj = oldobj[rowindex]
-          oldobj[rowindex] = oldobj[0]
-          oldobj[0] = tempobj
-          localStorage.addedLocations = JSON.stringify oldobj
-          renderRows()
-      */
       localStorage["default"] = rowindex;
       return renderRows();
     }
@@ -478,18 +585,6 @@
     }
   });
 
-  $("lKNHi span").live({
-    click: function(e) {},
-    mouseover: function() {}
-  });
-
-  $("ulsss").live({
-    click: function(e) {
-      return sr_click(e);
-    },
-    mouseover: function() {}
-  });
-
   sr_click = function(e, k) {
     var both, botharr, key, key_arr, len, newobj, offset, oldobj, timestr, val;
     if (typeof k === "undefined") k = $(e.target).attr("k");
@@ -567,8 +662,9 @@
     return getLocations(presline, st);
   };
 
-  renderRows = function() {
+  renderRows = function(callback) {
     var ad_offset, ad_utc, cl, d, datedetailstr, dayusedarr, dayusedstr, defaultind, defaultobj, defaultoffset, diffoffset, diffoffsetstr, floatOffset, formattedOffset, height, hourline, hourstart, i, icons_homedelete, idx, ind, iorig, left, monInNum, newobj, nextDayStr, nextdayarr, oldobj, pi, presdate, presdatearr, presdatestr, presline, prevdate, prevdatearr, prevdatestr, prevline, req, reqArr, row, selectedDateStr, subTillPi, sym, tempstr, timearr, timeextrastr, timestr, tval;
+    console.log(callback);
     oldobj = {};
     if ("addedLocations" in localStorage && "default" in localStorage) {
       oldobj = JSON.parse(localStorage.addedLocations);
@@ -578,7 +674,12 @@
       ad_offset = (d.getTime() - ad_utc) / 3600000;
       formattedOffset = convertOffset(ad_offset);
       pi = tzdata.indexOf(formattedOffset);
-      if (pi === -1) return;
+      if (pi === -1) {
+        console.log("return");
+        return;
+      } else {
+        console.log("not returning");
+      }
       subTillPi = tzdata.substr(0, pi);
       prevline = subTillPi.lastIndexOf("\n");
       if (prevline === -1) prevline = 0;
@@ -601,35 +702,7 @@
       oldobj = JSON.parse(localStorage.addedLocations);
     }
     updateUtc();
-    /*
-      floatOffset = oldobj[0].offset
-      #floatOffset = convertOffsetToFloat offset
-      timestr = getNewTime floatOffset
-      timearr = timestr.split " "
-      timearr[4] = timearr[4].substr(0,5)
-    
-      hourline = "<ul class='hourline_ul'>"
-      i=0
-      cl = ""
-      while i<24
-        if i<6
-          cl="li_n"
-        else if i>5 and i<8
-          cl = "li_m"
-        else if i>7 and i<19
-          cl = "li_d"
-        else if i>18 and i<22
-          cl = "li_e"
-        else
-          cl = "li_n"
-        i++
-        hourline+="<span class='smallspace'></span> <li class='"+cl+"'>"+i+"</li>"
-      hourline+="</ul>"
-    
-    
-      row = "<div class='row'><div class='tzdetails'><div class='offset'><img class='homeicon' /> </div><div class='location'><span class='city'>"+oldobj[0].city+"</span><br><span class='country'>"+oldobj[0].country+"</span></div><div class='timedata'><span class='time'>"+timearr[4]+"</span><br><span class='timeextra'>"+timearr[0]+" , "+timearr[1]+" "+timearr[2]+" "+timearr[3]+"</span></div></div><div class='dates'>"+hourline+"</div></div>"
-      $("#content").html row
-    */
+    console.log(callback);
     defaultind = localStorage["default"];
     defaultobj = oldobj[defaultind];
     defaultoffset = parseFloat(defaultobj.offset);
@@ -760,7 +833,7 @@
       hourline += "</ul>";
       sym = "";
       if (diffoffset > 0) sym = "+";
-      row += "<div class='row' id='row_" + ind + "' rowindex='" + ind + "' time='" + timearr[4] + "' ><div class='tzdetails'><div class='offset'>" + sym + (floatOffset - defaultoffset) + "<br><span class='small' >Hours</span></div><div class='location'><span class='city'>" + oldobj[ind].city + "</span><br><span class='country'>" + oldobj[ind].country + "</span></div><div class='timedata'><span class='time'>" + timearr[4] + "</span><br><span class='timeextra'>" + timeextrastr + "</span></div></div><div class='dates'>" + hourline + "</div></div> ";
+      row += "<div class='row' id='row_" + ind + "' rowindex='" + ind + "' time='" + timearr[4] + "' original_offset='" + oldobj[ind].offset + "' ><div class='tzdetails'><div class='offset'>" + sym + (floatOffset - defaultoffset) + "<br><span class='small' >Hours</span></div><div class='location'><span class='city'>" + oldobj[ind].city + "</span><br><span class='country'>" + oldobj[ind].country + "</span></div><div class='timedata'><span class='time'>" + timearr[4] + "</span><br><span class='timeextra'>" + timeextrastr + "</span></div></div><div class='dates'>" + hourline + "</div></div> ";
     }
     $("#content").html(row);
     $("#content").prepend("<div id='vband'></div><div id='selectedband'></div>");
@@ -780,10 +853,25 @@
     left = parseInt($("#selectedband").css("left"));
     $("#vband").css("left", left - 2);
     $("#vband").css("height", $("#selectedband").css("height"));
-    return $("#content").sortable({
+    $("#content").sortable({
       'containment': 'parent',
       'items': '.row'
     });
+    console.log(callback);
+    if (typeof callback === "function") {
+      console.log("calling");
+      callback();
+    } else {
+      console.log(callback);
+      console.log("not calling");
+    }
+    if (callback === "a") {
+      console.log("yes a");
+      return generate_meeting_link();
+    } else {
+      console.log("not a");
+      return console.log(callback);
+    }
   };
 
   convertOffsetToFloat = function(str) {
@@ -822,48 +910,6 @@
       second = "00";
     }
     return sign + first + ":" + second;
-  };
-
-  convsdfsertOffset = function(offset) {
-    var first, newlocaloffset, second, sign;
-    newlocaloffset = offset;
-    offset = offset + "";
-    first = "";
-    second = "";
-    if (offset.indexOf(".") > -1) {
-      if (offset.indexOf("-") > -1) {
-        first = offset.substr(1, 2);
-        if (first.length === 1) first = "0" + first;
-        second = parseInt(offset.substr(4, 5)) * 60;
-        if (second.length === 1) second = second + "0";
-        sign = "-";
-      } else {
-        first = offset.substr(0, 1);
-        if (first.length === 1) first = "0" + first;
-        second = parseInt(offset.substr(3, 4)) * 60;
-        if (second.length === 1) second = second + "0";
-        sign = "+";
-      }
-    } else {
-      if (offset.indexOf("-") > -1) {
-        sign = "-";
-        if (offset.length === 3) {
-          first = offset.substr(1, 2);
-        } else {
-          first = "0" + offset.substr(1, 1);
-        }
-        second = "00";
-      } else {
-        sign = "+";
-        if (offset.length === 2) {
-          first = offset.substr(0, 2);
-        } else {
-          first = offset.substr(0, 1);
-        }
-        second = "00";
-      }
-    }
-    return $("body").append("<h1>" + first + " : " + second + "</h1>");
   };
 
   getMonth = function(mon, options) {

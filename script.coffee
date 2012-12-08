@@ -8,42 +8,26 @@ utc = 0
 selecteddate = {}
 rowsortstart = ""
 rowsortstop = ""
+#domain_name = "http://localhost/timezoneconvertor"
+domain_name = "http://533f.localtunnel.com/timezoneconvertor"
+#added_locations_status = ""
 #first set selecteddate to current date, later user can change
 
 $(document).ready ->
-  #console.log "ready"
   updateUtc()
   d = new Date()
-  #console.log d
   dstr=d.toLocaleString()
   datearr = dstr.split(" ")
-  #console.log "time : "+datearr[4]+" off : "+datearr[5]+" stand : "+datearr[6]
   localtime = d.getTime()
   localoffset = d.getTimezoneOffset()*60000
   utc = localtime + localoffset
-  #console.log "utc : "+utc
 
   bombayoff = 5.5
   bt = utc + (3600000*bombayoff)
-  #console.log bt is localtime
-  #console.log localtime
   nd = new Date(bt)
   ndstr = nd.toLocaleString()
-  #ndarr = new Array()
   ndarr = ndstr.split(" ")
-  #console.log ndarr[4].substr(0,5)
   setSelectedDate()
-
-  ###
-  $.ajax
-      url : "tz/cities.csv"
-      success : (cities) ->
-        origcities = cities.toLowerCase()
-        #console.log "cities loaded successfully"
-      error : (e) ->
-        #console.log "Error loading cities"
-  ###
-
 
   $.ajax
     url : "tz/tz.csv"
@@ -54,9 +38,101 @@ $(document).ready ->
 
       #console.log "tzdata loaded successfully"
       renderRows()
+      if window.location.search != ""
+        #if typeof(localStorage.addedLocations) == "undefined"
+        renderRows(generate_meeting_link)
+        #generate_meeting_link()
+      #  #renderRows(generate_meeting_link)
+      #  console.log "renderRows(a)"
+      #  renderRows()
+      #  renderRows(generate_meeting_link)
     error : (e) ->
       #console.log "Error loading tz data"
 
+  #Meeting Link
+  #if window.location.search != "" and typeof(localStorage.addedLocations) != "undefined"
+
+      
+    #setTimeout (->
+    #  generate_meeting_link()
+    #), 3000
+
+generate_meeting_link = ->
+    console.log "Genrat meeting lik starte"
+    search = decodeURI window.location.search
+    search = search.substr 1, search.length
+    params_arr = search.split("&")
+    time_arr = params_arr.pop()
+    param_obj = {}
+    for key in params_arr
+      temp = key.split("=")
+      param_obj[temp[0]] = temp[1]
+    oldobj = JSON.parse localStorage.addedLocations
+    console.log JSON.stringify oldobj
+    keys = Object.keys
+    old_keys = keys(oldobj)
+    param_keys = keys(param_obj)
+    duplicate_keys = []
+    i = 0
+
+    original_param_obj = {}
+    while i<param_keys.length
+      temp_arr = param_obj[i].split(";")
+      temp_obj = 
+        'city': temp_arr[0]
+        'country': temp_arr[1]
+        'offset': temp_arr[2]
+        'time': temp_arr[3]
+      param_obj[i] = temp_obj
+      original_param_obj[i] = temp_obj
+      j = 0
+      while j<old_keys.length
+        if param_obj[i].city.trim() == oldobj[j].city.trim() and param_obj[i].country.trim() == oldobj[j].country.trim()
+          duplicate_keys += [i]
+          break
+        j++
+      i++
+
+    
+    for key in duplicate_keys
+      delete param_obj[key]
+
+    temp_param_obj = {}
+    i = 0
+    for key, val of param_obj
+      temp_param_obj[i] = val
+      i++
+    
+    param_obj = temp_param_obj
+    param_keys = keys(param_obj)
+    i = old_keys.length
+    j = 0
+    while j<param_keys.length
+      oldobj[i] = param_obj[j]
+      i++
+      j++
+
+    localStorage.addedLocations = JSON.stringify oldobj
+    renderRows()
+
+    #Show on Modal
+    html = "<table class='table table-striped'>"
+    for key, val of original_param_obj
+      html += "<tr><td>"+val.city+"</td><td>"+val.country+"</td><td>"+val.time+"</td></tr>"
+    $("#meeting_details .modal-body").html(html).parent().show()
+    $("#meeting_details").draggable 
+      handle: '.meeting_details_move'
+
+
+
+remove_key = (obj, pos) ->
+  i = pos
+  len = Object.keys(obj).length
+  while i<len-1
+    obj[i] = obj[i+1]
+    i++
+  delete obj[len-1]
+  return obj
 
 
 
@@ -122,7 +198,6 @@ $("#search_input").live
 #   sr_click(e)
 $("li.searchresult_li").live
   click : (e) ->
-    console.log "-------li---------"
     sr_click(e)
 
 $(".searchresult_ul").live
@@ -175,6 +250,8 @@ $("#vband").live
     country = new Array()
     yeardetails = new Array()
     #console.log "printing row"
+    param_string = "?"
+    i = 0
     for ele in $(".row")
       #console.log ele.id
       #tinFloat = $("#"+ele.id+" #lihr_"+idx).attr("t")
@@ -184,11 +261,17 @@ $("#vband").live
       city.push $("#"+ele.id+" .city").text()
       country.push $("#"+ele.id+" .country").text()
       yeardetails.push $("#"+ele.id+" #lihr_"+idx).attr("details")
+      param_string += i+"="+city[i]+";"+country[i]+";"+$("#"+ele.id).attr('original_offset')+";"+yeardetails[i]+", "+t[i]+"&"
+      #param_string += i+"="+city[i]+";"+country[i]+";"+t[i]+"&"
+      i++
 
-
+    param_string += "time="+$($('.row')[0]).attr('original_offset')+";"+t[0]
+    #param_string = param_string.substr 0, param_string.length-1
+    param_string = encodeURI param_string
     #console.log "prointed"
     #console.log t+" : "+city+" : "+country
     $("#newevent").show()
+    $(".meeting_link").html "<a href='"+domain_name+param_string+"'><strong>Link</strong></a>"
     $("#newevent_time").text ""
     $("#newevent_msg").text ""
     $("#event_name").text ""
@@ -240,6 +323,31 @@ $("#event_close").live
     $("#newevent").hide()
     $(".canhide").css "opacity","1"
 
+$("#meeting_details .close").live
+  click : ->
+    hide_meeting_details()
+
+$("body").live
+  keyup : (e) ->
+    if e.keyCode == 27
+      hide_meeting_details()
+
+
+
+hide_meeting_details = ->
+  $("#meeting_details").slideUp()
+  $(".show_meeting_modal").show()
+  $(".help_meeting_schedule").show()
+  setTimeout (->
+    $(".help_meeting_schedule").fadeOut(4000)
+  ), 4000
+
+
+$(".show_meeting_modal span").live
+  click: ->
+    $("#meeting_details").slideDown()
+
+
 $("body").live
   keydown: (e) ->
     if e.keyCode == 27
@@ -253,18 +361,6 @@ $("#content .row .icons_homedelete .icon_delete").live
   click : (e) ->
     rowindex = parseInt($(e.target).parent().parent().attr("rowindex"))
     oldobj = JSON.parse localStorage.addedLocations
-    #len = 0
-    #for key of oldobj
-    #  len++
-    #i = rowindex+1
-    #while i<len
-    #  oldobj[i-1] = oldobj[i]
-    #  i++
-    #delete oldobj[i-1]
-    #localStorage.addedLocations = JSON.stringify oldobj
-    #defaultind = parseInt localStorage.default
-    #if defaultind is (i-1)
-    #  localStorage.default = (defaultind-1)
 
     oldobj = JSON.parse localStorage.addedLocations
     len = 0
@@ -291,16 +387,6 @@ $("#content .row .icons_homedelete .icon_delete").live
 $("#content .row .icons_homedelete .icon_home").live
   click : (e) ->
     rowindex = parseInt($(e.target).parent().parent().attr("rowindex"))
-    ###
-    oldobj = JSON.parse localStorage.addedLocations
-    tempobj = oldobj[rowindex]
-    oldobj[rowindex] = oldobj[0]
-    oldobj[0] = tempobj
-    localStorage.addedLocations = JSON.stringify oldobj
-    renderRows()
-    ###
-    #console.log rowindex
-    #ABOVE METHOD ALSO VERY NICE, BUT NOT ACCORDING TO THE SAMPLE SITE
     localStorage.default = rowindex
     renderRows()
 
@@ -492,19 +578,6 @@ $(".deleteEvent").live
     $("#wrapper #showevents .eventheader").trigger "click"
 
 
-$("lKNHi span").live
-  click : (e) ->
-    #console.log "--------span------------------"
-    #sr_click e
-  mouseover : ->
-    #console.log "----------"
-
-$("ulsss").live
-  click : (e) ->
-    #console.log "-------ul-------------"
-    sr_click e
-  mouseover : ->
-    #console.log "--"
 
 sr_click = (e, k) ->
   if typeof(k) == "undefined"
@@ -602,10 +675,15 @@ getLocations = (ind,st) =>
   getLocations presline,st
 
 
-renderRows = ->
+renderRows = (callback) ->
+  console.log callback
   oldobj = {}
   if "addedLocations" of localStorage and "default" of localStorage
 
+    #if typeof(localStorage.addedLocaations) == "undefined" or localStorage.addedLocations == "undefined"
+    #  oldobj = {}
+    #else
+    #  oldobj = JSON.parse localStorage.addedLocations
     oldobj = JSON.parse localStorage.addedLocations
   else
     #autodetect
@@ -623,8 +701,11 @@ renderRows = ->
     #console.log pi
     if pi == -1
       #do something if offset not found in our tz data
+      console.log "return"
 
       return
+    else
+      console.log "not returning"
     subTillPi = tzdata.substr 0,pi
 
     prevline = subTillPi.lastIndexOf "\n"
@@ -651,41 +732,9 @@ renderRows = ->
     oldobj = JSON.parse localStorage.addedLocations
 
     #console.log "++++++++++"
-  #now print old obj
-  #console.log "pp"
 
   updateUtc()
-
-  ###
-  floatOffset = oldobj[0].offset
-  #floatOffset = convertOffsetToFloat offset
-  timestr = getNewTime floatOffset
-  timearr = timestr.split " "
-  timearr[4] = timearr[4].substr(0,5)
-
-  hourline = "<ul class='hourline_ul'>"
-  i=0
-  cl = ""
-  while i<24
-    if i<6
-      cl="li_n"
-    else if i>5 and i<8
-      cl = "li_m"
-    else if i>7 and i<19
-      cl = "li_d"
-    else if i>18 and i<22
-      cl = "li_e"
-    else
-      cl = "li_n"
-    i++
-    hourline+="<span class='smallspace'></span> <li class='"+cl+"'>"+i+"</li>"
-  hourline+="</ul>"
-
-
-  row = "<div class='row'><div class='tzdetails'><div class='offset'><img class='homeicon' /> </div><div class='location'><span class='city'>"+oldobj[0].city+"</span><br><span class='country'>"+oldobj[0].country+"</span></div><div class='timedata'><span class='time'>"+timearr[4]+"</span><br><span class='timeextra'>"+timearr[0]+" , "+timearr[1]+" "+timearr[2]+" "+timearr[3]+"</span></div></div><div class='dates'>"+hourline+"</div></div>"
-  $("#content").html row
-  ###
-
+  console.log callback
   defaultind = localStorage.default
 
   defaultobj = oldobj[defaultind]
@@ -711,17 +760,10 @@ renderRows = ->
 
       hourstart = 24+diffoffset
 
-      #hourstart = parseInt(diffoffsetstr)-1
-      #if hourstart is -1
-      #  hourstart = 23
-      #  console.log "---------------------------------------------------"
-      #console.log "houstart  : "+hourstart
     else
       #hourstart = parseInt diffoffsetstr
       hourstart = diffoffset
       #console.log "hourstart +  : "+hourstart
-
-
 
     i=hourstart
     #console.log "__-------------------------------___________________"
@@ -875,7 +917,7 @@ renderRows = ->
       sym = "+"
 
 
-    row+= "<div class='row' id='row_"+ind+"' rowindex='"+ind+"' time='"+timearr[4]+"' ><div class='tzdetails'><div class='offset'>"+sym+(floatOffset-defaultoffset)+"<br><span class='small' >Hours</span></div><div class='location'><span class='city'>"+oldobj[ind].city+"</span><br><span class='country'>"+oldobj[ind].country+"</span></div><div class='timedata'><span class='time'>"+timearr[4]+"</span><br><span class='timeextra'>"+timeextrastr+"</span></div></div><div class='dates'>"+hourline+"</div></div> "
+    row+= "<div class='row' id='row_"+ind+"' rowindex='"+ind+"' time='"+timearr[4]+"' original_offset='"+oldobj[ind].offset+"' ><div class='tzdetails'><div class='offset'>"+sym+(floatOffset-defaultoffset)+"<br><span class='small' >Hours</span></div><div class='location'><span class='city'>"+oldobj[ind].city+"</span><br><span class='country'>"+oldobj[ind].country+"</span></div><div class='timedata'><span class='time'>"+timearr[4]+"</span><br><span class='timeextra'>"+timeextrastr+"</span></div></div><div class='dates'>"+hourline+"</div></div> "
 
   #$("#content").html "<div id='vband'></div><div id='selectedband'></div>"
   $("#content").html row
@@ -906,6 +948,22 @@ renderRows = ->
   $("#vband").css "left",(left-2)
   $("#vband").css "height",$("#selectedband").css("height")
   $("#content").sortable({'containment':'parent', 'items':'.row'})
+  #if added_locations_status == "undefined"
+  #  generate_meeting_link()
+  
+  console.log callback
+  if typeof(callback) == "function"
+    console.log "calling"
+    callback()
+  else
+    console.log callback
+    console.log "not calling"
+  if callback == "a"
+    console.log "yes a"
+    generate_meeting_link()
+  else
+    console.log "not a"
+    console.log callback
 
 convertOffsetToFloat = (str) ->
   first = str.substr(0,str.indexOf(":"))
@@ -942,45 +1000,6 @@ convertOffset = (ad_offset) ->
     second = "00"
   return sign+first+":"+second
 
-convsdfsertOffset = (offset) ->
-  newlocaloffset = offset
-  offset = offset+""
-  first = ""
-  second = ""
-  if offset.indexOf(".") > -1
-    if offset.indexOf("-") > -1
-      first = offset.substr(1,2)
-      if first.length is 1
-        first = "0"+first
-      second = parseInt(offset.substr(4,5))*60
-      if second.length is 1
-        second = second+"0"
-      sign = "-"
-    else
-      first = offset.substr(0,1)
-      if first.length is 1
-        first = "0"+first
-      second = parseInt(offset.substr(3,4))*60
-      if second.length is 1
-        second = second+"0"
-      sign = "+"
-  else
-    if offset.indexOf("-") > -1
-      sign = "-"
-      if offset.length is 3
-        first = offset.substr 1,2
-      else
-        first = "0"+offset.substr(1,1)
-      second = "00"
-    else
-      sign = "+"
-      if offset.length is 2
-        first = offset.substr 0,2
-      else
-        first = offset.substr 0,1
-      second = "00"
-
-  $("body").append "<h1>"+first+" : "+second+"</h1>"
 
 getMonth = (mon,options) ->
   month = new Array()

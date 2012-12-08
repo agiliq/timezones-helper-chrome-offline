@@ -32,8 +32,18 @@
                              </div> <!-- end of div search_result -->
                         </div> <!-- end of div div_locations_input_box -->
                         <div id='controls' class='pull-right'>
+
+                            <div class='show_meeting_modal pull-left margin-right-15px' >
+                                <div class='help_meeting_schedule help_style arrow_box well well-small'>
+                                    Click this to re-open the schedule
+
+                                </div>
+                                <span>
+                                    Show Meeting Schedule
+                                </span>
+                            </div>
                              <div id='error_inputdate' class='well well-small'></div>
-                             <div id='date_help' class='well'>Enter the date on which you wish to schedule</div>
+                             <div id='date_help' class='well help_style'>Enter the date on which you wish to schedule</div>
                              <input type='text' placeholder='mm-dd-yyyy' id='dateinput'  maxlength=10 /><span style=';display:inline-block;width : 10px' ></span>
                              <button id='setdate_go' class='btn'>Go</button>
                              <span class='seldate1'></span><span class='seldate2'></span>
@@ -61,6 +71,9 @@
 
                             <div class='event-body'>
                                 <div id='event_close'>X</div>
+                                <div class='meeting_link'>
+                                    <strong>   Link  </strong> 
+                                </div>
                                 <h3 class='backcolor'>Add New Event </h3>
                                 <span style='width:231px;display:inline-block;'>Name  </span><input type='text' id='event_name' placeholder='Enter event name here' />
                             <h3 class='backcolor'> Time  </h3>  <div  id='newevent_time' ></div>
@@ -75,12 +88,24 @@
 
                         <div id='showevents' class='canhide'>
                            <h3 class='eventheader'>Events</h3>
-                           <div id='event_help' class='well well-small' style='display:none'><span>Click to display the list of events</span></div>
+                           <div id='event_help' class='well well-small help_style' style='display:none'><span>Click to display the list of events</span></div>
                            <div id='showeventbody'></div>
 
 
 
                         </div> <!-- end of showevents -->
+
+                        <div id="meeting_details" class="modal">
+                            <div class='modal-header'>
+                                <div class='pull-right'>
+                                <a class='icon-move meeting_details_move pull-left margin-right-15px' ></a>
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            </div>
+                                <h3>Meeting Schedule</h3>
+                            </div>
+                            <div class='modal-body'></div>
+
+                        </div>
 
 
 
