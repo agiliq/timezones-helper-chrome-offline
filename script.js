@@ -337,12 +337,6 @@
     }
   });
 
-  $("body").live({
-    keyup: function(e) {
-      if (e.keyCode === 27) return hide_meeting_details();
-    }
-  });
-
   hide_meeting_details = function() {
     $("#meeting_details").slideUp();
     $(".show_meeting_modal").show();
@@ -362,7 +356,8 @@
     keydown: function(e) {
       if (e.keyCode === 27) {
         $("#newevent").hide();
-        return $(".canhide").css("opacity", "1");
+        $(".canhide").css("opacity", "1");
+        if (window.location.search !== "") return hide_meeting_details();
       }
     }
   });

@@ -327,12 +327,6 @@ $("#meeting_details .close").live
   click : ->
     hide_meeting_details()
 
-$("body").live
-  keyup : (e) ->
-    if e.keyCode == 27
-      hide_meeting_details()
-
-
 
 hide_meeting_details = ->
   $("#meeting_details").slideUp()
@@ -353,6 +347,8 @@ $("body").live
     if e.keyCode == 27
       $("#newevent").hide()
       $(".canhide").css "opacity","1"
+      if window.location.search != ""
+        hide_meeting_details()
 
 
 
