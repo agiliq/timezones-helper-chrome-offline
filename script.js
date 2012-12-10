@@ -1,6 +1,5 @@
 (function() {
-  var convertOffset, convertOffsetToFloat, convsdfsertOffset, getLocations, getMonth, getNewTime, k, locations, origcities, renderRows, rowsortstart, rowsortstop, selecteddate, setSelectedDate, sr_click, tzdata, tzdatalower, updateUtc, utc,
-    _this = this;
+  var cities_data_arr, convertOffset, convertOffsetToFloat, convsdfsertOffset, countries_data_arr, full_data_arr, full_data_original_arr, getCities, getMonth, getNewTime, getRequiredOffset, k, locations, origcities, renderRows, rowsortstart, rowsortstop, selecteddate, setSelectedDate, sr_click, tzdata, tzdatalower, updateUtc, utc;
 
   origcities = "";
 
@@ -19,6 +18,14 @@
   rowsortstart = "";
 
   rowsortstop = "";
+
+  cities_data_arr = [];
+
+  countries_data_arr = [];
+
+  full_data_arr = [];
+
+  full_data_original_arr = [];
 
   $(document).ready(function() {
     var bombayoff, bt, d, datearr, dstr, localoffset, localtime, nd, ndarr, ndstr;
@@ -41,6 +48,26 @@
         window.ttt = tz;
         tzdata = tz;
         tzdatalower = tz.toLowerCase();
+        cities_data_arr = [];
+        countries_data_arr = [];
+        full_data_arr = tzdatalower.split("\n");
+        full_data_original_arr = tzdata.split("\n");
+        console.log(full_data_arr);
+        full_data_arr.forEach(function(each_line) {
+          var each_line_arr;
+          each_line_arr = each_line.split(";");
+          cities_data_arr.push(each_line_arr[0]);
+          return countries_data_arr.push(each_line_arr[1]);
+        });
+        cities_data_arr.pop();
+        countries_data_arr.pop();
+        full_data_original_arr.pop();
+        full_data_arr.pop();
+        window.ci = cities_data_arr;
+        window.countries_data_arr = countries_data_arr;
+        window.fo = full_data_original_arr;
+        console.log(cities_data_arr);
+        console.log(countries_data_arr);
         return renderRows();
       },
       error: function(e) {}
@@ -98,7 +125,8 @@
       k = 0;
       $("#search_result").html("");
       updateUtc();
-      getLocations(0, st);
+      locations = getCities(st);
+      console.log(locations);
       $("#search_result").html(locations);
       if ($("#search_result").css("display") === "none") {
         return $("#search_result").slideDown();
@@ -355,17 +383,46 @@
         $("#error_inputdate").show();
         return;
       }
+      if ("display_date_animation" in localStorage) {
+        if (localStorage.display_date_animation === "false") {
+          $(".date_help_animation_box").hide();
+        } else {
+          $(".date_help_animation_box").show();
+        }
+      } else {
+        $(".date_help_animation_box").show();
+      }
       $("#error_inputdate").hide();
-      /*
-          selecteddate.m = mm-1
-          selecteddate.d = dd
-          selecteddate.year = year
-      */
+      setTimeout((function() {
+        return $(".date_help_animation_box").addClass("final_destination_date_animation").addClass("date_help_animation_box_large_dimensions").removeClass("date_help_animation_box_small_dimensions");
+      }), 100);
+      setTimeout((function() {
+        return $(".date_help_animation_box").addClass("arrow_box");
+      }), 2000);
+      setTimeout((function() {
+        return $(".date_help_animation_box").fadeOut(3000);
+      }), 15000);
       options = {};
       options.m = mm - 1;
       options.d = dd;
       options.year = year;
       return setSelectedDate(options);
+    }
+  });
+
+  $(".date_help_animation_box").live({
+    click: function() {
+      var that;
+      that = this;
+      if ($(this).find("input[type='checkbox']").attr("checked")) {
+        console.log($(this).find("input[type='checkbox']").attr("checked"));
+        localStorage.display_date_animation = "false";
+      } else {
+        localStorage.display_date_animation = "true";
+      }
+      return setTimeout((function() {
+        return $(that).fadeOut();
+      }), 1000);
     }
   });
 
@@ -530,37 +587,9 @@
     return renderRows();
   };
 
-  getLocations = function(ind, st) {
-    var finaloff, first, offset, pi, presline, prevline, req, reqArr, second, subTillPi, timearr, timestr;
-    if (k > 7) {
-      locations += "</ul>";
-      return;
-    }
-    k++;
-    ind = parseInt(ind);
-    if (ind === 0) {
-      ind = 0;
-    } else {
-      ind++;
-    }
-    pi = parseInt(tzdatalower.indexOf(st, ind));
-    if (pi === -1) {
-      locations += "</ul>";
-      return;
-    }
-    subTillPi = tzdatalower.substr(0, pi);
-    prevline = parseInt(subTillPi.lastIndexOf("\n"));
-    if (prevline === -1) {
-      prevline = 0;
-    } else if (prevline === 0) {
-      prevline = 0;
-    } else {
-      prevline++;
-    }
-    presline = parseInt(tzdatalower.indexOf("\n", pi));
-    req = tzdata.substr(prevline, presline - prevline);
-    reqArr = req.split(";");
-    offset = reqArr[3];
+  getRequiredOffset = function(original) {
+    var finaloff, first, offset, second, timearr, timestr;
+    offset = original;
     finaloff = "";
     if (offset.length === 9) {
       offset = offset.substr(3, 9);
@@ -574,8 +603,36 @@
     timestr = getNewTime(finaloff);
     timearr = timestr.split(" ");
     timearr[4] = timearr[4].substr(0, 5);
-    locations += "<li class='searchresult_li' offset='" + finaloff + "' timestr='" + timestr + "' id='lisr_" + k + "' k='" + k + "'><span class='litz' k='" + k + "'>" + reqArr[1] + " , " + reqArr[0] + ",</span><span class='litime' k='" + k + "'>" + timearr[4] + "</span></li>";
-    return getLocations(presline, st);
+    return [timestr, timearr[4], finaloff];
+  };
+
+  getCities = function(term) {
+    var key, len, required_offset, temp_arr, val;
+    term = term.toLowerCase();
+    len = 1;
+    for (key in cities_data_arr) {
+      val = cities_data_arr[key];
+      if (len > 7) break;
+      if (val.indexOf(term) > -1) {
+        temp_arr = full_data_original_arr[key].split(";");
+        required_offset = getRequiredOffset(temp_arr[3]);
+        locations += "<li class='searchresult_li' offset='" + required_offset[2] + "' timestr='" + required_offset[0] + "' id='lisr_" + len + "' k='" + len + "'>" + "<span class='litz' k='" + len + "'>" + temp_arr[1] + ", " + temp_arr[0] + "<span class='invisible_comma_search_result'>,</span> </span><span class='litime' k='" + len + "'>" + required_offset[1] + "</span></li>";
+        len++;
+      }
+    }
+    if (len < 8) {
+      for (key in countries_data_arr) {
+        val = countries_data_arr[key];
+        if (len > 7) break;
+        if (val.indexOf(term) > -1) {
+          temp_arr = full_data_original_arr[key].split(";");
+          required_offset = getRequiredOffset(temp_arr[3]);
+          locations += "<li class='searchresult_li' offset='" + required_offset[2] + "' timestr='" + required_offset[0] + "' id='lisr_" + len + "' k='" + len + "'>" + "<span class='litz' k='" + len + "'>" + temp_arr[1] + ", " + temp_arr[0] + "<span class='invisible_comma_search_result'>,</span> </span><span class='litime' k='" + len + "'>" + required_offset[1] + "</span></li>";
+          len++;
+        }
+      }
+    }
+    return locations;
   };
 
   renderRows = function() {

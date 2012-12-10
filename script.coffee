@@ -8,6 +8,10 @@ utc = 0
 selecteddate = {}
 rowsortstart = ""
 rowsortstop = ""
+cities_data_arr = []
+countries_data_arr = []
+full_data_arr = []
+full_data_original_arr = []
 #first set selecteddate to current date, later user can change
 
 $(document).ready ->
@@ -31,6 +35,27 @@ $(document).ready ->
       window.ttt = tz
       tzdata = tz
       tzdatalower = tz.toLowerCase()
+      cities_data_arr = []
+      countries_data_arr = []
+
+      full_data_arr = tzdatalower.split "\n"
+      full_data_original_arr = tzdata.split "\n"
+      console.log full_data_arr
+      full_data_arr.forEach (each_line) ->
+        each_line_arr = each_line.split ";"
+        cities_data_arr.push each_line_arr[0]
+        countries_data_arr.push each_line_arr[1]
+      cities_data_arr.pop()
+      countries_data_arr.pop()
+      full_data_original_arr.pop()
+      full_data_arr.pop()
+      window.ci = cities_data_arr
+      window.countries_data_arr = countries_data_arr
+      window.fo = full_data_original_arr
+      
+      console.log cities_data_arr
+      console.log countries_data_arr
+
 
       #console.log "tzdata loaded successfully"
       renderRows()
@@ -85,7 +110,8 @@ $("#search_input").live
     k = 0
     $("#search_result").html ""
     updateUtc()
-    getLocations 0,st
+    locations = getCities(st)
+    console.log locations
     $("#search_result").html locations
     if $("#search_result").css("display") == "none"
       $("#search_result").slideDown()
@@ -313,6 +339,7 @@ $("#dateinput").live
   mouseenter : (e) ->
     if $("#error_inputdate").css("display") is "none"
       $("#date_help").show()
+    
   mouseleave :->
     $("#date_help").hide()
   keyup: (e) ->
@@ -358,18 +385,45 @@ $("#setdate_go").live
       $("#error_inputdate").html errormsg
       $("#error_inputdate").show()
       return
+
+    if "display_date_animation" of localStorage
+      if localStorage.display_date_animation == "false"
+        $(".date_help_animation_box").hide()
+      else
+        $(".date_help_animation_box").show()
+    else
+        $(".date_help_animation_box").show()
     $("#error_inputdate").hide()
-    #console.log "----"
-    ###
-    selecteddate.m = mm-1
-    selecteddate.d = dd
-    selecteddate.year = year
-    ###
+
+    setTimeout (->
+      $(".date_help_animation_box").addClass("final_destination_date_animation").addClass("date_help_animation_box_large_dimensions").removeClass("date_help_animation_box_small_dimensions")
+    ), 100
+    setTimeout ( ->
+      $(".date_help_animation_box").addClass("arrow_box")
+    ), 2000
+    setTimeout (->
+      $(".date_help_animation_box").fadeOut(3000)
+    ), 15000
+
     options = {}
     options.m = mm-1
     options.d = dd
     options.year = year
     setSelectedDate options
+
+
+$(".date_help_animation_box").live
+  click: ->
+    that = @
+    if $(@).find("input[type='checkbox']").attr("checked")
+      console.log $(@).find("input[type='checkbox']").attr("checked")
+      localStorage.display_date_animation = "false"
+    else
+      localStorage.display_date_animation = "true"
+    setTimeout (->
+      $(that).fadeOut()
+    ), 1000
+
 
 $("#error_inputdate").live
   click : ->
@@ -548,61 +602,52 @@ sr_click = (e, k) ->
   renderRows()
 
 
+getRequiredOffset = (original) ->
+
+    offset = original
+    finaloff = ""
+    if offset.length is 9
+      offset = offset.substr(3,9)
+      first = offset.substr(0,3)
+      second = offset.substr(4,2)/60
+      second = (second+"").substr(1)
+      finaloff = parseFloat(first+second)
+
+      #console.log "final : "+finaloff
+    else
+      finaloff = 0
+    timestr = getNewTime(finaloff)
+    #console.log timestr.toLocaleString()
+    timearr = timestr.split(" ")
+    timearr[4] = (timearr[4]).substr(0,5)
+    return [timestr, timearr[4], finaloff]
 
 
-
-getLocations = (ind,st) =>
-  if k>7
-    locations+="</ul>"
-    return
-  k++
-  ind = parseInt ind
-  if ind is 0
-    ind = 0
-  else
-    ind++
-  pi = parseInt(tzdatalower.indexOf(st,ind))
-  if pi == -1
-    locations+="</ul>"
-    return
-  subTillPi = tzdatalower.substr(0,pi)
-  prevline = parseInt(subTillPi.lastIndexOf("\n"))
-
-  if prevline is -1
-    prevline = 0
-  else if prevline is 0
-    prevline = 0
-  else
-    prevline++
-
-  presline = parseInt(tzdatalower.indexOf("\n",pi))
-  req = tzdata.substr prevline,presline-prevline
-  reqArr = req.split(";")
-  offset = reqArr[3]
-  #console.log offset
-  #console.log offset.length
-  finaloff = ""
-  if offset.length is 9
-    offset = offset.substr(3,9)
-    first = offset.substr(0,3)
-    second = offset.substr(4,2)/60
-    second = (second+"").substr(1)
-    finaloff = parseFloat(first+second)
-
-    #console.log "final : "+finaloff
-  else
-    finaloff = 0
-  timestr = getNewTime(finaloff)
-  #console.log timestr.toLocaleString()
-  timearr = timestr.split(" ")
-  timearr[4] = (timearr[4]).substr(0,5)
-
-  #console.log "---------------------"
+getCities = (term) ->
+  term = term.toLowerCase()
+  len = 1
+  for key, val of cities_data_arr
+    if len > 7
+      break
+    if val.indexOf(term) > -1
+      temp_arr = full_data_original_arr[key].split(";")
+      required_offset = getRequiredOffset temp_arr[3]
 
 
-
-  locations+="<li class='searchresult_li' offset='"+finaloff+"' timestr='"+timestr+"' id='lisr_"+k+"' k='"+k+"'><span class='litz' k='"+k+"'>"+reqArr[1]+" , "+reqArr[0] + ",</span><span class='litime' k='"+k+"'>" + timearr[4]+ "</span></li>"
-  getLocations presline,st
+      locations += "<li class='searchresult_li' offset='"+required_offset[2]+"' timestr='"+required_offset[0]+"' id='lisr_"+len+"' k='"+len+"'>"+
+        "<span class='litz' k='"+len+"'>"+temp_arr[1]+", "+temp_arr[0]+"<span class='invisible_comma_search_result'>,</span> </span><span class='litime' k='"+len+"'>"+required_offset[1]+"</span></li>"
+      len++
+  if len < 8
+    for key, val of countries_data_arr
+      if len > 7
+        break
+      if val.indexOf(term) > -1
+        temp_arr = full_data_original_arr[key].split(";")
+        required_offset = getRequiredOffset temp_arr[3]
+        locations += "<li class='searchresult_li' offset='"+required_offset[2]+"' timestr='"+required_offset[0]+"' id='lisr_"+len+"' k='"+len+"'>"+
+          "<span class='litz' k='"+len+"'>"+temp_arr[1]+", "+temp_arr[0]+"<span class='invisible_comma_search_result'>,</span> </span><span class='litime' k='"+len+"'>"+required_offset[1]+"</span></li>"
+        len++
+  return locations
 
 
 renderRows = ->
