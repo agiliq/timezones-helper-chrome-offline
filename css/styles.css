@@ -366,7 +366,7 @@
                     }
                     */
                         #content .row .icons_homedelete{
-                            opacity : 0.3;
+                            opacity : 0.6;
                             height : 70px;
                             width : 45px;
                             position: absolute;
@@ -375,11 +375,16 @@
 
                         #content .row .icons_homedelete:hover{
                             opacity : 1;
+                            zoom: 120%;
                         }
 
                         #content .row .icons_homedelete .icon_delete{
 
                             height : 50%;
+                            position: relative;
+                            left: 6px;
+                            font-size: 14pt;
+                            font-weight: bold;
                         }
 
                         #content .row .icons_homedelete .icon_home{
@@ -390,6 +395,7 @@
 
                         #content .row .icons_homedelete .icon_delete:hover{
                             cursor : pointer;
+
 
                         }
 
