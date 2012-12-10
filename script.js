@@ -509,7 +509,7 @@
           tabl += "<tr><td>" + city[i] + "</td><td>" + country[i] + "</td><td>" + yeardetails[i] + " " + t[i] + "</td></tr>";
         }
         tabl += "</tbody></table>";
-        data += "<h2><span class='event_num'># " + (parseInt(key) + 1) + "</span> " + oldobj[key].name + "<span class='deleteEvent' key='" + key + "'>X&nbsp;</span></h2>" + tabl + "<h3>Description : </h3><p style='padding-left:15px;padding-right:15px;'> " + oldobj[key].desc + "</p><br><hr class='showevents_hr' />";
+        data += "<h4><span class='event_num'># " + (parseInt(key) + 1) + "</span> " + oldobj[key].name + "<span class='deleteEvent' key='" + key + "'>X&nbsp;</span></h4>" + tabl + "<h4>Description  </h4><p style='padding-left:15px;padding-right:15px;'> " + oldobj[key].desc + "</p><br><hr class='showevents_hr' />";
       }
       if (data === "") {
         data = "<h3>No events available, you can add events by clicking on any box showing time.</h3>";
