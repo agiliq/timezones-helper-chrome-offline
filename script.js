@@ -227,7 +227,7 @@
 
   $("#wrapper button#saveevent").live({
     click: function(e) {
-      var city, country, evname, len, msg, oldobj, selected, selected_time, yeardetails;
+      var city, country, evname, len, msg, oldobj, selected, selected_time, total_checked, yeardetails;
       msg = $("#wrapper #newevent #newevent_msg").val().trim();
       evname = $("#wrapper #newevent #event_name").val().trim();
       if (msg.length < 1) {
@@ -243,14 +243,20 @@
       selected = "";
       yeardetails = "";
       selected_time = "";
+      total_checked = 0;
       $("#newevent_table tr").each(function() {
         if ($(this).find("input[type='checkbox']").attr('checked')) {
           city += $($(this).find("td")[1]).text() + ",";
           country += $($(this).find("td")[2]).text() + ",";
           yeardetails += $($($(this).find("td")[3]).find(".yeardetails")).text() + ";";
-          return selected_time += $($($(this).find("td")[3]).find(".selected_time")).text().trim();
+          selected_time += $($($(this).find("td")[3]).find(".selected_time")).text().trim();
+          return total_checked++;
         }
       });
+      if (total_checked === 0) {
+        alert("Select atleast one timezone .");
+        return;
+      }
       country = country.substr(0, country.length - 1);
       city = city.substr(0, city.length - 1);
       yeardetails = yeardetails.substr(0, yeardetails.length - 1);

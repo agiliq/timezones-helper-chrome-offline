@@ -234,12 +234,17 @@ $("#wrapper button#saveevent").live
     selected = ""
     yeardetails = ""
     selected_time = ""
+    total_checked = 0
     $("#newevent_table tr").each () ->
       if $(@).find("input[type='checkbox']").attr 'checked'
         city += $($(@).find("td")[1]).text() + ","
         country += $($(@).find("td")[2]).text() + ","
         yeardetails += $($($(@).find("td")[3]).find(".yeardetails")).text() + ";"
         selected_time += $($($(@).find("td")[3]).find(".selected_time")).text().trim() 
+        total_checked++
+    if total_checked == 0
+      alert "Select atleast one timezone ."
+      return
 
     country = country.substr 0, country.length-1
     city = city.substr 0, city.length-1
