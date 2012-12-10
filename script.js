@@ -324,6 +324,7 @@
       var datestr, dd, errormsg, key, lenofdash, mm, options, year, _i, _len;
       errormsg = "mm-dd-yyyy format only";
       datestr = $("#dateinput").val().trim();
+      $(".selected_date").text(datestr);
       window.da = datestr;
       if (datestr.length !== 10) {
         $("#error_inputdate").html(errormsg);

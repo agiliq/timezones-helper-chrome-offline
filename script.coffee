@@ -325,6 +325,7 @@ $("#setdate_go").live
     errormsg = "mm-dd-yyyy format only"
 
     datestr = $("#dateinput").val().trim()
+    $(".selected_date").text datestr
     window.da = datestr
     unless datestr.length is 10
       $("#error_inputdate").html errormsg

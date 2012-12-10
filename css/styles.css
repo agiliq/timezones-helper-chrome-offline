@@ -133,6 +133,14 @@
 
                 }
 
+                .selected_date {
+                    position: absolute;
+                    left: 427px;
+                    top: 15px;
+                    font-weight: bolder;
+                    color: whitesmoke;
+                    font-size: 14pt;
+                }
 
                 #controls{
                    position: absolute;
