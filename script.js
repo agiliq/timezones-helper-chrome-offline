@@ -299,6 +299,9 @@
     },
     mouseleave: function() {
       return $("#date_help").hide();
+    },
+    keyup: function(e) {
+      if (e.keyCode === 13) return $("#setdate_go").trigger("click");
     }
   });
 

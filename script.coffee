@@ -291,6 +291,9 @@ $("#dateinput").live
       $("#date_help").show()
   mouseleave :->
     $("#date_help").hide()
+  keyup: (e) ->
+    if e.keyCode == 13
+      $("#setdate_go").trigger "click"
 
 $("#setdate_go").live
   click : (e) ->
