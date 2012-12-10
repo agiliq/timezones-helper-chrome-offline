@@ -427,7 +427,7 @@ $("#wrapper #showevents .eventheader").live
       return
     #console.log prev+" -- should be none"
     unless "events" of localStorage
-      $("#wrapper #showevents #showeventbody").html "<h3>No events available, add them first by clicking on the boxes showing time.</h3>"
+      $("#wrapper #showevents #showeventbody").html "<h3>No events available, you can add events by clicking on any box showing time.</h3>"
       #$("#wrapper #showevents #showeventbody").css "display","block"
       $("#wrapper #showevents #showeventbody").slideDown()
       $("body").scrollTo(".showevents")
@@ -454,7 +454,7 @@ $("#wrapper #showevents .eventheader").live
 
 
     if data is ""
-      data="<h3>No events available, add them first by clicking on the boxes showing time.</h3>"
+      data="<h3>No events available, you can add events by clicking on any box showing time.</h3>"
     $("#wrapper #showevents #showeventbody").html data
     #$("#wrapper #showevents #showeventbody").css "display","block"
     $("#wrapper #showevents #showeventbody").slideDown()
@@ -747,7 +747,7 @@ renderRows = ->
     if i is 0 or i is 0.5
 
       cl = "li_24"
-      hourline+=" <li class='"+cl+"' id='lihr_"+idx+"' idx='"+idx+"' t='"+i+"' details='"+selectedDateStr+"' ><div class='span_hl' idx='"+idx+"'><span idx='"+idx+"' class='small' >"+selecteddate.mText+"</span><br><span idx='"+idx+"' class='small' >"+selecteddate.d+"</span></div></li>"
+      hourline+=" <li class='"+cl+"' id='lihr_"+idx+"' idx='"+idx+"' t='"+i+"' details='"+selectedDateStr+"' ><div class='span_hl' idx='"+idx+"'><span idx='"+idx+"' class='small small-top' >"+selecteddate.mText+"</span><br><span idx='"+idx+"' class='small' >"+selecteddate.d+"</span></div></li>"
 
       i = 1
       idx++
@@ -816,7 +816,7 @@ renderRows = ->
       hourline+=" <li class='"+cl+"' id='lihr_"+idx+"' idx='"+idx+"' t='"+tval+"'  details='"+datedetailstr+"'><div class='span_hl' idx='"+idx+"'><span class='medium' idx='"+idx+"'>"+parseInt(i)+"</span><br><span class='small' idx='"+idx+"'>"+tempstr+"</span></div></li>"
 
       if tempstr is " "
-        hourline = hourline.replace "<span class='medium' idx='"+idx+"'>","<span idx='"+idx+"' >"
+        hourline = hourline.replace "<span class='medium' idx='"+idx+"'>","<span idx='"+idx+"' class='box_center' >"
       idx++
       i++
 
@@ -829,7 +829,7 @@ renderRows = ->
 
       cl = "li_24"
       if iorig != 0.5
-        hourline+=" <li class='"+cl+"' id='lihr_"+idx+"' idx='"+idx+"' t='"+iorig+"' details='"+dayusedstr+"' ><div class='span_hl' idx='"+idx+"'><span idx='"+idx+"'  class='small'> "+dayusedarr[1]+"</span><br><span idx='"+idx+"' class='small' >"+dayusedarr[2]+"</span></div></li>"
+        hourline+=" <li class='"+cl+"' id='lihr_"+idx+"' idx='"+idx+"' t='"+iorig+"' details='"+dayusedstr+"' ><div class='span_hl' idx='"+idx+"'><span idx='"+idx+"'  class='small small-top'> "+dayusedarr[1]+"</span><br><span idx='"+idx+"' class='small' >"+dayusedarr[2]+"</span></div></li>"
       if timestr is " "
         i=1
       else
@@ -864,7 +864,7 @@ renderRows = ->
 
       hourline+=" <li class='"+cl+"' id='lihr_"+idx+"' idx='"+idx+"' t='"+tval+"' details='"+datedetailstr+"' ><div class='span_hl' idx='"+idx+"'><span class='medium' idx='"+idx+"'>"+parseInt(i)+"</span><br><span class='small' idx='"+idx+"'>"+tempstr+"</span></div></li>"
       if tempstr is " "
-        hourline = hourline.replace "<span class='medium' idx='"+idx+"'>","<span idx='"+idx+"' >"
+        hourline = hourline.replace "<span class='medium' idx='"+idx+"'>","<span idx='"+idx+"' class='box_center' >"
       i++
       idx++
 

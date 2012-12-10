@@ -56,6 +56,11 @@
                 opacity: 0.6;
                 cursor: pointer;
            }
+
+           #newevent_msg {
+                width: 85%;
+                height: 135px;
+           }
             #controls{
                 z-index : 9999;
                 background-color : white;
@@ -118,7 +123,6 @@
                 input#search_input{
                   position : absolute;
                   left : 10px;
-                  height : 30px;
                   width : 250px;
                   border-radius : 5px;
 
@@ -138,7 +142,6 @@
                     }
 
                     #dateinput{
-                        height  : 30px;
                         width  : 150px;
                         border-radius : 5px;
 
@@ -490,7 +493,7 @@
 
                                 #content .row .dates .hourline_ul li {
                                   width : 22px;
-                                  line-height : 30px;
+                                /*  line-height : 30px; */
                                   text-align : center;
                                   vertical-align : bottom;
                                   border : 1px solid #357EC7 ;
@@ -498,6 +501,9 @@
                                   display : inline-block;
                                   color : white;
 
+                                }
+                                #content .row .dates .hourline_ul li span.box_center { 
+                                    line-height: 30px;
                                 }
 
                                 #content .row .dates .hourline_ul li .idxdetails_li{
@@ -517,13 +523,17 @@
 
                                 .small{
                                     font-size : 8pt;
-                                    line-height : 15px;
+                                    line-height : 6px;
                                     vertical-align : top;
                                 }
                                 #content .row .dates .hourline_ul li div.span_hl .small{
                                     font-size : 8pt;
-                                    line-height : 15px;
+                                    line-height : 6px;
                                     vertical-align : top;
+                                }
+
+                                #content .row .dates .hourline_ul li div.span_hl .small-top{
+                                    line-height: 12px;
                                 }
 
                                 #content .row .dates .hourline_ul li div.span_hl .medium{
@@ -607,4 +617,9 @@
                 width:310px;
                 border-radius: 25px;
 
+            }
+
+            .gplay {
+                margin-left: 83%;
+                margin-top: 150px;
             }
