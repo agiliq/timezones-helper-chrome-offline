@@ -719,8 +719,8 @@ renderRows = (callback) ->
     #newobj[0].standard = reqArr[2]
     floatOffset = convertOffsetToFloat reqArr[3].substr(3)
 
-    if (floatOffset+"").indexOf "-" is -1
-      if (floatOffset+"").indexOf "+" is -1
+    if (floatOffset+"").indexOf("-") is -1
+      if (floatOffset+"").indexOf("+") is -1
         floatOffset = "+"+floatOffset
     newobj[0].offset = floatOffset
     localStorage.addedLocations = JSON.stringify newobj
