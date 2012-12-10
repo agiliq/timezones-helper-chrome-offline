@@ -590,8 +590,8 @@
       newobj[0].city = reqArr[0];
       newobj[0].country = reqArr[1];
       floatOffset = convertOffsetToFloat(reqArr[3].substr(3));
-      if ((floatOffset + "").indexOf("-" === -1)) {
-        if ((floatOffset + "").indexOf("+" === -1)) {
+      if ((floatOffset + "").indexOf("-") === -1) {
+        if ((floatOffset + "").indexOf("+") === -1) {
           floatOffset = "+" + floatOffset;
         }
       }
