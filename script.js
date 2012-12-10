@@ -35,15 +35,6 @@
     ndstr = nd.toLocaleString();
     ndarr = ndstr.split(" ");
     setSelectedDate();
-    /*
-      $.ajax
-          url : "tz/cities.csv"
-          success : (cities) ->
-            origcities = cities.toLowerCase()
-            #console.log "cities loaded successfully"
-          error : (e) ->
-            #console.log "Error loading cities"
-    */
     return $.ajax({
       url: "tz/tz.csv",
       success: function(tz) {
@@ -62,6 +53,7 @@
       $(".searchresult_li").removeClass("temp_active");
       if (e.keyCode === 13) {
         k = $(".searchresult_li.active_search").attr("k");
+        $("#search_input").val("");
         sr_click(e, k);
         $("#search_result").hide();
         return;
@@ -121,7 +113,7 @@
 
   $("li.searchresult_li").live({
     click: function(e) {
-      console.log("-------li---------");
+      $("#search_input").val("");
       return sr_click(e);
     }
   });

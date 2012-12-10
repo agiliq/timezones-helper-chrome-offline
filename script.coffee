@@ -11,39 +11,19 @@ rowsortstop = ""
 #first set selecteddate to current date, later user can change
 
 $(document).ready ->
-  #console.log "ready"
   updateUtc()
   d = new Date()
-  #console.log d
   dstr=d.toLocaleString()
   datearr = dstr.split(" ")
-  #console.log "time : "+datearr[4]+" off : "+datearr[5]+" stand : "+datearr[6]
   localtime = d.getTime()
   localoffset = d.getTimezoneOffset()*60000
   utc = localtime + localoffset
-  #console.log "utc : "+utc
-
   bombayoff = 5.5
   bt = utc + (3600000*bombayoff)
-  #console.log bt is localtime
-  #console.log localtime
   nd = new Date(bt)
   ndstr = nd.toLocaleString()
-  #ndarr = new Array()
   ndarr = ndstr.split(" ")
-  #console.log ndarr[4].substr(0,5)
   setSelectedDate()
-
-  ###
-  $.ajax
-      url : "tz/cities.csv"
-      success : (cities) ->
-        origcities = cities.toLowerCase()
-        #console.log "cities loaded successfully"
-      error : (e) ->
-        #console.log "Error loading cities"
-  ###
-
 
   $.ajax
     url : "tz/tz.csv"
@@ -65,6 +45,7 @@ $("#search_input").live
     $(".searchresult_li").removeClass("temp_active")
     if e.keyCode == 13
       k = $(".searchresult_li.active_search").attr "k"
+      $("#search_input").val("")
       sr_click(e, k)
       $("#search_result").hide()
       return
@@ -117,12 +98,9 @@ $("#search_input").live
 
 
 # add locations to the localStorage
-#$("#search_result").on "click", {}, (e) ->
-#   console.log "------clicked-----"
-#   sr_click(e)
 $("li.searchresult_li").live
   click : (e) ->
-    console.log "-------li---------"
+    $("#search_input").val("")
     sr_click(e)
 
 $(".searchresult_ul").live
