@@ -1,6 +1,6 @@
 {
   "name": "Time zone convertor",
-  "version": "1.7",
+  "version": "1.8",
   "manifest_version": 1,
   "description": "Time zone convertor - Compare different timezones, schedule events.",
   "app" : {
