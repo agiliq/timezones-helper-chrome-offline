@@ -34,6 +34,7 @@
                 /*
                border : 1px solid black;
                */
+                width: 80%;
 
            }
            #wrapper table.showevent_table th{
@@ -330,6 +331,15 @@
                                width : 80%;
                                background-color: white;
 
+                            }
+
+                            #wrapper .each_event {
+                                padding: 10px 10px 10px 10px;
+                            }
+
+                            #wrapper .event_num {
+                                color: #DF9494;
+                                font-size: 19pt;
                             }
 
                     #content .row{
@@ -629,6 +639,7 @@
             .gplay {
                 margin-left: 83%;
                 margin-top: 150px;
+                margin-bottom: 50px;
             }
 
 

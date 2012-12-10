@@ -170,12 +170,12 @@ $("#vband").live
     $("#newevent_time").text ""
     $("#newevent_msg").text ""
     $("#event_name").text ""
-    tabl = "<table id='newevent_table' class='table table-striped' ><thead><th>City</th><th>Country</th><th>Time</th></thead>"
+    tabl = "<table id='newevent_table' class='table table-striped' ><thead><th>Select</th><th>City</th><th>Country</th><th>Time</th></thead>"
 
     for ind of t
 
       #$("#newevent_time").append "\n"+city[ind]+" : "+country[ind]+" : "+t[ind]
-      tabl+="<tr><td>"+city[ind]+"</td><td>"+country[ind]+"</td><td>"+yeardetails[ind]+" , "+t[ind]+"</td></tr>"
+      tabl+="<tr><td><input type='checkbox' checked /></td><td>"+city[ind]+"</td><td>"+country[ind]+"</td><td><span class='yeardetails'>"+yeardetails[ind]+"</span><span class='selected_time'>, "+t[ind]+"</td></tr>"
     tabl+="</table>"
     $("#newevent_time").html tabl
     $("#newevent_time").attr "city",city
@@ -196,19 +196,43 @@ $("#wrapper button#saveevent").live
       alert "Please enter event name"
       return
 
+    #   Getting data to be saved to localStorage.events
+    #for key, val of $("#newevent_table")
+    #  if $(val).find("input[type='checkbox']").attr("checked")
+    #    console.log "yes"
+    #  else
+    #    console.log "no"
+
+    city = ""
+    country = ""
+    selected = ""
+    yeardetails = ""
+    selected_time = ""
+    $("#newevent_table tr").each () ->
+      if $(@).find("input[type='checkbox']").attr 'checked'
+        city += $($(@).find("td")[1]).text() + ","
+        country += $($(@).find("td")[2]).text() + ","
+        yeardetails += $($($(@).find("td")[3]).find(".yeardetails")).text() + ";"
+        selected_time += $($($(@).find("td")[3]).find(".selected_time")).text().trim() 
+
+    country = country.substr 0, country.length-1
+    city = city.substr 0, city.length-1
+    yeardetails = yeardetails.substr 0, yeardetails.length-1
+    selected_time = selected_time.substr 1, selected_time.length
+        
+    #   end of getting the data  
+
     oldobj = {}
     if "events" of localStorage
       oldobj = JSON.parse localStorage.events
-    len=0
-    for key of oldobj
-      len++
+    len = Object.keys(oldobj).length
     oldobj[len] = {}
     oldobj[len].name = evname
     oldobj[len].desc = msg
-    oldobj[len].city = $("#newevent_time").attr "city"
-    oldobj[len].country = $("#newevent_time").attr "country"
-    oldobj[len].time = $("#newevent_time").attr "time"
-    oldobj[len].yeardetails = $("#newevent_time").attr "yeardetails"
+    oldobj[len].city = city
+    oldobj[len].country = country
+    oldobj[len].time = selected_time
+    oldobj[len].yeardetails = yeardetails
     localStorage.events = JSON.stringify oldobj
     $("#event_close").trigger 'click'
 
@@ -401,12 +425,8 @@ $("#wrapper #showevents .eventheader").live
     prev = $("#wrapper #showevents #showeventbody").css "display"
     #console.log prev
     unless prev is "none"
-      #console.log prev+"--"
-      #$("#wrapper #showevents #showeventbody").css "display","none"
       $("#wrapper #showevents #showeventbody").slideUp()
-
       return
-    #console.log prev+" -- should be none"
     unless "events" of localStorage
       $("#wrapper #showevents #showeventbody").html "<h3>No events available, you can add events by clicking on any box showing time.</h3>"
       #$("#wrapper #showevents #showeventbody").css "display","block"
@@ -431,11 +451,12 @@ $("#wrapper #showevents .eventheader").live
       for i of city
         tabl+="<tr><td>"+city[i]+"</td><td>"+country[i]+"</td><td>"+yeardetails[i]+" "+t[i]+"</td></tr>"
       tabl+="</tbody></table>"
-      data+= "<h2># "+(parseInt(key)+1)+" "+oldobj[key].name+"<span class='deleteEvent' key='"+key+"'>X&nbsp;</span></h2>"+tabl+"<h3>Description : </h3><p style='padding-left:15px;padding-right:15px;'> "+oldobj[key].desc+"</p><br><hr class='showevents_hr' />"
+      data+= "<h2><span class='event_num'># "+(parseInt(key)+1)+"</span> "+oldobj[key].name+"<span class='deleteEvent' key='"+key+"'>X&nbsp;</span></h2>"+tabl+"<h3>Description : </h3><p style='padding-left:15px;padding-right:15px;'> "+oldobj[key].desc+"</p><br><hr class='showevents_hr' />"
 
 
     if data is ""
       data="<h3>No events available, you can add events by clicking on any box showing time.</h3>"
+    data = "<div class='each_event'>"+data+"</div>"
     $("#wrapper #showevents #showeventbody").html data
     #$("#wrapper #showevents #showeventbody").css "display","block"
     $("#wrapper #showevents #showeventbody").slideDown()
@@ -718,9 +739,9 @@ renderRows = ->
         else
           tempstr=" "
     #console.log "selected date"
-    selectedDateStr = selecteddate.dayInText+" , "+selecteddate.mText+" "+selecteddate.d+" , "+selecteddate.year
+    selectedDateStr = selecteddate.dayInText+", "+selecteddate.mText+" "+selecteddate.d+", "+selecteddate.year
 
-    timeextrastr = selecteddate.dayInText+" , "+selecteddate.mText+" "+selecteddate.d+"  "+selecteddate.year
+    timeextrastr = selecteddate.dayInText+", "+selecteddate.mText+" "+selecteddate.d+"  "+selecteddate.year
     hourline = "<ul class='hourline_ul'>"
     idx = 0
 
@@ -743,7 +764,7 @@ renderRows = ->
     presdate = d+""
 
     presdatearr = presdate.split " "
-    presdatestr = presdatearr[0]+" , "+presdatearr[1]+" "+presdatearr[2]+" , "+presdatearr[3]
+    presdatestr = presdatearr[0]+", "+presdatearr[1]+" "+presdatearr[2]+", "+presdatearr[3]
 
     prevdate = new Date()
     prevdate.setFullYear selecteddate.year,selecteddate.m,selecteddate.d
@@ -752,7 +773,7 @@ renderRows = ->
     #prevdate = prevdate.toLocaleString()
     prevdate = prevdate+""
     prevdatearr = prevdate.split " "
-    prevdatestr = prevdatearr[0]+" , "+prevdatearr[1]+" "+prevdatearr[2]+" , "+prevdatearr[3]
+    prevdatestr = prevdatearr[0]+", "+prevdatearr[1]+" "+prevdatearr[2]+", "+prevdatearr[3]
 
 
     d.setTime d.getTime()+86400000
@@ -760,7 +781,7 @@ renderRows = ->
     #d = d.toLocaleString()
     d = d+""
     nextdayarr = d.split " "
-    nextDayStr = nextdayarr[0]+" , "+nextdayarr[1]+" "+nextdayarr[2]+" , "+nextdayarr[3]
+    nextDayStr = nextdayarr[0]+", "+nextdayarr[1]+" "+nextdayarr[2]+", "+nextdayarr[3]
 
 
     dayusedarr = []

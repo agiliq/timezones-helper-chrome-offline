@@ -184,9 +184,9 @@
       $("#newevent_time").text("");
       $("#newevent_msg").text("");
       $("#event_name").text("");
-      tabl = "<table id='newevent_table' class='table table-striped' ><thead><th>City</th><th>Country</th><th>Time</th></thead>";
+      tabl = "<table id='newevent_table' class='table table-striped' ><thead><th>Select</th><th>City</th><th>Country</th><th>Time</th></thead>";
       for (ind in t) {
-        tabl += "<tr><td>" + city[ind] + "</td><td>" + country[ind] + "</td><td>" + yeardetails[ind] + " , " + t[ind] + "</td></tr>";
+        tabl += "<tr><td><input type='checkbox' checked /></td><td>" + city[ind] + "</td><td>" + country[ind] + "</td><td><span class='yeardetails'>" + yeardetails[ind] + "</span><span class='selected_time'>, " + t[ind] + "</td></tr>";
       }
       tabl += "</table>";
       $("#newevent_time").html(tabl);
@@ -199,7 +199,7 @@
 
   $("#wrapper button#saveevent").live({
     click: function(e) {
-      var evname, key, len, msg, oldobj;
+      var city, country, evname, len, msg, oldobj, selected, selected_time, yeardetails;
       msg = $("#wrapper #newevent #newevent_msg").val().trim();
       evname = $("#wrapper #newevent #event_name").val().trim();
       if (msg.length < 1) {
@@ -210,19 +210,33 @@
         alert("Please enter event name");
         return;
       }
+      city = "";
+      country = "";
+      selected = "";
+      yeardetails = "";
+      selected_time = "";
+      $("#newevent_table tr").each(function() {
+        if ($(this).find("input[type='checkbox']").attr('checked')) {
+          city += $($(this).find("td")[1]).text() + ",";
+          country += $($(this).find("td")[2]).text() + ",";
+          yeardetails += $($($(this).find("td")[3]).find(".yeardetails")).text() + ";";
+          return selected_time += $($($(this).find("td")[3]).find(".selected_time")).text().trim();
+        }
+      });
+      country = country.substr(0, country.length - 1);
+      city = city.substr(0, city.length - 1);
+      yeardetails = yeardetails.substr(0, yeardetails.length - 1);
+      selected_time = selected_time.substr(1, selected_time.length);
       oldobj = {};
       if ("events" in localStorage) oldobj = JSON.parse(localStorage.events);
-      len = 0;
-      for (key in oldobj) {
-        len++;
-      }
+      len = Object.keys(oldobj).length;
       oldobj[len] = {};
       oldobj[len].name = evname;
       oldobj[len].desc = msg;
-      oldobj[len].city = $("#newevent_time").attr("city");
-      oldobj[len].country = $("#newevent_time").attr("country");
-      oldobj[len].time = $("#newevent_time").attr("time");
-      oldobj[len].yeardetails = $("#newevent_time").attr("yeardetails");
+      oldobj[len].city = city;
+      oldobj[len].country = country;
+      oldobj[len].time = selected_time;
+      oldobj[len].yeardetails = yeardetails;
       localStorage.events = JSON.stringify(oldobj);
       return $("#event_close").trigger('click');
     }
@@ -431,11 +445,12 @@
           tabl += "<tr><td>" + city[i] + "</td><td>" + country[i] + "</td><td>" + yeardetails[i] + " " + t[i] + "</td></tr>";
         }
         tabl += "</tbody></table>";
-        data += "<h2># " + (parseInt(key) + 1) + " " + oldobj[key].name + "<span class='deleteEvent' key='" + key + "'>X&nbsp;</span></h2>" + tabl + "<h3>Description : </h3><p style='padding-left:15px;padding-right:15px;'> " + oldobj[key].desc + "</p><br><hr class='showevents_hr' />";
+        data += "<h2><span class='event_num'># " + (parseInt(key) + 1) + "</span> " + oldobj[key].name + "<span class='deleteEvent' key='" + key + "'>X&nbsp;</span></h2>" + tabl + "<h3>Description : </h3><p style='padding-left:15px;padding-right:15px;'> " + oldobj[key].desc + "</p><br><hr class='showevents_hr' />";
       }
       if (data === "") {
         data = "<h3>No events available, you can add events by clicking on any box showing time.</h3>";
       }
+      data = "<div class='each_event'>" + data + "</div>";
       $("#wrapper #showevents #showeventbody").html(data);
       $("#wrapper #showevents #showeventbody").slideDown();
       return $("body").scrollTo("#showevents");
@@ -654,8 +669,8 @@
           tempstr = " ";
         }
       }
-      selectedDateStr = selecteddate.dayInText + " , " + selecteddate.mText + " " + selecteddate.d + " , " + selecteddate.year;
-      timeextrastr = selecteddate.dayInText + " , " + selecteddate.mText + " " + selecteddate.d + "  " + selecteddate.year;
+      selectedDateStr = selecteddate.dayInText + ", " + selecteddate.mText + " " + selecteddate.d + ", " + selecteddate.year;
+      timeextrastr = selecteddate.dayInText + ", " + selecteddate.mText + " " + selecteddate.d + "  " + selecteddate.year;
       hourline = "<ul class='hourline_ul'>";
       idx = 0;
       iorig = i;
@@ -672,17 +687,17 @@
       d.setFullYear(selecteddate.year, selecteddate.m, selecteddate.d);
       presdate = d + "";
       presdatearr = presdate.split(" ");
-      presdatestr = presdatearr[0] + " , " + presdatearr[1] + " " + presdatearr[2] + " , " + presdatearr[3];
+      presdatestr = presdatearr[0] + ", " + presdatearr[1] + " " + presdatearr[2] + ", " + presdatearr[3];
       prevdate = new Date();
       prevdate.setFullYear(selecteddate.year, selecteddate.m, selecteddate.d);
       prevdate.setTime(prevdate.getTime() - 86400000);
       prevdate = prevdate + "";
       prevdatearr = prevdate.split(" ");
-      prevdatestr = prevdatearr[0] + " , " + prevdatearr[1] + " " + prevdatearr[2] + " , " + prevdatearr[3];
+      prevdatestr = prevdatearr[0] + ", " + prevdatearr[1] + " " + prevdatearr[2] + ", " + prevdatearr[3];
       d.setTime(d.getTime() + 86400000);
       d = d + "";
       nextdayarr = d.split(" ");
-      nextDayStr = nextdayarr[0] + " , " + nextdayarr[1] + " " + nextdayarr[2] + " , " + nextdayarr[3];
+      nextDayStr = nextdayarr[0] + ", " + nextdayarr[1] + " " + nextdayarr[2] + ", " + nextdayarr[3];
       dayusedarr = [];
       dayusedstr = "";
       if (diffoffset >= 0) {
