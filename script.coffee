@@ -190,10 +190,10 @@ $("#wrapper button#saveevent").live
     msg= $("#wrapper #newevent #newevent_msg").val().trim()
     evname =  $("#wrapper #newevent #event_name").val().trim()
     if msg.length<1
-      alert "Please enter some message"
+      alert "Please enter description"
       return
     if evname.length<1
-      alert "please enter event name"
+      alert "Please enter event name"
       return
 
     oldobj = {}

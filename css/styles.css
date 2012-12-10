@@ -9,6 +9,10 @@
 
             }
 
+            #saveevent {
+                margin-left: 10px; margin-top: -15px;
+                
+            }
 
            #wrapper table#newevent_table{
             /*   border : 1px solid black; */
@@ -233,6 +237,9 @@
                         right : 10px;
                         top:10px;
 
+                    }
+                    #wrapper #newevent #event_close:hover {
+                        cursor: pointer;
                     }
 
                     #wrapper #showevents{
@@ -623,3 +630,5 @@
                 margin-left: 83%;
                 margin-top: 150px;
             }
+
+
