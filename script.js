@@ -470,7 +470,7 @@
 
   $("#wrapper #showevents .eventheader").live({
     click: function(e) {
-      var city, country, data, i, key, oldobj, prev, t, tabl, yeardetails;
+      var city, country, data, hr_i, i, key, objlen, oldobj, prev, t, tabl, yeardetails;
       prev = $("#wrapper #showevents #showeventbody").css("display");
       if (prev !== "none") {
         $("#wrapper #showevents #showeventbody").slideUp();
@@ -484,6 +484,8 @@
       }
       oldobj = JSON.parse(localStorage.events);
       data = "";
+      objlen = Object.keys(oldobj).length;
+      hr_i = 1;
       for (key in oldobj) {
         city = new Array();
         country = new Array();
@@ -498,12 +500,14 @@
           tabl += "<tr><td>" + city[i] + "</td><td>" + country[i] + "</td><td>" + yeardetails[i] + " " + t[i] + "</td></tr>";
         }
         tabl += "</tbody></table>";
-        data += "<h4><span class='event_num'># " + (parseInt(key) + 1) + "</span> " + oldobj[key].name + "<span class='deleteEvent' key='" + key + "'>X&nbsp;</span></h4>" + tabl + "<h4>Description  </h4><p style='padding-left:15px;padding-right:15px;'> " + oldobj[key].desc + "</p><br><hr class='showevents_hr' />";
+        data += "<div class='each_event_header'><span class='event_name_desc'><span class='event_num'># " + (parseInt(key) + 1) + "</span><span class='event_name'> " + oldobj[key].name + "</span> - <span class='event_desc'>" + oldobj[key].desc + "</span></span><span class='deleteEvent' key='" + key + "'>X&nbsp;</span></div>" + tabl + "<br>";
+        if (hr_i !== objlen) data += "<hr>";
+        hr_i++;
       }
       if (data === "") {
         data = "<h3>No events available, you can add events by clicking on any box showing time.</h3>";
       }
-      data = "<div class='each_event'>" + data + "</div>";
+      data = "<div class='events'>" + data + "</div>";
       $("#wrapper #showevents #showeventbody").html(data);
       $("#wrapper #showevents #showeventbody").slideDown();
       return $("body").scrollTo("#showevents");
@@ -518,23 +522,22 @@
 
   $(".deleteEvent").live({
     click: function(e) {
-      var i, key, len, oldobj, r, rowindex;
+      var i, len, oldobj, r, rowindex;
       r = confirm("Do you really want to delete this event ? ");
       if (r !== true) return;
       rowindex = parseInt($(e.target).attr("key"));
       oldobj = JSON.parse(localStorage.events);
-      len = 0;
-      for (key in oldobj) {
-        len++;
-      }
-      if (rowindex !== len - 1) {
+      len = Object.keys(oldobj).length;
+      if (i !== len - 1) {
         i = rowindex + 1;
         while (i < len) {
           oldobj[i - 1] = oldobj[i];
           i++;
         }
+        delete oldobj[len - 1];
+      } else {
+        delete oldobj[rowindex];
       }
-      delete oldobj[rowindex];
       localStorage.events = JSON.stringify(oldobj);
       $("#wrapper #showevents #showeventbody").css("display", "none");
       return $("#wrapper #showevents .eventheader").trigger("click");
