@@ -1,9 +1,11 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <title>TimeZone Convertor</title>
         <link href="css/bootstrap.css" rel="stylesheet" />
         <link rel="stylesheet" href="css/styles.css" type='text/css' />
         <link href="css/jquery-ui.css" rel="stylesheet" type='text/css' />
+        
         <!--
         <link rel="stylesheet" href="css/bootstrap-table.css" type='text/css' />
         <link rel="stylesheet" href="css/bootstrap-button.css" type='text/css' />
@@ -64,8 +66,9 @@
                             <div class='event-body'>
                                 <div id='event_close'><strong>X</strong></div>
                                 <h3 class='backcolor'>Add New Event </h3>
-                                <span style='width:231px;display:inline-block;'>Name  </span><input type='text' id='event_name' placeholder='Enter event name here' />
+                                <input type='text' id='event_name' placeholder='Enter event name here' />
                                 <button id='saveevent' class='btn btn-primary '>Save</button>
+                                <a  class='btn btn-primary link_export_google_cal' target='_blank' style='margin-top: -15px; margin-left:10px;'>Export to Google Calendar</a>
                             <h3 class='backcolor'> Time  </h3>  <div  id='newevent_time' ></div>
 
                                <h4 class='backcolor'> Description  </h4>
