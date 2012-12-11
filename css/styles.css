@@ -647,9 +647,9 @@
             }
 
             #event_name { 
-                height: 36px;
+              /*  height: 25px; */
                 width:310px;
-                border-radius: 25px;
+                border-radius: 6px;
 
             }
 

@@ -1,5 +1,5 @@
 (function() {
-  var cities_data_arr, convertOffset, convertOffsetToFloat, countries_data_arr, full_data_arr, full_data_original_arr, getCities, getMonth, getNewTime, getRequiredOffset, k, locations, origcities, renderRows, rowsortstart, rowsortstop, selecteddate, setSelectedDate, sr_click, tzdata, tzdatalower, updateUtc, utc;
+  var cities_data_arr, convertOffset, convertOffsetToFloat, countries_data_arr, full_data_arr, full_data_original_arr, getCities, getMonth, getNewTime, getRequiredOffset, get_google_cal_dates_param, k, locations, open_in_new_tab, origcities, renderRows, rowsortstart, rowsortstop, selecteddate, setSelectedDate, sr_click, tzdata, tzdatalower, updateUtc, utc;
 
   origcities = "";
 
@@ -191,7 +191,7 @@
       return $("#content").sortable('enable');
     },
     click: function(e) {
-      var city, country, ele, idx, ind, t, tText, tabl, yeardetails, _i, _len, _ref;
+      var city, country, ele, idx, ind, original_offset, t, tText, tabl, yeardetails, _i, _len, _ref;
       $(".canhide").css("opacity", "0.1");
       idx = $(e.target).attr("idx");
       if (idx === void 0) return;
@@ -199,6 +199,7 @@
       city = new Array();
       country = new Array();
       yeardetails = new Array();
+      original_offset = new Array();
       _ref = $(".row");
       for (_i = 0, _len = _ref.length; _i < _len; _i++) {
         ele = _ref[_i];
@@ -207,6 +208,7 @@
         city.push($("#" + ele.id + " .city").text());
         country.push($("#" + ele.id + " .country").text());
         yeardetails.push($("#" + ele.id + " #lihr_" + idx).attr("details"));
+        original_offset.push($(ele).attr("floatoffset"));
       }
       $("#newevent").show();
       $("#newevent_time").text("");
@@ -214,7 +216,7 @@
       $("#event_name").text("");
       tabl = "<table id='newevent_table' class='table table-striped' ><thead><th>Select</th><th>City</th><th>Country</th><th>Time</th></thead>";
       for (ind in t) {
-        tabl += "<tr><td><input type='checkbox' checked /></td><td>" + city[ind] + "</td><td>" + country[ind] + "</td><td><span class='yeardetails'>" + yeardetails[ind] + "</span><span class='selected_time'>, " + t[ind] + "</td></tr>";
+        tabl += "<tr floatoffset='" + original_offset[ind] + "'><td><input type='checkbox' checked /></td><td>" + city[ind] + "</td><td>" + country[ind] + "</td><td><span class='yeardetails'>" + yeardetails[ind] + "</span><span class='selected_time'>, " + t[ind] + "</td></tr>";
       }
       tabl += "</table>";
       $("#newevent_time").html(tabl);
@@ -297,7 +299,6 @@
       var defaultidx, i, key, len, newobj, oldobj, rowindex, val;
       rowindex = parseInt($(e.target).parent().parent().attr("rowindex"));
       oldobj = JSON.parse(localStorage.addedLocations);
-      oldobj = JSON.parse(localStorage.addedLocations);
       len = 0;
       for (key in oldobj) {
         len++;
@@ -326,14 +327,6 @@
     click: function(e) {
       var rowindex;
       rowindex = parseInt($(e.target).parent().parent().attr("rowindex"));
-      /*
-          oldobj = JSON.parse localStorage.addedLocations
-          tempobj = oldobj[rowindex]
-          oldobj[rowindex] = oldobj[0]
-          oldobj[0] = tempobj
-          localStorage.addedLocations = JSON.stringify oldobj
-          renderRows()
-      */
       localStorage["default"] = rowindex;
       return renderRows();
     }
@@ -544,18 +537,6 @@
       $("#wrapper #showevents #showeventbody").css("display", "none");
       return $("#wrapper #showevents .eventheader").trigger("click");
     }
-  });
-
-  $("lKNHi span").live({
-    click: function(e) {},
-    mouseover: function() {}
-  });
-
-  $("ulsss").live({
-    click: function(e) {
-      return sr_click(e);
-    },
-    mouseover: function() {}
   });
 
   sr_click = function(e, k) {
@@ -799,7 +780,7 @@
       hourline += "</ul>";
       sym = "";
       if (diffoffset > 0) sym = "+";
-      row += "<div class='row' id='row_" + ind + "' rowindex='" + ind + "' time='" + timearr[4] + "' ><div class='tzdetails'><div class='offset'>" + sym + (floatOffset - defaultoffset) + "<br><span class='small' >Hours</span></div><div class='location'><span class='city'>" + oldobj[ind].city + "</span><br><span class='country'>" + oldobj[ind].country + "</span></div><div class='timedata'><span class='time'>" + timearr[4] + "</span><br><span class='timeextra'>" + timeextrastr + "</span></div></div><div class='dates'>" + hourline + "</div></div> ";
+      row += "<div class='row' id='row_" + ind + "' rowindex='" + ind + "' time='" + timearr[4] + "' floatoffset='" + floatOffset + "'><div class='tzdetails'><div class='offset'>" + sym + (floatOffset - defaultoffset) + "<br><span class='small' >Hours</span></div><div class='location'><span class='city'>" + oldobj[ind].city + "</span><br><span class='country'>" + oldobj[ind].country + "</span></div><div class='timedata'><span class='time'>" + timearr[4] + "</span><br><span class='timeextra'>" + timeextrastr + "</span></div></div><div class='dates'>" + hourline + "</div></div> ";
     }
     $("#content").html(row);
     $("#content").prepend("<div id='vband'></div><div id='selectedband'></div>");
@@ -936,6 +917,59 @@
     nd = new Date(newtime);
     ndstr = nd.toLocaleString();
     return ndstr;
+  };
+
+  open_in_new_tab = function(url) {
+    window.open(url, '_blank');
+    return window.focus();
+  };
+
+  $(".link_export_google_cal").live({
+    click: function(e) {
+      var d, ele, floatoffset, gcal_url, gmt_str, google_cal_dates_param, link_desc, next_day, td_arr, _i, _len, _ref;
+      e.preventDefault();
+      link_desc = "";
+      _ref = $("#newevent_table tr");
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        ele = _ref[_i];
+        if ($(ele).find("input[type='checkbox']").attr("checked")) {
+          td_arr = $(ele).find("td");
+          link_desc += $(td_arr[1]).text().trim() + ", " + $(td_arr[2]).text().trim() + ", " + $(td_arr[3]).find('.yeardetails').text().trim() + " " + $(td_arr[3]).find('.selected_time').text().trim() + "\n";
+        }
+      }
+      gmt_str = $($("#newevent_table tr")[1]).find("td")[3];
+      floatoffset = $($("#newevent_table tr")[1]).attr("floatoffset");
+      gmt_str = $($(gmt_str).find('.yeardetails')).text().trim() + " " + $($(gmt_str).find('.selected_time')).text().trim();
+      d = new Date(gmt_str);
+      d.setHours(d.getHours() - Number(floatoffset));
+      google_cal_dates_param = get_google_cal_dates_param(d);
+      next_day = d;
+      next_day.setHours(d.getHours() + 1);
+      google_cal_dates_param += "/" + get_google_cal_dates_param(next_day);
+      gcal_url = "https://www.google.com/calendar/render?action=TEMPLATE&details=" + link_desc;
+      if ($("#newevent_msg").val().trim().length > 0) {
+        gcal_url += '\n' + $("#newevent_msg").val().trim();
+      }
+      if ($("#event_name").val().trim().length > 0) {
+        gcal_url += "&text=" + $('#event_name').val().trim();
+      }
+      gcal_url += "&dates=" + google_cal_dates_param;
+      $(".link_export_google_cal").attr("href", encodeURI(gcal_url));
+      return open_in_new_tab($(".link_export_google_cal").attr('href'));
+    }
+  });
+
+  get_google_cal_dates_param = function(d) {
+    var day_str, google_cal_dates_param, hour_str, min_str, month_str;
+    month_str = d.getMonth() + 1;
+    if ((month_str + "").trim().length === 1) month_str = "0" + month_str;
+    day_str = d.getDate();
+    if ((day_str + "").trim().length === 1) day_str = "0" + day_str;
+    min_str = d.getMinutes();
+    if ((min_str + "").trim().length === 1) min_str = "0" + min_str;
+    hour_str = d.getHours();
+    if ((hour_str + "").trim().length === 1) hour_str = "0" + hour_str;
+    return google_cal_dates_param = "" + d.getFullYear() + month_str + day_str + "T" + hour_str + min_str + "00Z";
   };
 
 }).call(this);
