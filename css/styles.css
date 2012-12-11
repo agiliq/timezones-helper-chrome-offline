@@ -9,6 +9,10 @@
 
             }
 
+            #saveevent {
+                margin-left: 10px; margin-top: -15px;
+                
+            }
 
            #wrapper table#newevent_table{
             /*   border : 1px solid black; */
@@ -30,6 +34,7 @@
                 /*
                border : 1px solid black;
                */
+                width: 80%;
 
            }
            #wrapper table.showevent_table th{
@@ -55,6 +60,11 @@
            #wrapper .deleteEvent:hover {
                 opacity: 0.6;
                 cursor: pointer;
+           }
+
+           #newevent_msg {
+                width: 85%;
+                height: 135px;
            }
             #controls{
                 z-index : 9999;
@@ -118,12 +128,19 @@
                 input#search_input{
                   position : absolute;
                   left : 10px;
-                  height : 30px;
                   width : 250px;
                   border-radius : 5px;
 
                 }
 
+                .selected_date {
+                    position: absolute;
+                    left: 427px;
+                    top: 15px;
+                    font-weight: bolder;
+                    color: whitesmoke;
+                    font-size: 14pt;
+                }
 
                 #controls{
                    position: absolute;
@@ -138,7 +155,6 @@
                     }
 
                     #dateinput{
-                        height  : 30px;
                         width  : 150px;
                         border-radius : 5px;
 
@@ -191,6 +207,9 @@
 
 
 
+                    .invisible_comma_search_result {
+                        color: #DAF9FF;
+                    }
 
                     #search_result{
                         position : absolute;
@@ -230,6 +249,9 @@
                         right : 10px;
                         top:10px;
 
+                    }
+                    #wrapper #newevent #event_close:hover {
+                        cursor: pointer;
                     }
 
                     #wrapper #showevents{
@@ -322,6 +344,15 @@
 
                             }
 
+                            #wrapper .each_event {
+                                padding: 10px 10px 10px 10px;
+                            }
+
+                            #wrapper .event_num {
+                                color: #BFACE0;
+                                font-size: 12pt;
+                            }
+
                     #content .row{
                         display : block;
                         text-align : left;
@@ -346,7 +377,7 @@
                     }
                     */
                         #content .row .icons_homedelete{
-                            opacity : 0.3;
+                            opacity : 0.6;
                             height : 70px;
                             width : 45px;
                             position: absolute;
@@ -355,11 +386,16 @@
 
                         #content .row .icons_homedelete:hover{
                             opacity : 1;
+                            zoom: 120%;
                         }
 
                         #content .row .icons_homedelete .icon_delete{
 
                             height : 50%;
+                            position: relative;
+                            left: 6px;
+                            font-size: 14pt;
+                            font-weight: bold;
                         }
 
                         #content .row .icons_homedelete .icon_home{
@@ -370,6 +406,7 @@
 
                         #content .row .icons_homedelete .icon_delete:hover{
                             cursor : pointer;
+
 
                         }
 
@@ -464,7 +501,7 @@
                                     position : absolute;
                                     top : 15px;
                                     left : 35px;
-                                    z-index : 9999;
+                                    z-index : 999;
 
                                 }
 
@@ -490,7 +527,7 @@
 
                                 #content .row .dates .hourline_ul li {
                                   width : 22px;
-                                  line-height : 30px;
+                                /*  line-height : 30px; */
                                   text-align : center;
                                   vertical-align : bottom;
                                   border : 1px solid #357EC7 ;
@@ -498,6 +535,9 @@
                                   display : inline-block;
                                   color : white;
 
+                                }
+                                #content .row .dates .hourline_ul li span.box_center { 
+                                    line-height: 30px;
                                 }
 
                                 #content .row .dates .hourline_ul li .idxdetails_li{
@@ -517,13 +557,17 @@
 
                                 .small{
                                     font-size : 8pt;
-                                    line-height : 15px;
+                                    line-height : 6px;
                                     vertical-align : top;
                                 }
                                 #content .row .dates .hourline_ul li div.span_hl .small{
                                     font-size : 8pt;
-                                    line-height : 15px;
+                                    line-height : 6px;
                                     vertical-align : top;
+                                }
+
+                                #content .row .dates .hourline_ul li div.span_hl .small-top{
+                                    line-height: 12px;
                                 }
 
                                 #content .row .dates .hourline_ul li div.span_hl .medium{
@@ -607,4 +651,77 @@
                 width:310px;
                 border-radius: 25px;
 
+            }
+
+            .gplay {
+                margin-left: 83%;
+                margin-top: 150px;
+                margin-bottom: 50px;
+            }
+
+
+
+            div.date_help_animation_box {
+                position: absolute;
+                top: 150px;
+                left: 50px;
+                display: none;
+                width: 350px; height: 100px;
+                z-index: 9999;
+
+            }
+
+            div.date_help_animation_box div{
+                color: whitesmoke;
+                font-weight: bold;
+                padding: 15px;
+
+
+                width: 91%;
+                height: 70%;
+  background-image: -moz-linear-gradient(top , #F7D794, #BE5605);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#EB9258), to(#BE5605));
+  background-image: -webkit-linear-gradient(top,#EB9258, #BE5605 );
+  background-image: -o-linear-gradient(top,#F7D794, #BE5605);
+  background-image: linear-gradient(to bottom,#F7D794, #BE5605);
+            }
+
+
+
+            .arrow_box_date_help {
+                position: relative;
+                background: #E4AB8A;
+                border: 4px solid #E4AB8A;
+            }
+            .arrow_box_date_help:after, .arrow_box_date_help:before {
+                bottom: 100%;
+                border: solid transparent;
+                content: " ";
+                height: 0;
+                width: 0;
+                position: absolute;
+                pointer-events: none;
+            }
+
+            .arrow_box_date_help:after {
+              /*  border-color: #E4AB8A; */
+                border-bottom-color: #EB915E;
+                border-width: 30px;
+                left: 50%;
+                margin-left: -30px;
+            }
+            .arrow_box_date_help:before {
+               /* border-color: #E4AB8A;*/
+                border-bottom-color: #E4AB8A;
+                border-width: 36px;
+                left: 50%;
+                margin-left: -36px;
+            }
+
+            .small_font{
+                font-size: 8pt;
+            }
+
+            .margin-left-10 {
+                margin-left: 10px;
             }

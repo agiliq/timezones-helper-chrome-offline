@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
     <head>
         <link href="css/bootstrap.css" rel="stylesheet" />
@@ -14,13 +14,23 @@
         <div id="wrapper">
                   <div id="container" class='canhide'>
                       <div id='toolbar' class='well well-small'>
+                            <div class='date_help_animation_box arrow_box_date_help'>
+                                <div >
+                                    You can observe the date change here when you select and submit any date. The hourline on the rightside is based on this date. 
+                                    <br><input type='checkbox' id='display_date_animation' style='margin-top:-2px;' /><span class='small_font margin-left-10'>Tick this to never show this animation</span>
+                                </div>
+                            </div>
                         <div id='div_locations_input_box' class='pull-left'>
                             <input type='text' id='search_input' placeholder='search city, country...' autocomplete='off' />
                              <div id="search_result">
 
                              </div> <!-- end of div search_result -->
                         </div> <!-- end of div div_locations_input_box -->
+
+                        <div class='selected_date'></div>
+
                         <div id='controls' class='pull-right'>
+
                              <div id='error_inputdate' class='well well-small'></div>
                              <div id='date_help' class='well'>Enter the date on which you wish to schedule</div>
                              <input type='text' placeholder='mm-dd-yyyy' id='dateinput'  maxlength=10 /><span style=';display:inline-block;width : 10px' ></span>
@@ -31,6 +41,7 @@
                         </div> <!-- end of div controls -->
                       </div> <!-- end of div toolbar -->
                         <div id="content">
+
 
                           <!-- skeleton
                               <div class='row'>
@@ -49,15 +60,16 @@
             <div id='newevent'  style='display:none'>
 
                             <div class='event-body'>
-                                <div id='event_close'>X</div>
+                                <div id='event_close'><strong>X</strong></div>
                                 <h3 class='backcolor'>Add New Event </h3>
                                 <span style='width:231px;display:inline-block;'>Name  </span><input type='text' id='event_name' placeholder='Enter event name here' />
+                                <button id='saveevent' class='btn btn-primary '>Save</button>
                             <h3 class='backcolor'> Time  </h3>  <div  id='newevent_time' ></div>
 
                                <h4 class='backcolor'> Description  </h4>
 
-                                <textarea  rows='10' cols='70' id='newevent_msg'></textarea><br>
-                                <button id='saveevent' class='btn btn-primary'>Save</button>
+                                <textarea id='newevent_msg'></textarea><br>
+
                             </div>
 
                         </div> <!-- end of newevent -->
@@ -68,8 +80,13 @@
                            <div id='showeventbody'></div>
 
 
-
                         </div> <!-- end of showevents -->
+                        <div class='gplay'>
+                        <a href='https://play.google.com/store/apps/details?id=com.agiliq.timezone.core'><img src='images/gplay.png' /></a>
+                    </div>
+
+
+
 
 
 
@@ -85,5 +102,6 @@
                  $( "#dateinput" ).datepicker({ dateFormat: 'mm-dd-yy'});
             });
         </script>
+
     </body>
 </html>
