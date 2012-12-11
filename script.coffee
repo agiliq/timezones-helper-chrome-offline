@@ -254,6 +254,8 @@ $("#wrapper button#saveevent").live
     oldobj[len].yeardetails = yeardetails
     localStorage.events = JSON.stringify oldobj
     $("#event_close").trigger 'click'
+    $("#wrapper #showevents #showeventbody").hide()
+    $(".eventheader").trigger "click"
 
 
 $("#event_close").live

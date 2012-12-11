@@ -274,7 +274,9 @@
       oldobj[len].time = selected_time;
       oldobj[len].yeardetails = yeardetails;
       localStorage.events = JSON.stringify(oldobj);
-      return $("#event_close").trigger('click');
+      $("#event_close").trigger('click');
+      $("#wrapper #showevents #showeventbody").hide();
+      return $(".eventheader").trigger("click");
     }
   });
 
