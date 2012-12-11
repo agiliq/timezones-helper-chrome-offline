@@ -688,12 +688,12 @@
 
 
 
-            .arrow_box {
+            .arrow_box_date_help {
                 position: relative;
                 background: #E4AB8A;
                 border: 4px solid #E4AB8A;
             }
-            .arrow_box:after, .arrow_box:before {
+            .arrow_box_date_help:after, .arrow_box_date_help:before {
                 bottom: 100%;
                 border: solid transparent;
                 content: " ";
@@ -703,14 +703,14 @@
                 pointer-events: none;
             }
 
-            .arrow_box:after {
+            .arrow_box_date_help:after {
               /*  border-color: #E4AB8A; */
                 border-bottom-color: #EB915E;
                 border-width: 30px;
                 left: 50%;
                 margin-left: -30px;
             }
-            .arrow_box:before {
+            .arrow_box_date_help:before {
                /* border-color: #E4AB8A;*/
                 border-bottom-color: #E4AB8A;
                 border-width: 36px;
