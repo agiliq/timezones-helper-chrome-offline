@@ -663,22 +663,14 @@
 
             div.date_help_animation_box {
                 position: absolute;
-                top: -34px;
-                right: 50px;
-                -webkit-transition: all 2s ease-in;
-                -webkit-transition-property: all;
-                -webkit-transition-duration: 2s;
-                -webkit-transition-timing-function: ease-in;
+                top: 150px;
+                left: 50px;
                 display: none;
-
-            }
-
-            div.date_help_animation_box_small_dimensions {
-                width: 100px; height: 100px;
-            }
-            div.date_help_animation_box_large_dimensions {
                 width: 350px; height: 100px;
+                z-index: 9999;
+
             }
+
             div.date_help_animation_box div{
                 color: whitesmoke;
                 font-weight: bold;
@@ -687,11 +679,6 @@
 
                 width: 91%;
                 height: 70%;
--webkit-transition: all 2s ease-in-out;
--moz-transition: all 2s ease-in-out;
-o-transition: all 2s ease-in-out;
--ms-transition: all 2s ease-in-out;
-transition: all 2s ease-in-out;
   background-image: -moz-linear-gradient(top , #F7D794, #BE5605);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#EB9258), to(#BE5605));
   background-image: -webkit-linear-gradient(top,#EB9258, #BE5605 );
@@ -699,22 +686,6 @@ transition: all 2s ease-in-out;
   background-image: linear-gradient(to bottom,#F7D794, #BE5605);
             }
 
-               .final_destination_date_animation {
-                    -webkit-transform: translate(-620px,175px);
-                    -moz-transform: translate(540px,-200px);
-                    -o-transform: translate(540px,-200px);
-                    -ms-transform: translate(540px,-200px);
-                    transition: all 2s ease-in-out;
-
-
-            }
-               .final_destination_date_animation div{
-                    -webkit-transform: rotate(-2160deg);
-                    -moz-transform: rotate(70deg);
-                    -o-transform: rotate(70deg);
-                    -ms-transform: rotate(70deg);
-                    transform: rotate(70deg);
-                }
 
 
             .arrow_box {

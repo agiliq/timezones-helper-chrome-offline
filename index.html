@@ -14,6 +14,12 @@
         <div id="wrapper">
                   <div id="container" class='canhide'>
                       <div id='toolbar' class='well well-small'>
+                            <div class='date_help_animation_box arrow_box'>
+                                <div >
+                                    You can observe the date change here when you select and submit any date. The hourline on the rightside is based on this date. 
+                                    <br><input type='checkbox' id='display_date_animation' style='margin-top:-2px;' /><span class='small_font margin-left-10'>Tick this to never show this animation</span>
+                                </div>
+                            </div>
                         <div id='div_locations_input_box' class='pull-left'>
                             <input type='text' id='search_input' placeholder='search city, country...' autocomplete='off' />
                              <div id="search_result">
@@ -24,12 +30,7 @@
                         <div class='selected_date'></div>
 
                         <div id='controls' class='pull-right'>
-                            <div class='date_help_animation_box date_help_animation_box_small_dimensions'>
-                                <div >
-                                    You can observe the date change here when you select and submit any date. The hourline on the rightside is based on this date. 
-                                    <br><input type='checkbox' id='display_date_animation' style='margin-top:-2px;' /><span class='small_font margin-left-10'>Tick this to never show this animation</span>
-                                </div>
-                            </div>
+
                              <div id='error_inputdate' class='well well-small'></div>
                              <div id='date_help' class='well'>Enter the date on which you wish to schedule</div>
                              <input type='text' placeholder='mm-dd-yyyy' id='dateinput'  maxlength=10 /><span style=';display:inline-block;width : 10px' ></span>
@@ -40,6 +41,7 @@
                         </div> <!-- end of div controls -->
                       </div> <!-- end of div toolbar -->
                         <div id="content">
+
 
                           <!-- skeleton
                               <div class='row'>

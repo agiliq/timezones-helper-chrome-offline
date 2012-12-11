@@ -401,12 +401,6 @@ $("#setdate_go").live
     $("#error_inputdate").hide()
 
     setTimeout (->
-      $(".date_help_animation_box").addClass("final_destination_date_animation").addClass("date_help_animation_box_large_dimensions").removeClass("date_help_animation_box_small_dimensions")
-    ), 100
-    setTimeout ( ->
-      $(".date_help_animation_box").addClass("arrow_box")
-    ), 2000
-    setTimeout (->
       $(".date_help_animation_box").fadeOut(3000)
     ), 15000
 
@@ -665,15 +659,9 @@ renderRows = ->
     d = new Date()
     ad_utc = d.getTime() + (d.getTimezoneOffset()*60000)
     ad_offset = (d.getTime()-ad_utc)/3600000
-    #console.log "Detected offset  : "+ad_offset+"--"+(ad_offset+"").length
 
     formattedOffset = convertOffset ad_offset
-    #console.log formattedOffset
     pi = tzdata.indexOf formattedOffset
-    #console.log window.ttt.indexOf("+05:30")
-    #console.log tzdata.indexOf("+05:30")
-    #console.log tzdata.length
-    #console.log pi
     if pi == -1
       #do something if offset not found in our tz data
 
@@ -684,15 +672,12 @@ renderRows = ->
     prevline = 0 if prevline is -1
     presline = tzdata.indexOf "\n",pi
     req = tzdata.substr prevline+1,presline-prevline-1
-    #console.log req
     reqArr = req.split ";"
-    #console.log reqArr
     newobj = {}
 
     newobj[0] = {}
     newobj[0].city = reqArr[0]
     newobj[0].country = reqArr[1]
-    #newobj[0].standard = reqArr[2]
     floatOffset = convertOffsetToFloat reqArr[3].substr(3)
 
     if (floatOffset+"").indexOf("-") is -1
@@ -703,41 +688,9 @@ renderRows = ->
     localStorage.default = "0"
     oldobj = JSON.parse localStorage.addedLocations
 
-    #console.log "++++++++++"
-  #now print old obj
-  #console.log "pp"
 
   updateUtc()
 
-  ###
-  floatOffset = oldobj[0].offset
-  #floatOffset = convertOffsetToFloat offset
-  timestr = getNewTime floatOffset
-  timearr = timestr.split " "
-  timearr[4] = timearr[4].substr(0,5)
-
-  hourline = "<ul class='hourline_ul'>"
-  i=0
-  cl = ""
-  while i<24
-    if i<6
-      cl="li_n"
-    else if i>5 and i<8
-      cl = "li_m"
-    else if i>7 and i<19
-      cl = "li_d"
-    else if i>18 and i<22
-      cl = "li_e"
-    else
-      cl = "li_n"
-    i++
-    hourline+="<span class='smallspace'></span> <li class='"+cl+"'>"+i+"</li>"
-  hourline+="</ul>"
-
-
-  row = "<div class='row'><div class='tzdetails'><div class='offset'><img class='homeicon' /> </div><div class='location'><span class='city'>"+oldobj[0].city+"</span><br><span class='country'>"+oldobj[0].country+"</span></div><div class='timedata'><span class='time'>"+timearr[4]+"</span><br><span class='timeextra'>"+timearr[0]+" , "+timearr[1]+" "+timearr[2]+" "+timearr[3]+"</span></div></div><div class='dates'>"+hourline+"</div></div>"
-  $("#content").html row
-  ###
 
   defaultind = localStorage.default
 
@@ -746,40 +699,23 @@ renderRows = ->
   row = ""
   for ind of oldobj
     floatOffset = parseFloat oldobj[ind].offset
-    #console.log floatOffset+" : "+defaultoffset
-    #console.log floatOffset-defaultoffset
-    #floatOffset = convertOffsetToFloat offset
     timestr = getNewTime floatOffset
     timearr = timestr.split " "
     timearr[4] = timearr[4].substr(0,5)
-    #console.log timearr
     diffoffset = floatOffset-defaultoffset
 
     #now do hourline operation , and finally add it to "dates"
     diffoffsetstr = diffoffset+""
     hourstart = 1
-    #console.log "diffoffsetstr : "+diffoffsetstr
     if diffoffsetstr.indexOf("-") > -1
       diffoffsetstr = diffoffsetstr.substr(1)
 
       hourstart = 24+diffoffset
 
-      #hourstart = parseInt(diffoffsetstr)-1
-      #if hourstart is -1
-      #  hourstart = 23
-      #  console.log "---------------------------------------------------"
-      #console.log "houstart  : "+hourstart
     else
-      #hourstart = parseInt diffoffsetstr
       hourstart = diffoffset
-      #console.log "hourstart +  : "+hourstart
-
-
 
     i=hourstart
-    #console.log "__-------------------------------___________________"
-    #console.log i
-
 
     tempstr = " "
     if (i+"").indexOf(".") > -1
@@ -789,7 +725,6 @@ renderRows = ->
           tempstr="30"
         else
           tempstr=" "
-    #console.log "selected date"
     selectedDateStr = selecteddate.dayInText+", "+selecteddate.mText+" "+selecteddate.d+", "+selecteddate.year
 
     timeextrastr = selecteddate.dayInText+", "+selecteddate.mText+" "+selecteddate.d+"  "+selecteddate.year
@@ -995,45 +930,6 @@ convertOffset = (ad_offset) ->
     second = "00"
   return sign+first+":"+second
 
-convsdfsertOffset = (offset) ->
-  newlocaloffset = offset
-  offset = offset+""
-  first = ""
-  second = ""
-  if offset.indexOf(".") > -1
-    if offset.indexOf("-") > -1
-      first = offset.substr(1,2)
-      if first.length is 1
-        first = "0"+first
-      second = parseInt(offset.substr(4,5))*60
-      if second.length is 1
-        second = second+"0"
-      sign = "-"
-    else
-      first = offset.substr(0,1)
-      if first.length is 1
-        first = "0"+first
-      second = parseInt(offset.substr(3,4))*60
-      if second.length is 1
-        second = second+"0"
-      sign = "+"
-  else
-    if offset.indexOf("-") > -1
-      sign = "-"
-      if offset.length is 3
-        first = offset.substr 1,2
-      else
-        first = "0"+offset.substr(1,1)
-      second = "00"
-    else
-      sign = "+"
-      if offset.length is 2
-        first = offset.substr 0,2
-      else
-        first = offset.substr 0,1
-      second = "00"
-
-  $("body").append "<h1>"+first+" : "+second+"</h1>"
 
 getMonth = (mon,options) ->
   month = new Array()

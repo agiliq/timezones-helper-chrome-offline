@@ -1,5 +1,5 @@
 (function() {
-  var cities_data_arr, convertOffset, convertOffsetToFloat, convsdfsertOffset, countries_data_arr, full_data_arr, full_data_original_arr, getCities, getMonth, getNewTime, getRequiredOffset, k, locations, origcities, renderRows, rowsortstart, rowsortstop, selecteddate, setSelectedDate, sr_click, tzdata, tzdatalower, updateUtc, utc;
+  var cities_data_arr, convertOffset, convertOffsetToFloat, countries_data_arr, full_data_arr, full_data_original_arr, getCities, getMonth, getNewTime, getRequiredOffset, k, locations, origcities, renderRows, rowsortstart, rowsortstop, selecteddate, setSelectedDate, sr_click, tzdata, tzdatalower, updateUtc, utc;
 
   origcities = "";
 
@@ -400,12 +400,6 @@
       }
       $("#error_inputdate").hide();
       setTimeout((function() {
-        return $(".date_help_animation_box").addClass("final_destination_date_animation").addClass("date_help_animation_box_large_dimensions").removeClass("date_help_animation_box_small_dimensions");
-      }), 100);
-      setTimeout((function() {
-        return $(".date_help_animation_box").addClass("arrow_box");
-      }), 2000);
-      setTimeout((function() {
         return $(".date_help_animation_box").fadeOut(3000);
       }), 15000);
       options = {};
@@ -675,35 +669,6 @@
       oldobj = JSON.parse(localStorage.addedLocations);
     }
     updateUtc();
-    /*
-      floatOffset = oldobj[0].offset
-      #floatOffset = convertOffsetToFloat offset
-      timestr = getNewTime floatOffset
-      timearr = timestr.split " "
-      timearr[4] = timearr[4].substr(0,5)
-    
-      hourline = "<ul class='hourline_ul'>"
-      i=0
-      cl = ""
-      while i<24
-        if i<6
-          cl="li_n"
-        else if i>5 and i<8
-          cl = "li_m"
-        else if i>7 and i<19
-          cl = "li_d"
-        else if i>18 and i<22
-          cl = "li_e"
-        else
-          cl = "li_n"
-        i++
-        hourline+="<span class='smallspace'></span> <li class='"+cl+"'>"+i+"</li>"
-      hourline+="</ul>"
-    
-    
-      row = "<div class='row'><div class='tzdetails'><div class='offset'><img class='homeicon' /> </div><div class='location'><span class='city'>"+oldobj[0].city+"</span><br><span class='country'>"+oldobj[0].country+"</span></div><div class='timedata'><span class='time'>"+timearr[4]+"</span><br><span class='timeextra'>"+timearr[0]+" , "+timearr[1]+" "+timearr[2]+" "+timearr[3]+"</span></div></div><div class='dates'>"+hourline+"</div></div>"
-      $("#content").html row
-    */
     defaultind = localStorage["default"];
     defaultobj = oldobj[defaultind];
     defaultoffset = parseFloat(defaultobj.offset);
@@ -896,48 +861,6 @@
       second = "00";
     }
     return sign + first + ":" + second;
-  };
-
-  convsdfsertOffset = function(offset) {
-    var first, newlocaloffset, second, sign;
-    newlocaloffset = offset;
-    offset = offset + "";
-    first = "";
-    second = "";
-    if (offset.indexOf(".") > -1) {
-      if (offset.indexOf("-") > -1) {
-        first = offset.substr(1, 2);
-        if (first.length === 1) first = "0" + first;
-        second = parseInt(offset.substr(4, 5)) * 60;
-        if (second.length === 1) second = second + "0";
-        sign = "-";
-      } else {
-        first = offset.substr(0, 1);
-        if (first.length === 1) first = "0" + first;
-        second = parseInt(offset.substr(3, 4)) * 60;
-        if (second.length === 1) second = second + "0";
-        sign = "+";
-      }
-    } else {
-      if (offset.indexOf("-") > -1) {
-        sign = "-";
-        if (offset.length === 3) {
-          first = offset.substr(1, 2);
-        } else {
-          first = "0" + offset.substr(1, 1);
-        }
-        second = "00";
-      } else {
-        sign = "+";
-        if (offset.length === 2) {
-          first = offset.substr(0, 2);
-        } else {
-          first = offset.substr(0, 1);
-        }
-        second = "00";
-      }
-    }
-    return $("body").append("<h1>" + first + " : " + second + "</h1>");
   };
 
   getMonth = function(mon, options) {
