@@ -1,5 +1,6 @@
 (function() {
-  var cities_data_arr, convertOffset, convertOffsetToFloat, countries_data_arr, domain_name, full_data_arr, full_data_original_arr, generate_meeting_link, getCities, getMonth, getNewTime, getRequiredOffset, get_google_cal_dates_param, hide_meeting_details, k, locations, open_in_new_tab, origcities, renderRows, rowsortstart, rowsortstop, selecteddate, setSelectedDate, sr_click, tzdata, tzdatalower, updateUtc, utc;
+  var cities_data_arr, convertOffset, convertOffsetToFloat, countries_data_arr, domain_name, full_data_arr, full_data_original_arr, generate_meeting_link, getCities, getMonth, getNewTime, getRequiredOffset, get_google_cal_dates_param, hide_meeting_details, k, locations, open_in_new_tab, origcities, renderRows, rowsortstart, rowsortstop, selected_idx, selecteddate, setSelectedDate, sr_click, tzdata, tzdatalower, updateUtc, utc,
+    __indexOf = Array.prototype.indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   origcities = "";
 
@@ -14,6 +15,8 @@
   utc = 0;
 
   selecteddate = {};
+
+  selected_idx = "";
 
   rowsortstart = "";
 
@@ -275,6 +278,7 @@
       $(".canhide").css("opacity", "0.1");
       idx = $(e.target).attr("idx");
       if (idx === void 0) return;
+      selected_idx = idx;
       t = new Array();
       city = new Array();
       country = new Array();
@@ -311,6 +315,54 @@
       $("#newevent_time").attr("country", country);
       $("#newevent_time").attr("time", t);
       return $("#newevent_time").attr("yeardetails", yeardetails.join(";"));
+    }
+  });
+
+  $("#newevent_table input[type='checkbox']").live({
+    change: function() {
+      var available_timezones, city, country, ele, i, idx, j, original_offset, param_idx, param_string, t, tText, yeardetails, _i, _j, _len, _len2, _ref, _ref2;
+      idx = selected_idx;
+      if (idx === void 0 || idx === "") return;
+      console.log("idx : " + idx);
+      param_string = "?";
+      i = 0;
+      t = new Array();
+      j = 0;
+      available_timezones = [];
+      _ref = $("#newevent_table tr");
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        ele = _ref[_i];
+        if ($($(ele).find("input[type='checkbox']")).attr("checked")) {
+          available_timezones.push(j - 1);
+          console.log("push");
+        }
+        j++;
+      }
+      console.log(available_timezones);
+      param_idx = 0;
+      _ref2 = $(".row");
+      for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
+        ele = _ref2[_j];
+        tText = convertOffset($("#" + ele.id + " #lihr_" + idx).attr("t"));
+        t.push(tText.substr(1));
+        console.log(t[0]);
+        city = $("#" + ele.id + " .city").text();
+        country = $("#" + ele.id + " .country").text();
+        yeardetails = $("#" + ele.id + " #lihr_" + idx).attr("details");
+        original_offset = $(ele).attr("floatoffset");
+        if (__indexOf.call(available_timezones, i) >= 0) {
+          param_string += param_idx + "=" + city + ";" + country + ";" + $("#" + ele.id).attr('original_offset') + ";" + yeardetails + ", " + t[i] + "&";
+          param_idx++;
+        }
+        i++;
+      }
+      if (param_idx === 0) {
+        param_string = "";
+      } else {
+        param_string += "time=" + $($('.row')[0]).attr('original_offset') + ";" + t[0];
+        param_string = encodeURI(param_string);
+      }
+      return $(".meeting_link").html("<span class='add-on'>Link </span><input type='text' value='" + domain_name + param_string + "' class='input-xxlarge' />");
     }
   });
 

@@ -6,6 +6,7 @@ k=0
 locations=""
 utc = 0
 selecteddate = {}
+selected_idx = ""
 rowsortstart = ""
 rowsortstop = ""
 cities_data_arr = []
@@ -241,6 +242,7 @@ $("#vband").live
     idx = $(e.target).attr "idx"
     if idx is undefined
       return
+    selected_idx =idx
     t = new Array()
     city = new Array()
     country = new Array()
@@ -280,6 +282,48 @@ $("#vband").live
     $("#newevent_time").attr "country",country
     $("#newevent_time").attr "time",t
     $("#newevent_time").attr "yeardetails",yeardetails.join(";")
+
+
+$("#newevent_table input[type='checkbox']").live
+  change: ->
+    idx = selected_idx
+    if idx is undefined or idx == ""
+      return
+    console.log "idx : "+idx
+    param_string = "?"
+    i = 0
+    t = new Array()
+    j = 0
+    available_timezones = []
+    for ele in $("#newevent_table tr")
+      if $($(ele).find("input[type='checkbox']")).attr("checked")
+        available_timezones.push j-1
+        console.log "push"
+      j++
+    console.log available_timezones
+
+    param_idx = 0
+    for ele in $(".row")
+      tText = convertOffset $("#"+ele.id+" #lihr_"+idx).attr("t")
+      t.push tText.substr(1)
+      console.log t[0]
+      city = $("#"+ele.id+" .city").text()
+      country = $("#"+ele.id+" .country").text()
+      yeardetails = $("#"+ele.id+" #lihr_"+idx).attr("details")
+      original_offset = $(ele).attr "floatoffset"
+      if i in available_timezones
+        param_string += param_idx+"="+city+";"+country+";"+$("#"+ele.id).attr('original_offset')+";"+yeardetails+", "+t[i]+"&"
+        param_idx++
+      i++
+
+    if param_idx == 0
+      param_string = ""
+    else
+      param_string += "time="+$($('.row')[0]).attr('original_offset')+";"+t[0]
+      param_string = encodeURI param_string
+
+
+    $(".meeting_link").html "<span class='add-on'>Link </span><input type='text' value='"+domain_name+param_string+"' class='input-xxlarge' />"
 
 $("#wrapper button#saveevent").live
   click : (e) ->
