@@ -12,7 +12,7 @@ cities_data_arr = []
 countries_data_arr = []
 full_data_arr = []
 full_data_original_arr = []
-domain_name = window.location.origin+window.location.pathname
+domain_name = window.location.protocol+"//"+window.location.host+window.location.pathname
 #first set selecteddate to current date, later user can change
 
 $(document).ready ->

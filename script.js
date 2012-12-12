@@ -27,7 +27,7 @@
 
   full_data_original_arr = [];
 
-  domain_name = window.location.origin + window.location.pathname;
+  domain_name = window.location.protocol + "//" + window.location.host + window.location.pathname;
 
   $(document).ready(function() {
     var bombayoff, bt, d, datearr, dstr, localoffset, localtime, nd, ndarr, ndstr;
