@@ -10,8 +10,32 @@
             }
 
             #saveevent {
-                margin-left: 10px; margin-top: -15px;
+                 margin-top: -15px;
                 
+            }
+
+            .link_export_google_cal {
+                cursor: pointer;
+                display: inline-block;
+                position: relative;
+            }
+
+            .link_export_google_cal img {
+                margin-top: -15px;
+                margin-left: 10px;
+            }
+
+            .export_calendar_help {
+                position: absolute;
+                width: 232px;
+                top: -58px;
+                left: -100px;
+                border-radius: 5px;
+                display: none;
+            }
+
+            .link_export_google_cal a:hover + .export_calendar_help {
+                display: block;
             }
 
            #wrapper table#newevent_table{
@@ -82,10 +106,6 @@
                 font-weight: bold;
            }
 
-           #newevent_msg {
-                width: 85%;
-                height: 135px;
-           }
             #controls{
                 z-index : 9999;
                 background-color : white;
@@ -673,8 +693,16 @@
 
             #event_name { 
               /*  height: 25px; */
-                width:310px;
                 border-radius: 6px;
+
+            }
+            .help_style {
+                background-image: -moz-linear-gradient(top , #F7D794, #BE5605);
+                background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#F7D794), to(#BE5605));
+                background-image: -webkit-linear-gradient(top,#F7D794, #BE5605 );
+                background-image: -o-linear-gradient(top,#F7D794, #BE5605);
+                background-image: linear-gradient(to bottom,#F7D794, #BE5605);
+                color: black;
 
             }
 
