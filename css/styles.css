@@ -14,6 +14,30 @@
                 
             }
 
+            .link_export_google_cal {
+                cursor: pointer;
+                display: inline-block;
+                position: relative;
+            }
+
+            .link_export_google_cal img {
+                margin-top: -15px;
+                margin-left: 10px;
+            }
+
+            .export_calendar_help {
+                position: absolute;
+                width: 232px;
+                top: -58px;
+                left: -100px;
+                border-radius: 5px;
+                display: none;
+            }
+
+            .link_export_google_cal a:hover + .export_calendar_help {
+                display: block;
+            }
+
            #wrapper table#newevent_table{
             /*   border : 1px solid black; */
 
