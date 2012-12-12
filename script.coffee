@@ -52,7 +52,7 @@ $(document).ready ->
       window.ci = cities_data_arr
       window.countries_data_arr = countries_data_arr
       window.fo = full_data_original_arr
-      
+
       console.log cities_data_arr
       console.log countries_data_arr
 
@@ -228,7 +228,7 @@ $("#wrapper button#saveevent").live
         city += $($(@).find("td")[1]).text() + ","
         country += $($(@).find("td")[2]).text() + ","
         yeardetails += $($($(@).find("td")[3]).find(".yeardetails")).text() + ";"
-        selected_time += $($($(@).find("td")[3]).find(".selected_time")).text().trim() 
+        selected_time += $($($(@).find("td")[3]).find(".selected_time")).text().trim()
         total_checked++
     if total_checked == 0
       alert "Select atleast one timezone ."
@@ -238,8 +238,8 @@ $("#wrapper button#saveevent").live
     city = city.substr 0, city.length-1
     yeardetails = yeardetails.substr 0, yeardetails.length-1
     selected_time = selected_time.substr 1, selected_time.length
-        
-    #   end of getting the data  
+
+    #   end of getting the data
 
     oldobj = {}
     if "events" of localStorage
@@ -307,7 +307,7 @@ $("#dateinput").live
   mouseenter : (e) ->
     if $("#error_inputdate").css("display") is "none"
       $("#date_help").show()
-    
+
   mouseleave :->
     $("#date_help").hide()
   keyup: (e) ->
@@ -338,7 +338,7 @@ $("#setdate_go").live
     #console.log (datestr.substr(0,2))
     mm = Number datestr.substr(0,2)
     dd = Number datestr.substr(3,2)
-    
+
     year =  datestr.substr(6,4)
     unless year.length is 4
       $("#error_inputdate").html errormsg
@@ -418,7 +418,7 @@ $("#content").live
     oldobj[rowsortstop] = startobj
 
     defaultind = Number localStorage.default
-    if (defaultind <= rowsortstop and defaultind > rowsortstart) 
+    if (defaultind <= rowsortstop and defaultind > rowsortstart)
       defaultind--
     else if  (defaultind <rowsortstart and defaultind >= rowsortstop )
       defaultind++
@@ -433,7 +433,7 @@ $("#content").live
   sortstart: (e, ui) ->
     rowsortstart = ui.item.index() - 2
 
-  
+
 
 $("#wrapper #showevents .eventheader").live
 
@@ -911,11 +911,11 @@ setSelectedDate = (options) ->
     dnew = new Date()
     dnew.setMonth(selecteddate.m)
     dnew.setDate(selecteddate.d)
-    dnew.setFullYear(selecteddate.year) 
+    dnew.setFullYear(selecteddate.year)
     dnew = dnew.toLocaleString()
     dnewarr = dnew.split " "
     selecteddate.dayInText = dnewarr[0]
-    
+
 
 
   else
@@ -928,7 +928,7 @@ setSelectedDate = (options) ->
     dnew = new Date()
     dnew.setMonth(selecteddate.m)
     dnew.setDate(selecteddate.d)
-    dnew.setFullYear(selecteddate.year) 
+    dnew.setFullYear(selecteddate.year)
     dnew = dnew.toLocaleString()
     dnewarr = dnew.split " "
     selecteddate.dayInText = dnewarr[0]
@@ -989,7 +989,9 @@ $(".link_export_google_cal").live
       gcal_url += '\n'+$("#newevent_msg").val().trim()
     if $("#event_name").val().trim().length > 0
       gcal_url += "&text="+$('#event_name').val().trim()
+    gcal_url += '\n'+"Powered by http://agiliq.com/timezones/"
     gcal_url += "&dates="+google_cal_dates_param
+
 
     $(".link_export_google_cal").attr "href", encodeURI(gcal_url)
     open_in_new_tab($(".link_export_google_cal").attr('href'))
