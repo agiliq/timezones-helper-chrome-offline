@@ -8,9 +8,11 @@ utc = 0
 selecteddate = {}
 rowsortstart = ""
 rowsortstop = ""
-#domain_name = "http://localhost/timezoneconvertor"
-domain_name = "http://533f.localtunnel.com/timezoneconvertor"
-#added_locations_status = ""
+cities_data_arr = []
+countries_data_arr = []
+full_data_arr = []
+full_data_original_arr = []
+domain_name = ""
 #first set selecteddate to current date, later user can change
 
 $(document).ready ->
@@ -21,7 +23,6 @@ $(document).ready ->
   localtime = d.getTime()
   localoffset = d.getTimezoneOffset()*60000
   utc = localtime + localoffset
-
   bombayoff = 5.5
   bt = utc + (3600000*bombayoff)
   nd = new Date(bt)
@@ -35,27 +36,30 @@ $(document).ready ->
       window.ttt = tz
       tzdata = tz
       tzdatalower = tz.toLowerCase()
+      cities_data_arr = []
+      countries_data_arr = []
+
+      full_data_arr = tzdatalower.split "\n"
+      full_data_original_arr = tzdata.split "\n"
+      console.log full_data_arr
+      full_data_arr.forEach (each_line) ->
+        each_line_arr = each_line.split ";"
+        cities_data_arr.push each_line_arr[0]
+        countries_data_arr.push each_line_arr[1]
+      cities_data_arr.pop()
+      countries_data_arr.pop()
+      full_data_original_arr.pop()
+      full_data_arr.pop()
+      
 
       #console.log "tzdata loaded successfully"
       renderRows()
       if window.location.search != ""
         #if typeof(localStorage.addedLocations) == "undefined"
         renderRows(generate_meeting_link)
-        #generate_meeting_link()
-      #  #renderRows(generate_meeting_link)
-      #  console.log "renderRows(a)"
-      #  renderRows()
-      #  renderRows(generate_meeting_link)
     error : (e) ->
       #console.log "Error loading tz data"
 
-  #Meeting Link
-  #if window.location.search != "" and typeof(localStorage.addedLocations) != "undefined"
-
-      
-    #setTimeout (->
-    #  generate_meeting_link()
-    #), 3000
 
 generate_meeting_link = ->
     console.log "Genrat meeting lik starte"
@@ -124,23 +128,12 @@ generate_meeting_link = ->
       handle: '.meeting_details_move'
 
 
-
-remove_key = (obj, pos) ->
-  i = pos
-  len = Object.keys(obj).length
-  while i<len-1
-    obj[i] = obj[i+1]
-    i++
-  delete obj[len-1]
-  return obj
-
-
-
 $("#search_input").live
   keyup : (e) ->
     $(".searchresult_li").removeClass("temp_active")
     if e.keyCode == 13
       k = $(".searchresult_li.active_search").attr "k"
+      $("#search_input").val("")
       sr_click(e, k)
       $("#search_result").hide()
       return
@@ -180,7 +173,8 @@ $("#search_input").live
     k = 0
     $("#search_result").html ""
     updateUtc()
-    getLocations 0,st
+    locations = getCities(st)
+    console.log locations
     $("#search_result").html locations
     if $("#search_result").css("display") == "none"
       $("#search_result").slideDown()
@@ -193,11 +187,9 @@ $("#search_input").live
 
 
 # add locations to the localStorage
-#$("#search_result").on "click", {}, (e) ->
-#   console.log "------clicked-----"
-#   sr_click(e)
 $("li.searchresult_li").live
   click : (e) ->
+    $("#search_input").val("")
     sr_click(e)
 
 $(".searchresult_ul").live
@@ -249,79 +241,100 @@ $("#vband").live
     city = new Array()
     country = new Array()
     yeardetails = new Array()
-    #console.log "printing row"
+    original_offset = new Array()
     param_string = "?"
     i = 0
     for ele in $(".row")
-      #console.log ele.id
-      #tinFloat = $("#"+ele.id+" #lihr_"+idx).attr("t")
       tText = convertOffset $("#"+ele.id+" #lihr_"+idx).attr("t")
-      #console.log tText
       t.push tText.substr(1)
       city.push $("#"+ele.id+" .city").text()
       country.push $("#"+ele.id+" .country").text()
       yeardetails.push $("#"+ele.id+" #lihr_"+idx).attr("details")
+      original_offset.push $(ele).attr "floatoffset"
       param_string += i+"="+city[i]+";"+country[i]+";"+$("#"+ele.id).attr('original_offset')+";"+yeardetails[i]+", "+t[i]+"&"
-      #param_string += i+"="+city[i]+";"+country[i]+";"+t[i]+"&"
+
       i++
 
     param_string += "time="+$($('.row')[0]).attr('original_offset')+";"+t[0]
     #param_string = param_string.substr 0, param_string.length-1
     param_string = encodeURI param_string
-    #console.log "prointed"
-    #console.log t+" : "+city+" : "+country
+
     $("#newevent").show()
     $(".meeting_link").html "<a href='"+domain_name+param_string+"'><strong>Link</strong></a>"
     $("#newevent_time").text ""
     $("#newevent_msg").text ""
     $("#event_name").text ""
-    tabl = "<table id='newevent_table' class='table table-striped' ><thead><th>City</th><th>Country</th><th>Time</th></thead>"
+    tabl = "<table id='newevent_table' class='table table-striped' ><thead><th>Select</th><th>City</th><th>Country</th><th>Time</th></thead>"
 
     for ind of t
 
-      #$("#newevent_time").append "\n"+city[ind]+" : "+country[ind]+" : "+t[ind]
-      tabl+="<tr><td>"+city[ind]+"</td><td>"+country[ind]+"</td><td>"+yeardetails[ind]+" , "+t[ind]+"</td></tr>"
+      tabl+="<tr floatoffset='"+original_offset[ind]+"'><td><input type='checkbox' checked /></td><td>"+city[ind]+"</td><td>"+country[ind]+"</td><td><span class='yeardetails'>"+yeardetails[ind]+"</span><span class='selected_time'>, "+t[ind]+"</td></tr>"
     tabl+="</table>"
+
     $("#newevent_time").html tabl
     $("#newevent_time").attr "city",city
     $("#newevent_time").attr "country",country
     $("#newevent_time").attr "time",t
     $("#newevent_time").attr "yeardetails",yeardetails.join(";")
-    #t = $("#content #row_ #lihr_"+idx).attr "t"
-    #console.log t+" : "+idx
 
 $("#wrapper button#saveevent").live
   click : (e) ->
     msg= $("#wrapper #newevent #newevent_msg").val().trim()
     evname =  $("#wrapper #newevent #event_name").val().trim()
     if msg.length<1
-      alert "Please enter some message"
+      alert "Please enter description"
       return
     if evname.length<1
-      alert "please enter event name"
+      alert "Please enter event name"
       return
+
+
+    city = ""
+    country = ""
+    selected = ""
+    yeardetails = ""
+    selected_time = ""
+    total_checked = 0
+    $("#newevent_table tr").each () ->
+      if $(@).find("input[type='checkbox']").attr 'checked'
+        city += $($(@).find("td")[1]).text() + ","
+        country += $($(@).find("td")[2]).text() + ","
+        yeardetails += $($($(@).find("td")[3]).find(".yeardetails")).text() + ";"
+        selected_time += $($($(@).find("td")[3]).find(".selected_time")).text().trim() 
+        total_checked++
+    if total_checked == 0
+      alert "Select atleast one timezone ."
+      return
+
+    country = country.substr 0, country.length-1
+    city = city.substr 0, city.length-1
+    yeardetails = yeardetails.substr 0, yeardetails.length-1
+    selected_time = selected_time.substr 1, selected_time.length
+        
+    #   end of getting the data  
 
     oldobj = {}
     if "events" of localStorage
       oldobj = JSON.parse localStorage.events
-    len=0
-    for key of oldobj
-      len++
+    len = Object.keys(oldobj).length
     oldobj[len] = {}
     oldobj[len].name = evname
     oldobj[len].desc = msg
-    oldobj[len].city = $("#newevent_time").attr "city"
-    oldobj[len].country = $("#newevent_time").attr "country"
-    oldobj[len].time = $("#newevent_time").attr "time"
-    oldobj[len].yeardetails = $("#newevent_time").attr "yeardetails"
+    oldobj[len].city = city
+    oldobj[len].country = country
+    oldobj[len].time = selected_time
+    oldobj[len].yeardetails = yeardetails
     localStorage.events = JSON.stringify oldobj
     $("#event_close").trigger 'click'
+    $("#wrapper #showevents #showeventbody").hide()
+    $(".eventheader").trigger "click"
 
 
 $("#event_close").live
   click : (e) ->
     $("#newevent").hide()
     $(".canhide").css "opacity","1"
+
 
 $("#meeting_details .close").live
   click : ->
@@ -341,7 +354,6 @@ $(".show_meeting_modal span").live
   click: ->
     $("#meeting_details").slideDown()
 
-
 $("body").live
   keydown: (e) ->
     if e.keyCode == 27
@@ -358,7 +370,6 @@ $("#content .row .icons_homedelete .icon_delete").live
     rowindex = parseInt($(e.target).parent().parent().attr("rowindex"))
     oldobj = JSON.parse localStorage.addedLocations
 
-    oldobj = JSON.parse localStorage.addedLocations
     len = 0
     for key of oldobj
       len++
@@ -387,14 +398,16 @@ $("#content .row .icons_homedelete .icon_home").live
     renderRows()
 
 
-
-
 $("#dateinput").live
   mouseenter : (e) ->
     if $("#error_inputdate").css("display") is "none"
       $("#date_help").show()
+    
   mouseleave :->
     $("#date_help").hide()
+  keyup: (e) ->
+    if e.keyCode == 13
+      $("#setdate_go").trigger "click"
 
 $("#setdate_go").live
   click : (e) ->
@@ -402,6 +415,7 @@ $("#setdate_go").live
     errormsg = "mm-dd-yyyy format only"
 
     datestr = $("#dateinput").val().trim()
+    $(".selected_date").text datestr
     window.da = datestr
     unless datestr.length is 10
       $("#error_inputdate").html errormsg
@@ -434,18 +448,39 @@ $("#setdate_go").live
       $("#error_inputdate").html errormsg
       $("#error_inputdate").show()
       return
+
+    if "display_date_animation" of localStorage
+      if localStorage.display_date_animation == "false"
+        $(".date_help_animation_box").hide()
+      else
+        $(".date_help_animation_box").show()
+    else
+        $(".date_help_animation_box").show()
     $("#error_inputdate").hide()
-    #console.log "----"
-    ###
-    selecteddate.m = mm-1
-    selecteddate.d = dd
-    selecteddate.year = year
-    ###
+
+    setTimeout (->
+      $(".date_help_animation_box").fadeOut(3000)
+    ), 15000
+
     options = {}
     options.m = mm-1
     options.d = dd
     options.year = year
     setSelectedDate options
+
+
+$(".date_help_animation_box").live
+  click: ->
+    that = @
+    if $(@).find("input[type='checkbox']").attr("checked")
+      console.log $(@).find("input[type='checkbox']").attr("checked")
+      localStorage.display_date_animation = "false"
+    else
+      localStorage.display_date_animation = "true"
+    setTimeout (->
+      $(that).fadeOut()
+    ), 1000
+
 
 $("#error_inputdate").live
   click : ->
@@ -502,14 +537,10 @@ $("#wrapper #showevents .eventheader").live
     prev = $("#wrapper #showevents #showeventbody").css "display"
     #console.log prev
     unless prev is "none"
-      #console.log prev+"--"
-      #$("#wrapper #showevents #showeventbody").css "display","none"
       $("#wrapper #showevents #showeventbody").slideUp()
-
       return
-    #console.log prev+" -- should be none"
     unless "events" of localStorage
-      $("#wrapper #showevents #showeventbody").html "<h3>No events available, add them first by clicking on the boxes showing time.</h3>"
+      $("#wrapper #showevents #showeventbody").html "<h3>No events available, you can add events by clicking on any box showing time.</h3>"
       #$("#wrapper #showevents #showeventbody").css "display","block"
       $("#wrapper #showevents #showeventbody").slideDown()
       $("body").scrollTo(".showevents")
@@ -518,6 +549,8 @@ $("#wrapper #showevents .eventheader").live
     oldobj = JSON.parse localStorage.events
     #console.log oldobj
     data = ""
+    objlen = Object.keys(oldobj).length
+    hr_i = 1
     for key of oldobj
       #console.log oldobj[key]
       city = new Array()
@@ -532,11 +565,15 @@ $("#wrapper #showevents .eventheader").live
       for i of city
         tabl+="<tr><td>"+city[i]+"</td><td>"+country[i]+"</td><td>"+yeardetails[i]+" "+t[i]+"</td></tr>"
       tabl+="</tbody></table>"
-      data+= "<h2># "+(parseInt(key)+1)+" "+oldobj[key].name+"<span class='deleteEvent' key='"+key+"'>X&nbsp;</span></h2>"+tabl+"<h3>Description : </h3><p style='padding-left:15px;padding-right:15px;'> "+oldobj[key].desc+"</p><br><hr class='showevents_hr' />"
+      data+= "<div class='each_event_header'><span class='event_name_desc'><span class='event_num'># "+(parseInt(key)+1)+"</span><span class='event_name'> "+oldobj[key].name+"</span> - <span class='event_desc'>"+oldobj[key].desc+"</span></span><span class='deleteEvent' key='"+key+"'>X&nbsp;</span></div>"+tabl+"<br>"
+      if hr_i != objlen
+        data += "<hr>"
+      hr_i++
 
 
     if data is ""
-      data="<h3>No events available, add them first by clicking on the boxes showing time.</h3>"
+      data="<h3>No events available, you can add events by clicking on any box showing time.</h3>"
+    data = "<div class='events'>"+data+"</div>"
     $("#wrapper #showevents #showeventbody").html data
     #$("#wrapper #showevents #showeventbody").css "display","block"
     $("#wrapper #showevents #showeventbody").slideDown()
@@ -559,16 +596,16 @@ $(".deleteEvent").live
     #console.log rowindex
 
     oldobj = JSON.parse localStorage.events
-    len = 0
-    for key of oldobj
-      len++
+    len = Object.keys(oldobj).length
 
-    unless rowindex is len-1
+    if i != len-1
       i=rowindex+1
       while i<len
         oldobj[i-1] = oldobj[i]
         i++
-    delete oldobj[rowindex]
+      delete oldobj[len-1]
+    else
+      delete oldobj[rowindex]
     localStorage.events = JSON.stringify oldobj
     $("#wrapper #showevents #showeventbody").css "display","none"
     $("#wrapper #showevents .eventheader").trigger "click"
@@ -614,109 +651,83 @@ sr_click = (e, k) ->
   renderRows()
 
 
+getRequiredOffset = (original) ->
+
+    offset = original
+    finaloff = ""
+    if offset.length is 9
+      offset = offset.substr(3,9)
+      first = offset.substr(0,3)
+      second = offset.substr(4,2)/60
+      second = (second+"").substr(1)
+      finaloff = parseFloat(first+second)
+
+      #console.log "final : "+finaloff
+    else
+      finaloff = 0
+    timestr = getNewTime(finaloff)
+    #console.log timestr.toLocaleString()
+    timearr = timestr.split(" ")
+    timearr[4] = (timearr[4]).substr(0,5)
+    return [timestr, timearr[4], finaloff]
 
 
-
-getLocations = (ind,st) =>
-  if k>7
-    locations+="</ul>"
-    return
-  k++
-  ind = parseInt ind
-  if ind is 0
-    ind = 0
-  else
-    ind++
-  pi = parseInt(tzdatalower.indexOf(st,ind))
-  if pi == -1
-    locations+="</ul>"
-    return
-  subTillPi = tzdatalower.substr(0,pi)
-  prevline = parseInt(subTillPi.lastIndexOf("\n"))
-
-  if prevline is -1
-    prevline = 0
-  else if prevline is 0
-    prevline = 0
-  else
-    prevline++
-
-  presline = parseInt(tzdatalower.indexOf("\n",pi))
-  req = tzdata.substr prevline,presline-prevline
-  reqArr = req.split(";")
-  offset = reqArr[3]
-  #console.log offset
-  #console.log offset.length
-  finaloff = ""
-  if offset.length is 9
-    offset = offset.substr(3,9)
-    first = offset.substr(0,3)
-    second = offset.substr(4,2)/60
-    second = (second+"").substr(1)
-    finaloff = parseFloat(first+second)
-
-    #console.log "final : "+finaloff
-  else
-    finaloff = 0
-  timestr = getNewTime(finaloff)
-  #console.log timestr.toLocaleString()
-  timearr = timestr.split(" ")
-  timearr[4] = (timearr[4]).substr(0,5)
-
-  #console.log "---------------------"
+getCities = (term) ->
+  term = term.toLowerCase()
+  len = 1
+  for key, val of cities_data_arr
+    if len > 7
+      break
+    if val.indexOf(term) > -1
+      temp_arr = full_data_original_arr[key].split(";")
+      required_offset = getRequiredOffset temp_arr[3]
 
 
+      locations += "<li class='searchresult_li' offset='"+required_offset[2]+"' timestr='"+required_offset[0]+"' id='lisr_"+len+"' k='"+len+"'>"+
+        "<span class='litz' k='"+len+"'>"+temp_arr[1]+", "+temp_arr[0]+"<span class='invisible_comma_search_result'>,</span> </span><span class='litime' k='"+len+"'>"+required_offset[1]+"</span></li>"
+      len++
+  if len < 8
+    for key, val of countries_data_arr
+      if len > 7
+        break
+      if val.indexOf(term) > -1
+        temp_arr = full_data_original_arr[key].split(";")
+        required_offset = getRequiredOffset temp_arr[3]
+        locations += "<li class='searchresult_li' offset='"+required_offset[2]+"' timestr='"+required_offset[0]+"' id='lisr_"+len+"' k='"+len+"'>"+
+          "<span class='litz' k='"+len+"'>"+temp_arr[1]+", "+temp_arr[0]+"<span class='invisible_comma_search_result'>,</span> </span><span class='litime' k='"+len+"'>"+required_offset[1]+"</span></li>"
+        len++
+  return locations
 
-  locations+="<li class='searchresult_li' offset='"+finaloff+"' timestr='"+timestr+"' id='lisr_"+k+"' k='"+k+"'><span class='litz' k='"+k+"'>"+reqArr[1]+" , "+reqArr[0] + ",</span><span class='litime' k='"+k+"'>" + timearr[4]+ "</span></li>"
-  getLocations presline,st
 
-
-renderRows = (callback) ->
-  console.log callback
+renderRows = (callback)->
   oldobj = {}
   if "addedLocations" of localStorage and "default" of localStorage
 
-    #if typeof(localStorage.addedLocaations) == "undefined" or localStorage.addedLocations == "undefined"
-    #  oldobj = {}
-    #else
-    #  oldobj = JSON.parse localStorage.addedLocations
     oldobj = JSON.parse localStorage.addedLocations
   else
     #autodetect
     d = new Date()
     ad_utc = d.getTime() + (d.getTimezoneOffset()*60000)
     ad_offset = (d.getTime()-ad_utc)/3600000
-    #console.log "Detected offset  : "+ad_offset+"--"+(ad_offset+"").length
 
     formattedOffset = convertOffset ad_offset
-    #console.log formattedOffset
     pi = tzdata.indexOf formattedOffset
-    #console.log window.ttt.indexOf("+05:30")
-    #console.log tzdata.indexOf("+05:30")
-    #console.log tzdata.length
-    #console.log pi
     if pi == -1
       #do something if offset not found in our tz data
-      console.log "return"
 
       return
-    else
-      console.log "not returning"
     subTillPi = tzdata.substr 0,pi
 
     prevline = subTillPi.lastIndexOf "\n"
     prevline = 0 if prevline is -1
     presline = tzdata.indexOf "\n",pi
     req = tzdata.substr prevline+1,presline-prevline-1
-    #console.log req
     reqArr = req.split ";"
-    #console.log reqArr
     newobj = {}
 
     newobj[0] = {}
     newobj[0].city = reqArr[0]
     newobj[0].country = reqArr[1]
-    #newobj[0].standard = reqArr[2]
     floatOffset = convertOffsetToFloat reqArr[3].substr(3)
 
     if (floatOffset+"").indexOf("-") is -1
@@ -727,10 +738,10 @@ renderRows = (callback) ->
     localStorage.default = "0"
     oldobj = JSON.parse localStorage.addedLocations
 
-    #console.log "++++++++++"
 
   updateUtc()
-  console.log callback
+
+
   defaultind = localStorage.default
 
   defaultobj = oldobj[defaultind]
@@ -738,33 +749,23 @@ renderRows = (callback) ->
   row = ""
   for ind of oldobj
     floatOffset = parseFloat oldobj[ind].offset
-    #console.log floatOffset+" : "+defaultoffset
-    #console.log floatOffset-defaultoffset
-    #floatOffset = convertOffsetToFloat offset
     timestr = getNewTime floatOffset
     timearr = timestr.split " "
     timearr[4] = timearr[4].substr(0,5)
-    #console.log timearr
     diffoffset = floatOffset-defaultoffset
 
     #now do hourline operation , and finally add it to "dates"
     diffoffsetstr = diffoffset+""
     hourstart = 1
-    #console.log "diffoffsetstr : "+diffoffsetstr
     if diffoffsetstr.indexOf("-") > -1
       diffoffsetstr = diffoffsetstr.substr(1)
 
       hourstart = 24+diffoffset
 
     else
-      #hourstart = parseInt diffoffsetstr
       hourstart = diffoffset
-      #console.log "hourstart +  : "+hourstart
 
     i=hourstart
-    #console.log "__-------------------------------___________________"
-    #console.log i
-
 
     tempstr = " "
     if (i+"").indexOf(".") > -1
@@ -774,10 +775,9 @@ renderRows = (callback) ->
           tempstr="30"
         else
           tempstr=" "
-    #console.log "selected date"
-    selectedDateStr = selecteddate.dayInText+" , "+selecteddate.mText+" "+selecteddate.d+" , "+selecteddate.year
+    selectedDateStr = selecteddate.dayInText+", "+selecteddate.mText+" "+selecteddate.d+", "+selecteddate.year
 
-    timeextrastr = selecteddate.dayInText+" , "+selecteddate.mText+" "+selecteddate.d+"  "+selecteddate.year
+    timeextrastr = selecteddate.dayInText+", "+selecteddate.mText+" "+selecteddate.d+"  "+selecteddate.year
     hourline = "<ul class='hourline_ul'>"
     idx = 0
 
@@ -785,7 +785,7 @@ renderRows = (callback) ->
     if i is 0 or i is 0.5
 
       cl = "li_24"
-      hourline+=" <li class='"+cl+"' id='lihr_"+idx+"' idx='"+idx+"' t='"+i+"' details='"+selectedDateStr+"' ><div class='span_hl' idx='"+idx+"'><span idx='"+idx+"' class='small' >"+selecteddate.mText+"</span><br><span idx='"+idx+"' class='small' >"+selecteddate.d+"</span></div></li>"
+      hourline+=" <li class='"+cl+"' id='lihr_"+idx+"' idx='"+idx+"' t='"+i+"' details='"+selectedDateStr+"' ><div class='span_hl' idx='"+idx+"'><span idx='"+idx+"' class='small small-top' >"+selecteddate.mText+"</span><br><span idx='"+idx+"' class='small' >"+selecteddate.d+"</span></div></li>"
 
       i = 1
       idx++
@@ -800,7 +800,7 @@ renderRows = (callback) ->
     presdate = d+""
 
     presdatearr = presdate.split " "
-    presdatestr = presdatearr[0]+" , "+presdatearr[1]+" "+presdatearr[2]+" , "+presdatearr[3]
+    presdatestr = presdatearr[0]+", "+presdatearr[1]+" "+presdatearr[2]+", "+presdatearr[3]
 
     prevdate = new Date()
     prevdate.setFullYear selecteddate.year,selecteddate.m,selecteddate.d
@@ -809,7 +809,7 @@ renderRows = (callback) ->
     #prevdate = prevdate.toLocaleString()
     prevdate = prevdate+""
     prevdatearr = prevdate.split " "
-    prevdatestr = prevdatearr[0]+" , "+prevdatearr[1]+" "+prevdatearr[2]+" , "+prevdatearr[3]
+    prevdatestr = prevdatearr[0]+", "+prevdatearr[1]+" "+prevdatearr[2]+", "+prevdatearr[3]
 
 
     d.setTime d.getTime()+86400000
@@ -817,7 +817,7 @@ renderRows = (callback) ->
     #d = d.toLocaleString()
     d = d+""
     nextdayarr = d.split " "
-    nextDayStr = nextdayarr[0]+" , "+nextdayarr[1]+" "+nextdayarr[2]+" , "+nextdayarr[3]
+    nextDayStr = nextdayarr[0]+", "+nextdayarr[1]+" "+nextdayarr[2]+", "+nextdayarr[3]
 
 
     dayusedarr = []
@@ -854,7 +854,7 @@ renderRows = (callback) ->
       hourline+=" <li class='"+cl+"' id='lihr_"+idx+"' idx='"+idx+"' t='"+tval+"'  details='"+datedetailstr+"'><div class='span_hl' idx='"+idx+"'><span class='medium' idx='"+idx+"'>"+parseInt(i)+"</span><br><span class='small' idx='"+idx+"'>"+tempstr+"</span></div></li>"
 
       if tempstr is " "
-        hourline = hourline.replace "<span class='medium' idx='"+idx+"'>","<span idx='"+idx+"' >"
+        hourline = hourline.replace "<span class='medium' idx='"+idx+"'>","<span idx='"+idx+"' class='box_center' >"
       idx++
       i++
 
@@ -867,7 +867,7 @@ renderRows = (callback) ->
 
       cl = "li_24"
       if iorig != 0.5
-        hourline+=" <li class='"+cl+"' id='lihr_"+idx+"' idx='"+idx+"' t='"+iorig+"' details='"+dayusedstr+"' ><div class='span_hl' idx='"+idx+"'><span idx='"+idx+"'  class='small'> "+dayusedarr[1]+"</span><br><span idx='"+idx+"' class='small' >"+dayusedarr[2]+"</span></div></li>"
+        hourline+=" <li class='"+cl+"' id='lihr_"+idx+"' idx='"+idx+"' t='"+iorig+"' details='"+dayusedstr+"' ><div class='span_hl' idx='"+idx+"'><span idx='"+idx+"'  class='small small-top'> "+dayusedarr[1]+"</span><br><span idx='"+idx+"' class='small' >"+dayusedarr[2]+"</span></div></li>"
       if timestr is " "
         i=1
       else
@@ -902,7 +902,7 @@ renderRows = (callback) ->
 
       hourline+=" <li class='"+cl+"' id='lihr_"+idx+"' idx='"+idx+"' t='"+tval+"' details='"+datedetailstr+"' ><div class='span_hl' idx='"+idx+"'><span class='medium' idx='"+idx+"'>"+parseInt(i)+"</span><br><span class='small' idx='"+idx+"'>"+tempstr+"</span></div></li>"
       if tempstr is " "
-        hourline = hourline.replace "<span class='medium' idx='"+idx+"'>","<span idx='"+idx+"' >"
+        hourline = hourline.replace "<span class='medium' idx='"+idx+"'>","<span idx='"+idx+"' class='box_center' >"
       i++
       idx++
 
@@ -913,7 +913,7 @@ renderRows = (callback) ->
       sym = "+"
 
 
-    row+= "<div class='row' id='row_"+ind+"' rowindex='"+ind+"' time='"+timearr[4]+"' original_offset='"+oldobj[ind].offset+"' ><div class='tzdetails'><div class='offset'>"+sym+(floatOffset-defaultoffset)+"<br><span class='small' >Hours</span></div><div class='location'><span class='city'>"+oldobj[ind].city+"</span><br><span class='country'>"+oldobj[ind].country+"</span></div><div class='timedata'><span class='time'>"+timearr[4]+"</span><br><span class='timeextra'>"+timeextrastr+"</span></div></div><div class='dates'>"+hourline+"</div></div> "
+    row+= "<div class='row' id='row_"+ind+"' rowindex='"+ind+"' time='"+timearr[4]+"' floatoffset='"+floatOffset+"' original_offset='"+oldobj[ind].offset+"'><div class='tzdetails'><div class='offset'>"+sym+(floatOffset-defaultoffset)+"<br><span class='small' >Hours</span></div><div class='location'><span class='city'>"+oldobj[ind].city+"</span><br><span class='country'>"+oldobj[ind].country+"</span></div><div class='timedata'><span class='time'>"+timearr[4]+"</span><br><span class='timeextra'>"+timeextrastr+"</span></div></div><div class='dates'>"+hourline+"</div></div> "
 
   #$("#content").html "<div id='vband'></div><div id='selectedband'></div>"
   $("#content").html row
@@ -944,22 +944,12 @@ renderRows = (callback) ->
   $("#vband").css "left",(left-2)
   $("#vband").css "height",$("#selectedband").css("height")
   $("#content").sortable({'containment':'parent', 'items':'.row'})
-  #if added_locations_status == "undefined"
-  #  generate_meeting_link()
-  
-  console.log callback
   if typeof(callback) == "function"
     console.log "calling"
     callback()
   else
     console.log callback
     console.log "not calling"
-  if callback == "a"
-    console.log "yes a"
-    generate_meeting_link()
-  else
-    console.log "not a"
-    console.log callback
 
 convertOffsetToFloat = (str) ->
   first = str.substr(0,str.indexOf(":"))
@@ -1070,3 +1060,59 @@ getNewTime = (offset) ->
   return ndstr
   #ndarr = ndstr.split(" ")
   #console.log ndarr[4].substr(0,5)
+  #
+
+open_in_new_tab = (url) ->
+  window.open url, '_blank'
+  window.focus()
+
+
+$(".link_export_google_cal").live
+  click: (e) ->
+    e.preventDefault()
+    link_desc = ""
+    for ele in $("#newevent_table tr")
+      if $(ele).find("input[type='checkbox']").attr "checked"
+        td_arr = $(ele).find("td")
+        link_desc += $(td_arr[1]).text().trim()+", "+$(td_arr[2]).text().trim()+", "+$(td_arr[3]).find('.yeardetails').text().trim()+" "+$(td_arr[3]).find('.selected_time').text().trim()+"\n"
+
+    #calculating utc
+    gmt_str = $($("#newevent_table tr")[1]).find("td")[3]
+    floatoffset =$( $("#newevent_table tr")[1]).attr "floatoffset"
+    gmt_str = $($(gmt_str).find('.yeardetails')).text().trim()+" "+$($(gmt_str).find('.selected_time')).text().trim()
+    d = new Date(gmt_str)
+    d.setHours(d.getHours()-Number(floatoffset))
+
+    google_cal_dates_param = get_google_cal_dates_param(d)
+
+    next_day = d
+    next_day.setHours d.getHours()+1
+
+    google_cal_dates_param += "/"+get_google_cal_dates_param(next_day)
+
+    gcal_url = "https://www.google.com/calendar/render?action=TEMPLATE&details="+link_desc
+    if $("#newevent_msg").val().trim().length > 0
+      gcal_url += '\n'+$("#newevent_msg").val().trim()
+    if $("#event_name").val().trim().length > 0
+      gcal_url += "&text="+$('#event_name').val().trim()
+    gcal_url += "&dates="+google_cal_dates_param
+
+    $(".link_export_google_cal").attr "href", encodeURI(gcal_url)
+    open_in_new_tab($(".link_export_google_cal").attr('href'))
+
+
+get_google_cal_dates_param = (d) ->
+    month_str = d.getMonth()+1
+    if (month_str+"").trim().length == 1
+      month_str = "0"+month_str
+    day_str = d.getDate()
+    if (day_str+"").trim().length == 1
+      day_str = "0"+day_str
+    min_str = d.getMinutes()
+    if (min_str+"").trim().length == 1
+      min_str = "0"+min_str
+    hour_str = d.getHours()
+    if (hour_str+"").trim().length == 1
+      hour_str = "0"+hour_str
+    google_cal_dates_param = ""+d.getFullYear()+month_str+day_str+"T"+hour_str+min_str+"00Z"
+

@@ -1,6 +1,5 @@
 (function() {
-  var convertOffset, convertOffsetToFloat, domain_name, generate_meeting_link, getLocations, getMonth, getNewTime, hide_meeting_details, k, locations, origcities, remove_key, renderRows, rowsortstart, rowsortstop, selecteddate, setSelectedDate, sr_click, tzdata, tzdatalower, updateUtc, utc,
-    _this = this;
+  var cities_data_arr, convertOffset, convertOffsetToFloat, countries_data_arr, domain_name, full_data_arr, full_data_original_arr, generate_meeting_link, getCities, getMonth, getNewTime, getRequiredOffset, get_google_cal_dates_param, hide_meeting_details, k, locations, open_in_new_tab, origcities, renderRows, rowsortstart, rowsortstop, selecteddate, setSelectedDate, sr_click, tzdata, tzdatalower, updateUtc, utc;
 
   origcities = "";
 
@@ -20,7 +19,15 @@
 
   rowsortstop = "";
 
-  domain_name = "http://533f.localtunnel.com/timezoneconvertor";
+  cities_data_arr = [];
+
+  countries_data_arr = [];
+
+  full_data_arr = [];
+
+  full_data_original_arr = [];
+
+  domain_name = "";
 
   $(document).ready(function() {
     var bombayoff, bt, d, datearr, dstr, localoffset, localtime, nd, ndarr, ndstr;
@@ -43,6 +50,21 @@
         window.ttt = tz;
         tzdata = tz;
         tzdatalower = tz.toLowerCase();
+        cities_data_arr = [];
+        countries_data_arr = [];
+        full_data_arr = tzdatalower.split("\n");
+        full_data_original_arr = tzdata.split("\n");
+        console.log(full_data_arr);
+        full_data_arr.forEach(function(each_line) {
+          var each_line_arr;
+          each_line_arr = each_line.split(";");
+          cities_data_arr.push(each_line_arr[0]);
+          return countries_data_arr.push(each_line_arr[1]);
+        });
+        cities_data_arr.pop();
+        countries_data_arr.pop();
+        full_data_original_arr.pop();
+        full_data_arr.pop();
         renderRows();
         if (window.location.search !== "") {
           return renderRows(generate_meeting_link);
@@ -126,24 +148,13 @@
     });
   };
 
-  remove_key = function(obj, pos) {
-    var i, len;
-    i = pos;
-    len = Object.keys(obj).length;
-    while (i < len - 1) {
-      obj[i] = obj[i + 1];
-      i++;
-    }
-    delete obj[len - 1];
-    return obj;
-  };
-
   $("#search_input").live({
     keyup: function(e) {
       var st;
       $(".searchresult_li").removeClass("temp_active");
       if (e.keyCode === 13) {
         k = $(".searchresult_li.active_search").attr("k");
+        $("#search_input").val("");
         sr_click(e, k);
         $("#search_result").hide();
         return;
@@ -188,7 +199,8 @@
       k = 0;
       $("#search_result").html("");
       updateUtc();
-      getLocations(0, st);
+      locations = getCities(st);
+      console.log(locations);
       $("#search_result").html(locations);
       if ($("#search_result").css("display") === "none") {
         return $("#search_result").slideDown();
@@ -203,6 +215,7 @@
 
   $("li.searchresult_li").live({
     click: function(e) {
+      $("#search_input").val("");
       return sr_click(e);
     }
   });
@@ -252,7 +265,7 @@
       return $("#content").sortable('enable');
     },
     click: function(e) {
-      var city, country, ele, i, idx, ind, param_string, t, tText, tabl, yeardetails, _i, _len, _ref;
+      var city, country, ele, i, idx, ind, original_offset, param_string, t, tText, tabl, yeardetails, _i, _len, _ref;
       $(".canhide").css("opacity", "0.1");
       idx = $(e.target).attr("idx");
       if (idx === void 0) return;
@@ -260,6 +273,7 @@
       city = new Array();
       country = new Array();
       yeardetails = new Array();
+      original_offset = new Array();
       param_string = "?";
       i = 0;
       _ref = $(".row");
@@ -270,6 +284,7 @@
         city.push($("#" + ele.id + " .city").text());
         country.push($("#" + ele.id + " .country").text());
         yeardetails.push($("#" + ele.id + " #lihr_" + idx).attr("details"));
+        original_offset.push($(ele).attr("floatoffset"));
         param_string += i + "=" + city[i] + ";" + country[i] + ";" + $("#" + ele.id).attr('original_offset') + ";" + yeardetails[i] + ", " + t[i] + "&";
         i++;
       }
@@ -280,9 +295,9 @@
       $("#newevent_time").text("");
       $("#newevent_msg").text("");
       $("#event_name").text("");
-      tabl = "<table id='newevent_table' class='table table-striped' ><thead><th>City</th><th>Country</th><th>Time</th></thead>";
+      tabl = "<table id='newevent_table' class='table table-striped' ><thead><th>Select</th><th>City</th><th>Country</th><th>Time</th></thead>";
       for (ind in t) {
-        tabl += "<tr><td>" + city[ind] + "</td><td>" + country[ind] + "</td><td>" + yeardetails[ind] + " , " + t[ind] + "</td></tr>";
+        tabl += "<tr floatoffset='" + original_offset[ind] + "'><td><input type='checkbox' checked /></td><td>" + city[ind] + "</td><td>" + country[ind] + "</td><td><span class='yeardetails'>" + yeardetails[ind] + "</span><span class='selected_time'>, " + t[ind] + "</td></tr>";
       }
       tabl += "</table>";
       $("#newevent_time").html(tabl);
@@ -295,32 +310,54 @@
 
   $("#wrapper button#saveevent").live({
     click: function(e) {
-      var evname, key, len, msg, oldobj;
+      var city, country, evname, len, msg, oldobj, selected, selected_time, total_checked, yeardetails;
       msg = $("#wrapper #newevent #newevent_msg").val().trim();
       evname = $("#wrapper #newevent #event_name").val().trim();
       if (msg.length < 1) {
-        alert("Please enter some message");
+        alert("Please enter description");
         return;
       }
       if (evname.length < 1) {
-        alert("please enter event name");
+        alert("Please enter event name");
         return;
       }
+      city = "";
+      country = "";
+      selected = "";
+      yeardetails = "";
+      selected_time = "";
+      total_checked = 0;
+      $("#newevent_table tr").each(function() {
+        if ($(this).find("input[type='checkbox']").attr('checked')) {
+          city += $($(this).find("td")[1]).text() + ",";
+          country += $($(this).find("td")[2]).text() + ",";
+          yeardetails += $($($(this).find("td")[3]).find(".yeardetails")).text() + ";";
+          selected_time += $($($(this).find("td")[3]).find(".selected_time")).text().trim();
+          return total_checked++;
+        }
+      });
+      if (total_checked === 0) {
+        alert("Select atleast one timezone .");
+        return;
+      }
+      country = country.substr(0, country.length - 1);
+      city = city.substr(0, city.length - 1);
+      yeardetails = yeardetails.substr(0, yeardetails.length - 1);
+      selected_time = selected_time.substr(1, selected_time.length);
       oldobj = {};
       if ("events" in localStorage) oldobj = JSON.parse(localStorage.events);
-      len = 0;
-      for (key in oldobj) {
-        len++;
-      }
+      len = Object.keys(oldobj).length;
       oldobj[len] = {};
       oldobj[len].name = evname;
       oldobj[len].desc = msg;
-      oldobj[len].city = $("#newevent_time").attr("city");
-      oldobj[len].country = $("#newevent_time").attr("country");
-      oldobj[len].time = $("#newevent_time").attr("time");
-      oldobj[len].yeardetails = $("#newevent_time").attr("yeardetails");
+      oldobj[len].city = city;
+      oldobj[len].country = country;
+      oldobj[len].time = selected_time;
+      oldobj[len].yeardetails = yeardetails;
       localStorage.events = JSON.stringify(oldobj);
-      return $("#event_close").trigger('click');
+      $("#event_close").trigger('click');
+      $("#wrapper #showevents #showeventbody").hide();
+      return $(".eventheader").trigger("click");
     }
   });
 
@@ -367,7 +404,6 @@
       var defaultidx, i, key, len, newobj, oldobj, rowindex, val;
       rowindex = parseInt($(e.target).parent().parent().attr("rowindex"));
       oldobj = JSON.parse(localStorage.addedLocations);
-      oldobj = JSON.parse(localStorage.addedLocations);
       len = 0;
       for (key in oldobj) {
         len++;
@@ -409,6 +445,9 @@
     },
     mouseleave: function() {
       return $("#date_help").hide();
+    },
+    keyup: function(e) {
+      if (e.keyCode === 13) return $("#setdate_go").trigger("click");
     }
   });
 
@@ -417,6 +456,7 @@
       var datestr, dd, errormsg, key, lenofdash, mm, options, year, _i, _len;
       errormsg = "mm-dd-yyyy format only";
       datestr = $("#dateinput").val().trim();
+      $(".selected_date").text(datestr);
       window.da = datestr;
       if (datestr.length !== 10) {
         $("#error_inputdate").html(errormsg);
@@ -447,17 +487,40 @@
         $("#error_inputdate").show();
         return;
       }
+      if ("display_date_animation" in localStorage) {
+        if (localStorage.display_date_animation === "false") {
+          $(".date_help_animation_box").hide();
+        } else {
+          $(".date_help_animation_box").show();
+        }
+      } else {
+        $(".date_help_animation_box").show();
+      }
       $("#error_inputdate").hide();
-      /*
-          selecteddate.m = mm-1
-          selecteddate.d = dd
-          selecteddate.year = year
-      */
+      setTimeout((function() {
+        return $(".date_help_animation_box").fadeOut(3000);
+      }), 15000);
       options = {};
       options.m = mm - 1;
       options.d = dd;
       options.year = year;
       return setSelectedDate(options);
+    }
+  });
+
+  $(".date_help_animation_box").live({
+    click: function() {
+      var that;
+      that = this;
+      if ($(this).find("input[type='checkbox']").attr("checked")) {
+        console.log($(this).find("input[type='checkbox']").attr("checked"));
+        localStorage.display_date_animation = "false";
+      } else {
+        localStorage.display_date_animation = "true";
+      }
+      return setTimeout((function() {
+        return $(that).fadeOut();
+      }), 1000);
     }
   });
 
@@ -510,20 +573,22 @@
 
   $("#wrapper #showevents .eventheader").live({
     click: function(e) {
-      var city, country, data, i, key, oldobj, prev, t, tabl, yeardetails;
+      var city, country, data, hr_i, i, key, objlen, oldobj, prev, t, tabl, yeardetails;
       prev = $("#wrapper #showevents #showeventbody").css("display");
       if (prev !== "none") {
         $("#wrapper #showevents #showeventbody").slideUp();
         return;
       }
       if (!("events" in localStorage)) {
-        $("#wrapper #showevents #showeventbody").html("<h3>No events available, add them first by clicking on the boxes showing time.</h3>");
+        $("#wrapper #showevents #showeventbody").html("<h3>No events available, you can add events by clicking on any box showing time.</h3>");
         $("#wrapper #showevents #showeventbody").slideDown();
         $("body").scrollTo(".showevents");
         return;
       }
       oldobj = JSON.parse(localStorage.events);
       data = "";
+      objlen = Object.keys(oldobj).length;
+      hr_i = 1;
       for (key in oldobj) {
         city = new Array();
         country = new Array();
@@ -538,11 +603,14 @@
           tabl += "<tr><td>" + city[i] + "</td><td>" + country[i] + "</td><td>" + yeardetails[i] + " " + t[i] + "</td></tr>";
         }
         tabl += "</tbody></table>";
-        data += "<h2># " + (parseInt(key) + 1) + " " + oldobj[key].name + "<span class='deleteEvent' key='" + key + "'>X&nbsp;</span></h2>" + tabl + "<h3>Description : </h3><p style='padding-left:15px;padding-right:15px;'> " + oldobj[key].desc + "</p><br><hr class='showevents_hr' />";
+        data += "<div class='each_event_header'><span class='event_name_desc'><span class='event_num'># " + (parseInt(key) + 1) + "</span><span class='event_name'> " + oldobj[key].name + "</span> - <span class='event_desc'>" + oldobj[key].desc + "</span></span><span class='deleteEvent' key='" + key + "'>X&nbsp;</span></div>" + tabl + "<br>";
+        if (hr_i !== objlen) data += "<hr>";
+        hr_i++;
       }
       if (data === "") {
-        data = "<h3>No events available, add them first by clicking on the boxes showing time.</h3>";
+        data = "<h3>No events available, you can add events by clicking on any box showing time.</h3>";
       }
+      data = "<div class='events'>" + data + "</div>";
       $("#wrapper #showevents #showeventbody").html(data);
       $("#wrapper #showevents #showeventbody").slideDown();
       return $("body").scrollTo("#showevents");
@@ -557,23 +625,22 @@
 
   $(".deleteEvent").live({
     click: function(e) {
-      var i, key, len, oldobj, r, rowindex;
+      var i, len, oldobj, r, rowindex;
       r = confirm("Do you really want to delete this event ? ");
       if (r !== true) return;
       rowindex = parseInt($(e.target).attr("key"));
       oldobj = JSON.parse(localStorage.events);
-      len = 0;
-      for (key in oldobj) {
-        len++;
-      }
-      if (rowindex !== len - 1) {
+      len = Object.keys(oldobj).length;
+      if (i !== len - 1) {
         i = rowindex + 1;
         while (i < len) {
           oldobj[i - 1] = oldobj[i];
           i++;
         }
+        delete oldobj[len - 1];
+      } else {
+        delete oldobj[rowindex];
       }
-      delete oldobj[rowindex];
       localStorage.events = JSON.stringify(oldobj);
       $("#wrapper #showevents #showeventbody").css("display", "none");
       return $("#wrapper #showevents .eventheader").trigger("click");
@@ -609,37 +676,9 @@
     return renderRows();
   };
 
-  getLocations = function(ind, st) {
-    var finaloff, first, offset, pi, presline, prevline, req, reqArr, second, subTillPi, timearr, timestr;
-    if (k > 7) {
-      locations += "</ul>";
-      return;
-    }
-    k++;
-    ind = parseInt(ind);
-    if (ind === 0) {
-      ind = 0;
-    } else {
-      ind++;
-    }
-    pi = parseInt(tzdatalower.indexOf(st, ind));
-    if (pi === -1) {
-      locations += "</ul>";
-      return;
-    }
-    subTillPi = tzdatalower.substr(0, pi);
-    prevline = parseInt(subTillPi.lastIndexOf("\n"));
-    if (prevline === -1) {
-      prevline = 0;
-    } else if (prevline === 0) {
-      prevline = 0;
-    } else {
-      prevline++;
-    }
-    presline = parseInt(tzdatalower.indexOf("\n", pi));
-    req = tzdata.substr(prevline, presline - prevline);
-    reqArr = req.split(";");
-    offset = reqArr[3];
+  getRequiredOffset = function(original) {
+    var finaloff, first, offset, second, timearr, timestr;
+    offset = original;
     finaloff = "";
     if (offset.length === 9) {
       offset = offset.substr(3, 9);
@@ -653,13 +692,40 @@
     timestr = getNewTime(finaloff);
     timearr = timestr.split(" ");
     timearr[4] = timearr[4].substr(0, 5);
-    locations += "<li class='searchresult_li' offset='" + finaloff + "' timestr='" + timestr + "' id='lisr_" + k + "' k='" + k + "'><span class='litz' k='" + k + "'>" + reqArr[1] + " , " + reqArr[0] + ",</span><span class='litime' k='" + k + "'>" + timearr[4] + "</span></li>";
-    return getLocations(presline, st);
+    return [timestr, timearr[4], finaloff];
+  };
+
+  getCities = function(term) {
+    var key, len, required_offset, temp_arr, val;
+    term = term.toLowerCase();
+    len = 1;
+    for (key in cities_data_arr) {
+      val = cities_data_arr[key];
+      if (len > 7) break;
+      if (val.indexOf(term) > -1) {
+        temp_arr = full_data_original_arr[key].split(";");
+        required_offset = getRequiredOffset(temp_arr[3]);
+        locations += "<li class='searchresult_li' offset='" + required_offset[2] + "' timestr='" + required_offset[0] + "' id='lisr_" + len + "' k='" + len + "'>" + "<span class='litz' k='" + len + "'>" + temp_arr[1] + ", " + temp_arr[0] + "<span class='invisible_comma_search_result'>,</span> </span><span class='litime' k='" + len + "'>" + required_offset[1] + "</span></li>";
+        len++;
+      }
+    }
+    if (len < 8) {
+      for (key in countries_data_arr) {
+        val = countries_data_arr[key];
+        if (len > 7) break;
+        if (val.indexOf(term) > -1) {
+          temp_arr = full_data_original_arr[key].split(";");
+          required_offset = getRequiredOffset(temp_arr[3]);
+          locations += "<li class='searchresult_li' offset='" + required_offset[2] + "' timestr='" + required_offset[0] + "' id='lisr_" + len + "' k='" + len + "'>" + "<span class='litz' k='" + len + "'>" + temp_arr[1] + ", " + temp_arr[0] + "<span class='invisible_comma_search_result'>,</span> </span><span class='litime' k='" + len + "'>" + required_offset[1] + "</span></li>";
+          len++;
+        }
+      }
+    }
+    return locations;
   };
 
   renderRows = function(callback) {
     var ad_offset, ad_utc, cl, d, datedetailstr, dayusedarr, dayusedstr, defaultind, defaultobj, defaultoffset, diffoffset, diffoffsetstr, floatOffset, formattedOffset, height, hourline, hourstart, i, icons_homedelete, idx, ind, iorig, left, monInNum, newobj, nextDayStr, nextdayarr, oldobj, pi, presdate, presdatearr, presdatestr, presline, prevdate, prevdatearr, prevdatestr, prevline, req, reqArr, row, selectedDateStr, subTillPi, sym, tempstr, timearr, timeextrastr, timestr, tval;
-    console.log(callback);
     oldobj = {};
     if ("addedLocations" in localStorage && "default" in localStorage) {
       oldobj = JSON.parse(localStorage.addedLocations);
@@ -669,12 +735,7 @@
       ad_offset = (d.getTime() - ad_utc) / 3600000;
       formattedOffset = convertOffset(ad_offset);
       pi = tzdata.indexOf(formattedOffset);
-      if (pi === -1) {
-        console.log("return");
-        return;
-      } else {
-        console.log("not returning");
-      }
+      if (pi === -1) return;
       subTillPi = tzdata.substr(0, pi);
       prevline = subTillPi.lastIndexOf("\n");
       if (prevline === -1) prevline = 0;
@@ -697,7 +758,6 @@
       oldobj = JSON.parse(localStorage.addedLocations);
     }
     updateUtc();
-    console.log(callback);
     defaultind = localStorage["default"];
     defaultobj = oldobj[defaultind];
     defaultoffset = parseFloat(defaultobj.offset);
@@ -727,14 +787,14 @@
           tempstr = " ";
         }
       }
-      selectedDateStr = selecteddate.dayInText + " , " + selecteddate.mText + " " + selecteddate.d + " , " + selecteddate.year;
-      timeextrastr = selecteddate.dayInText + " , " + selecteddate.mText + " " + selecteddate.d + "  " + selecteddate.year;
+      selectedDateStr = selecteddate.dayInText + ", " + selecteddate.mText + " " + selecteddate.d + ", " + selecteddate.year;
+      timeextrastr = selecteddate.dayInText + ", " + selecteddate.mText + " " + selecteddate.d + "  " + selecteddate.year;
       hourline = "<ul class='hourline_ul'>";
       idx = 0;
       iorig = i;
       if (i === 0 || i === 0.5) {
         cl = "li_24";
-        hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='" + i + "' details='" + selectedDateStr + "' ><div class='span_hl' idx='" + idx + "'><span idx='" + idx + "' class='small' >" + selecteddate.mText + "</span><br><span idx='" + idx + "' class='small' >" + selecteddate.d + "</span></div></li>";
+        hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='" + i + "' details='" + selectedDateStr + "' ><div class='span_hl' idx='" + idx + "'><span idx='" + idx + "' class='small small-top' >" + selecteddate.mText + "</span><br><span idx='" + idx + "' class='small' >" + selecteddate.d + "</span></div></li>";
         i = 1;
         idx++;
       }
@@ -745,17 +805,17 @@
       d.setFullYear(selecteddate.year, selecteddate.m, selecteddate.d);
       presdate = d + "";
       presdatearr = presdate.split(" ");
-      presdatestr = presdatearr[0] + " , " + presdatearr[1] + " " + presdatearr[2] + " , " + presdatearr[3];
+      presdatestr = presdatearr[0] + ", " + presdatearr[1] + " " + presdatearr[2] + ", " + presdatearr[3];
       prevdate = new Date();
       prevdate.setFullYear(selecteddate.year, selecteddate.m, selecteddate.d);
       prevdate.setTime(prevdate.getTime() - 86400000);
       prevdate = prevdate + "";
       prevdatearr = prevdate.split(" ");
-      prevdatestr = prevdatearr[0] + " , " + prevdatearr[1] + " " + prevdatearr[2] + " , " + prevdatearr[3];
+      prevdatestr = prevdatearr[0] + ", " + prevdatearr[1] + " " + prevdatearr[2] + ", " + prevdatearr[3];
       d.setTime(d.getTime() + 86400000);
       d = d + "";
       nextdayarr = d.split(" ");
-      nextDayStr = nextdayarr[0] + " , " + nextdayarr[1] + " " + nextdayarr[2] + " , " + nextdayarr[3];
+      nextDayStr = nextdayarr[0] + ", " + nextdayarr[1] + " " + nextdayarr[2] + ", " + nextdayarr[3];
       dayusedarr = [];
       dayusedstr = "";
       if (diffoffset >= 0) {
@@ -782,7 +842,7 @@
         tval = convertOffsetToFloat(parseInt(i) + ":" + tempstr);
         hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='" + tval + "'  details='" + datedetailstr + "'><div class='span_hl' idx='" + idx + "'><span class='medium' idx='" + idx + "'>" + parseInt(i) + "</span><br><span class='small' idx='" + idx + "'>" + tempstr + "</span></div></li>";
         if (tempstr === " ") {
-          hourline = hourline.replace("<span class='medium' idx='" + idx + "'>", "<span idx='" + idx + "' >");
+          hourline = hourline.replace("<span class='medium' idx='" + idx + "'>", "<span idx='" + idx + "' class='box_center' >");
         }
         idx++;
         i++;
@@ -790,7 +850,7 @@
       if (hourstart !== 0) {
         cl = "li_24";
         if (iorig !== 0.5) {
-          hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='" + iorig + "' details='" + dayusedstr + "' ><div class='span_hl' idx='" + idx + "'><span idx='" + idx + "'  class='small'> " + dayusedarr[1] + "</span><br><span idx='" + idx + "' class='small' >" + dayusedarr[2] + "</span></div></li>";
+          hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='" + iorig + "' details='" + dayusedstr + "' ><div class='span_hl' idx='" + idx + "'><span idx='" + idx + "'  class='small small-top'> " + dayusedarr[1] + "</span><br><span idx='" + idx + "' class='small' >" + dayusedarr[2] + "</span></div></li>";
         }
         if (timestr === " ") {
           i = 1;
@@ -820,7 +880,7 @@
         }
         hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='" + tval + "' details='" + datedetailstr + "' ><div class='span_hl' idx='" + idx + "'><span class='medium' idx='" + idx + "'>" + parseInt(i) + "</span><br><span class='small' idx='" + idx + "'>" + tempstr + "</span></div></li>";
         if (tempstr === " ") {
-          hourline = hourline.replace("<span class='medium' idx='" + idx + "'>", "<span idx='" + idx + "' >");
+          hourline = hourline.replace("<span class='medium' idx='" + idx + "'>", "<span idx='" + idx + "' class='box_center' >");
         }
         i++;
         idx++;
@@ -828,7 +888,7 @@
       hourline += "</ul>";
       sym = "";
       if (diffoffset > 0) sym = "+";
-      row += "<div class='row' id='row_" + ind + "' rowindex='" + ind + "' time='" + timearr[4] + "' original_offset='" + oldobj[ind].offset + "' ><div class='tzdetails'><div class='offset'>" + sym + (floatOffset - defaultoffset) + "<br><span class='small' >Hours</span></div><div class='location'><span class='city'>" + oldobj[ind].city + "</span><br><span class='country'>" + oldobj[ind].country + "</span></div><div class='timedata'><span class='time'>" + timearr[4] + "</span><br><span class='timeextra'>" + timeextrastr + "</span></div></div><div class='dates'>" + hourline + "</div></div> ";
+      row += "<div class='row' id='row_" + ind + "' rowindex='" + ind + "' time='" + timearr[4] + "' floatoffset='" + floatOffset + "' original_offset='" + oldobj[ind].offset + "'><div class='tzdetails'><div class='offset'>" + sym + (floatOffset - defaultoffset) + "<br><span class='small' >Hours</span></div><div class='location'><span class='city'>" + oldobj[ind].city + "</span><br><span class='country'>" + oldobj[ind].country + "</span></div><div class='timedata'><span class='time'>" + timearr[4] + "</span><br><span class='timeextra'>" + timeextrastr + "</span></div></div><div class='dates'>" + hourline + "</div></div> ";
     }
     $("#content").html(row);
     $("#content").prepend("<div id='vband'></div><div id='selectedband'></div>");
@@ -852,20 +912,12 @@
       'containment': 'parent',
       'items': '.row'
     });
-    console.log(callback);
     if (typeof callback === "function") {
       console.log("calling");
-      callback();
+      return callback();
     } else {
       console.log(callback);
-      console.log("not calling");
-    }
-    if (callback === "a") {
-      console.log("yes a");
-      return generate_meeting_link();
-    } else {
-      console.log("not a");
-      return console.log(callback);
+      return console.log("not calling");
     }
   };
 
@@ -980,6 +1032,59 @@
     nd = new Date(newtime);
     ndstr = nd.toLocaleString();
     return ndstr;
+  };
+
+  open_in_new_tab = function(url) {
+    window.open(url, '_blank');
+    return window.focus();
+  };
+
+  $(".link_export_google_cal").live({
+    click: function(e) {
+      var d, ele, floatoffset, gcal_url, gmt_str, google_cal_dates_param, link_desc, next_day, td_arr, _i, _len, _ref;
+      e.preventDefault();
+      link_desc = "";
+      _ref = $("#newevent_table tr");
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        ele = _ref[_i];
+        if ($(ele).find("input[type='checkbox']").attr("checked")) {
+          td_arr = $(ele).find("td");
+          link_desc += $(td_arr[1]).text().trim() + ", " + $(td_arr[2]).text().trim() + ", " + $(td_arr[3]).find('.yeardetails').text().trim() + " " + $(td_arr[3]).find('.selected_time').text().trim() + "\n";
+        }
+      }
+      gmt_str = $($("#newevent_table tr")[1]).find("td")[3];
+      floatoffset = $($("#newevent_table tr")[1]).attr("floatoffset");
+      gmt_str = $($(gmt_str).find('.yeardetails')).text().trim() + " " + $($(gmt_str).find('.selected_time')).text().trim();
+      d = new Date(gmt_str);
+      d.setHours(d.getHours() - Number(floatoffset));
+      google_cal_dates_param = get_google_cal_dates_param(d);
+      next_day = d;
+      next_day.setHours(d.getHours() + 1);
+      google_cal_dates_param += "/" + get_google_cal_dates_param(next_day);
+      gcal_url = "https://www.google.com/calendar/render?action=TEMPLATE&details=" + link_desc;
+      if ($("#newevent_msg").val().trim().length > 0) {
+        gcal_url += '\n' + $("#newevent_msg").val().trim();
+      }
+      if ($("#event_name").val().trim().length > 0) {
+        gcal_url += "&text=" + $('#event_name').val().trim();
+      }
+      gcal_url += "&dates=" + google_cal_dates_param;
+      $(".link_export_google_cal").attr("href", encodeURI(gcal_url));
+      return open_in_new_tab($(".link_export_google_cal").attr('href'));
+    }
+  });
+
+  get_google_cal_dates_param = function(d) {
+    var day_str, google_cal_dates_param, hour_str, min_str, month_str;
+    month_str = d.getMonth() + 1;
+    if ((month_str + "").trim().length === 1) month_str = "0" + month_str;
+    day_str = d.getDate();
+    if ((day_str + "").trim().length === 1) day_str = "0" + day_str;
+    min_str = d.getMinutes();
+    if ((min_str + "").trim().length === 1) min_str = "0" + min_str;
+    hour_str = d.getHours();
+    if ((hour_str + "").trim().length === 1) hour_str = "0" + hour_str;
+    return google_cal_dates_param = "" + d.getFullYear() + month_str + day_str + "T" + hour_str + min_str + "00Z";
   };
 
 }).call(this);

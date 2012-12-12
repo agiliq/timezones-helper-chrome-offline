@@ -9,6 +9,10 @@
 
             }
 
+            #saveevent {
+                margin-left: 10px; margin-top: -15px;
+                
+            }
 
            #wrapper table#newevent_table{
             /*   border : 1px solid black; */
@@ -30,6 +34,7 @@
                 /*
                border : 1px solid black;
                */
+                width: 80%;
 
            }
            #wrapper table.showevent_table th{
@@ -50,11 +55,36 @@
                float : right;
                text-shadow: 0 1px 0 white;
                opacity: 0.3;
+               position: absolute;
+               right: 10px;
+               top: -3px;
 
            }
            #wrapper .deleteEvent:hover {
-                opacity: 0.6;
+                opacity: 1;
                 cursor: pointer;
+                font-size: 18pt;
+                font-weight: bold;
+           }
+
+           #wrapper .event_name_desc {
+               display: inline-block;
+               margin-left: 30px;
+               margin-right: 50px;
+
+           }
+
+           #wrapper .each_event_header {
+                position: relative;
+           }
+           #wrapper .each_event_header .event_name {
+                font-size:14pt;
+                font-weight: bold;
+           }
+
+           #newevent_msg {
+                width: 85%;
+                height: 135px;
            }
             #controls{
                 z-index : 99;
@@ -118,12 +148,19 @@
                 input#search_input{
                   position : absolute;
                   left : 10px;
-                  height : 30px;
                   width : 250px;
                   border-radius : 5px;
 
                 }
 
+                .selected_date {
+                    position: absolute;
+                    left: 427px;
+                    top: 15px;
+                    font-weight: bolder;
+                    color: whitesmoke;
+                    font-size: 14pt;
+                }
 
                 #controls{
                    position: absolute;
@@ -138,7 +175,6 @@
                     }
 
                     #dateinput{
-                        height  : 30px;
                         width  : 150px;
                         border-radius : 5px;
 
@@ -146,13 +182,11 @@
                     }
 
                     #error_inputdate{
-                        /*
   background-image: -moz-linear-gradient(top , #F7D794, #BE5605);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#F7D794), to(#BE5605));
   background-image: -webkit-linear-gradient(top,#F7D794, #BE5605 );
   background-image: -o-linear-gradient(top,#F7D794, #BE5605);
   background-image: linear-gradient(to bottom,#F7D794, #BE5605);
-  */
                         width  :200px;
                         border-radius : 3px;
                         position : absolute;
@@ -160,19 +194,17 @@
                         left : 0px;
                         display : none;
                         vertical-align : bottom;
+                        color: black;
                     }
 
                     #date_help{
-                        /*
   background-image: -moz-linear-gradient(top , #F7D794, #BE5605);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#F7D794), to(#BE5605));
   background-image: -webkit-linear-gradient(top,#F7D794, #BE5605 );
   background-image: -o-linear-gradient(top,#F7D794, #BE5605);
   background-image: linear-gradient(to bottom,#F7D794, #BE5605);
-  */
-                        color : black;
                         width  :200px;
-                        height : 35px;
+                        height : 34px;
                         border-radius : 3px;
                         position : absolute;
                         top : -55px;
@@ -180,6 +212,7 @@
                         display : none;
                         padding: 5px;
                         font-size: 10pt;
+                        color: black;
                     }
 
                     button#setdate_go{
@@ -195,6 +228,9 @@
 
 
 
+                    .invisible_comma_search_result {
+                        color: #DAF9FF;
+                    }
 
                     #search_result{
                         position : absolute;
@@ -234,6 +270,9 @@
                         right : 10px;
                         top:10px;
 
+                    }
+                    #wrapper #newevent #event_close:hover {
+                        cursor: pointer;
                     }
 
                     #wrapper #showevents{
@@ -299,22 +338,21 @@
                                 top : -50px;
                                 left : 500px;
                                 z-index : 10000;
-                                /*
   background-image: -moz-linear-gradient(top , #F7D794, #BE5605);
   background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#F7D794), to(#BE5605));
   background-image: -webkit-linear-gradient(top,#F7D794, #BE5605 );
   background-image: -o-linear-gradient(top,#F7D794, #BE5605);
   background-image: linear-gradient(to bottom,#F7D794, #BE5605);
-  */
                                 width : 300px;
-                                height : 45px;
+                                height : 34px;
+                                color: black;
 
                                 border-radius : 5px;
                             }
                             #wrapper #event_help span{
                                margin-top : 10px;
                                margin-left : 10px;
-                               line-height : 45px;
+                               line-height : 34px;
                             }
                             #wrapper #showeventbody{
                                display : none;
@@ -326,6 +364,18 @@
                                width : 80%;
                                background-color: white;
 
+                            }
+
+                            #wrapper .events {
+                                padding: 10px 10px 10px 10px;
+                            }
+
+                            #wrapper .event_num {
+                                color: #BFACE0;
+                                font-size: 12pt;
+                                position: absolute;
+                                left: -4px;
+                                top: 2px;
                             }
 
                     #content .row{
@@ -352,7 +402,7 @@
                     }
                     */
                         #content .row .icons_homedelete{
-                            opacity : 0.3;
+                            opacity : 0.6;
                             height : 70px;
                             width : 45px;
                             position: absolute;
@@ -361,11 +411,16 @@
 
                         #content .row .icons_homedelete:hover{
                             opacity : 1;
+                            zoom: 120%;
                         }
 
                         #content .row .icons_homedelete .icon_delete{
 
                             height : 50%;
+                            position: relative;
+                            left: 6px;
+                            font-size: 14pt;
+                            font-weight: bold;
                         }
 
                         #content .row .icons_homedelete .icon_home{
@@ -376,6 +431,7 @@
 
                         #content .row .icons_homedelete .icon_delete:hover{
                             cursor : pointer;
+
 
                         }
 
@@ -496,7 +552,7 @@
 
                                 #content .row .dates .hourline_ul li {
                                   width : 22px;
-                                  line-height : 30px;
+                                /*  line-height : 30px; */
                                   text-align : center;
                                   vertical-align : bottom;
                                   border : 1px solid #357EC7 ;
@@ -504,6 +560,9 @@
                                   display : inline-block;
                                   color : white;
 
+                                }
+                                #content .row .dates .hourline_ul li span.box_center { 
+                                    line-height: 30px;
                                 }
 
                                 #content .row .dates .hourline_ul li .idxdetails_li{
@@ -523,13 +582,17 @@
 
                                 .small{
                                     font-size : 8pt;
-                                    line-height : 15px;
+                                    line-height : 6px;
                                     vertical-align : top;
                                 }
                                 #content .row .dates .hourline_ul li div.span_hl .small{
                                     font-size : 8pt;
-                                    line-height : 15px;
+                                    line-height : 6px;
                                     vertical-align : top;
+                                }
+
+                                #content .row .dates .hourline_ul li div.span_hl .small-top{
+                                    line-height: 12px;
                                 }
 
                                 #content .row .dates .hourline_ul li div.span_hl .medium{
@@ -609,11 +672,12 @@
             }
 
             #event_name { 
-                height: 36px;
+              /*  height: 25px; */
                 width:310px;
-                border-radius: 25px;
+                border-radius: 6px;
 
             }
+
 
             #meeting_details {
                 display: none;
@@ -685,3 +749,81 @@
                 margin-left: -30px;
             }       
             
+
+            .gplay {
+                margin-left: 83%;
+                margin-top: 150px;
+                margin-bottom: 50px;
+            }
+
+
+
+            div.date_help_animation_box {
+                position: absolute;
+                top: 150px;
+                left: 50px;
+                display: none;
+                width: 350px; height: 100px;
+                z-index: 9999;
+                color: black;
+
+            }
+
+            .whitesmoke_color {
+                color: whitesmoke;
+                font-weight: bold;
+            }
+
+            div.date_help_animation_box div{
+
+                padding: 15px;
+
+
+                width: 91%;
+                height: 70%;
+  background-image: -moz-linear-gradient(top , #F7D794, #BE5605);
+  background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#EB9258), to(#BE5605));
+  background-image: -webkit-linear-gradient(top,#EB9258, #BE5605 );
+  background-image: -o-linear-gradient(top,#F7D794, #BE5605);
+  background-image: linear-gradient(to bottom,#F7D794, #BE5605);
+            }
+
+
+
+            .arrow_box_date_help {
+                position: relative;
+                background: #E4AB8A;
+                border: 4px solid #E4AB8A;
+            }
+            .arrow_box_date_help:after, .arrow_box_date_help:before {
+                bottom: 100%;
+                border: solid transparent;
+                content: " ";
+                height: 0;
+                width: 0;
+                position: absolute;
+                pointer-events: none;
+            }
+
+            .arrow_box_date_help:after {
+              /*  border-color: #E4AB8A; */
+                border-bottom-color: #EB915E;
+                border-width: 30px;
+                left: 50%;
+                margin-left: -30px;
+            }
+            .arrow_box_date_help:before {
+               /* border-color: #E4AB8A;*/
+                border-bottom-color: #E4AB8A;
+                border-width: 36px;
+                left: 50%;
+                margin-left: -36px;
+            }
+
+            .small_font{
+                font-size: 8pt;
+            }
+
+            .margin-left-10 {
+                margin-left: 10px;
+            }
