@@ -10,7 +10,7 @@
             }
 
             #saveevent {
-                margin-left: 10px; margin-top: -15px;
+                margin-top: -15px;
                 
             }
 
@@ -106,10 +106,6 @@
                 font-weight: bold;
            }
 
-           #newevent_msg {
-                width: 85%;
-                height: 135px;
-           }
             #controls{
                 z-index : 99;
                 background-color : white;
@@ -231,8 +227,8 @@
                         height : 34px;
                         border-radius : 3px;
                         position : absolute;
-                        top : -55px;
-                        left : 0px;
+                        top : -60px;
+                        right : 12px;
                         display : none;
                         padding: 5px;
                         font-size: 10pt;
@@ -704,7 +700,6 @@
 
             #event_name { 
               /*  height: 25px; */
-                width:310px;
                 border-radius: 6px;
 
             }
@@ -733,6 +728,7 @@
                 display: none;
                 position: absolute;
                 top: -55px;
+                font-weight: normal;
 
             }
 
@@ -742,6 +738,7 @@
                 background-image: -webkit-linear-gradient(top,#F7D794, #BE5605 );
                 background-image: -o-linear-gradient(top,#F7D794, #BE5605);
                 background-image: linear-gradient(to bottom,#F7D794, #BE5605);
+                color: black;
 
             }
 
@@ -767,7 +764,7 @@
                 border-color: rgba(136, 183, 213, 0);
                 border-top-color: #BE5300;
                 border-width: 24px;
-                left: 50%;
+                left: 55%;
                 margin-left: -125px;
             }
             .arrow_box:before {
