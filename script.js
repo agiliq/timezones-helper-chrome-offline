@@ -257,6 +257,12 @@
     }
   });
 
+  $(".meeting_link input").live({
+    click: function() {
+      return $(this).select();
+    }
+  });
+
   $("#vband").live({
     mouseenter: function(e) {
       return $("#content").sortable('disable');
@@ -291,7 +297,7 @@
       param_string += "time=" + $($('.row')[0]).attr('original_offset') + ";" + t[0];
       param_string = encodeURI(param_string);
       $("#newevent").show();
-      $(".meeting_link").html("<a href='" + domain_name + param_string + "'><strong>Link</strong></a>");
+      $(".meeting_link").html("<span class='add-on'>Link </span><input type='text' value='" + domain_name + param_string + "' class='input-xxlarge' />");
       $("#newevent_time").text("");
       $("#newevent_msg").text("");
       $("#event_name").text("");

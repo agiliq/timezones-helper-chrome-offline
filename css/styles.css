@@ -254,15 +254,16 @@
                 }
                     #wrapper #newevent, .mymodal{
                         position : absolute;
-                        top : 15%;
-                        left : 25%;
+                        top: 15%;
+                        left: 25%;
                         z-index : 99;
                        /* background-color : #E6F2B5;*/
                         background-color: white;
                         min-height : 650px;
-                        width : 650px;
-                        padding : 16px;
+                        width: 650px;
+                        padding: 16px;
                         border-radius : 10px;
+                        padding-top: 36px;
 
                     }
                     #wrapper #newevent #event_close{
@@ -273,6 +274,12 @@
                     }
                     #wrapper #newevent #event_close:hover {
                         cursor: pointer;
+                    }
+
+                    .meeting_link input {
+                        border-bottom-right-radius: 20px;
+                        border-top-right-radius: 20px;
+
                     }
 
                     #wrapper #showevents{

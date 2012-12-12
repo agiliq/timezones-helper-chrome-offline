@@ -223,6 +223,10 @@ $("#selectedband").live
     $("#content").sortable('enable')
 
 
+$(".meeting_link input").live
+  click: () ->
+    $(this).select()
+
 $("#vband").live
   mouseenter: (e) ->
     $("#content").sortable('disable')
@@ -260,7 +264,7 @@ $("#vband").live
     param_string = encodeURI param_string
 
     $("#newevent").show()
-    $(".meeting_link").html "<a href='"+domain_name+param_string+"'><strong>Link</strong></a>"
+    $(".meeting_link").html "<span class='add-on'>Link </span><input type='text' value='"+domain_name+param_string+"' class='input-xxlarge' />"
     $("#newevent_time").text ""
     $("#newevent_msg").text ""
     $("#event_name").text ""
