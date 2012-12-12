@@ -254,6 +254,8 @@ $("#wrapper button#saveevent").live
     oldobj[len].yeardetails = yeardetails
     localStorage.events = JSON.stringify oldobj
     $("#event_close").trigger 'click'
+    $("#wrapper #showevents #showeventbody").hide()
+    $(".eventheader").trigger "click"
 
 
 $("#event_close").live
@@ -454,6 +456,8 @@ $("#wrapper #showevents .eventheader").live
     oldobj = JSON.parse localStorage.events
     #console.log oldobj
     data = ""
+    objlen = Object.keys(oldobj).length
+    hr_i = 1
     for key of oldobj
       #console.log oldobj[key]
       city = new Array()
@@ -468,12 +472,15 @@ $("#wrapper #showevents .eventheader").live
       for i of city
         tabl+="<tr><td>"+city[i]+"</td><td>"+country[i]+"</td><td>"+yeardetails[i]+" "+t[i]+"</td></tr>"
       tabl+="</tbody></table>"
-      data+= "<h4><span class='event_num'># "+(parseInt(key)+1)+"</span> "+oldobj[key].name+"<span class='deleteEvent' key='"+key+"'>X&nbsp;</span></h4>"+tabl+"<h4>Description  </h4><p style='padding-left:15px;padding-right:15px;'> "+oldobj[key].desc+"</p><br><hr class='showevents_hr' />"
+      data+= "<div class='each_event_header'><span class='event_name_desc'><span class='event_num'># "+(parseInt(key)+1)+"</span><span class='event_name'> "+oldobj[key].name+"</span> - <span class='event_desc'>"+oldobj[key].desc+"</span></span><span class='deleteEvent' key='"+key+"'>X&nbsp;</span></div>"+tabl+"<br>"
+      if hr_i != objlen
+        data += "<hr>"
+      hr_i++
 
 
     if data is ""
       data="<h3>No events available, you can add events by clicking on any box showing time.</h3>"
-    data = "<div class='each_event'>"+data+"</div>"
+    data = "<div class='events'>"+data+"</div>"
     $("#wrapper #showevents #showeventbody").html data
     #$("#wrapper #showevents #showeventbody").css "display","block"
     $("#wrapper #showevents #showeventbody").slideDown()
@@ -496,16 +503,16 @@ $(".deleteEvent").live
     #console.log rowindex
 
     oldobj = JSON.parse localStorage.events
-    len = 0
-    for key of oldobj
-      len++
+    len = Object.keys(oldobj).length
 
-    unless rowindex is len-1
+    if i != len-1
       i=rowindex+1
       while i<len
         oldobj[i-1] = oldobj[i]
         i++
-    delete oldobj[rowindex]
+      delete oldobj[len-1]
+    else
+      delete oldobj[rowindex]
     localStorage.events = JSON.stringify oldobj
     $("#wrapper #showevents #showeventbody").css "display","none"
     $("#wrapper #showevents .eventheader").trigger "click"

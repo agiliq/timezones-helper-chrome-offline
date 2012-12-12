@@ -55,11 +55,31 @@
                float : right;
                text-shadow: 0 1px 0 white;
                opacity: 0.3;
+               position: absolute;
+               right: 10px;
+               top: -3px;
 
            }
            #wrapper .deleteEvent:hover {
-                opacity: 0.6;
+                opacity: 1;
                 cursor: pointer;
+                font-size: 18pt;
+                font-weight: bold;
+           }
+
+           #wrapper .event_name_desc {
+               display: inline-block;
+               margin-left: 30px;
+               margin-right: 50px;
+
+           }
+
+           #wrapper .each_event_header {
+                position: relative;
+           }
+           #wrapper .each_event_header .event_name {
+                font-size:14pt;
+                font-weight: bold;
            }
 
            #newevent_msg {
@@ -174,6 +194,7 @@
                         left : 0px;
                         display : none;
                         vertical-align : bottom;
+                        color: black;
                     }
 
                     #date_help{
@@ -182,9 +203,8 @@
   background-image: -webkit-linear-gradient(top,#F7D794, #BE5605 );
   background-image: -o-linear-gradient(top,#F7D794, #BE5605);
   background-image: linear-gradient(to bottom,#F7D794, #BE5605);
-                        color : black;
                         width  :200px;
-                        height : 35px;
+                        height : 34px;
                         border-radius : 3px;
                         position : absolute;
                         top : -55px;
@@ -192,6 +212,7 @@
                         display : none;
                         padding: 5px;
                         font-size: 10pt;
+                        color: black;
                     }
 
                     button#setdate_go{
@@ -323,14 +344,15 @@
   background-image: -o-linear-gradient(top,#F7D794, #BE5605);
   background-image: linear-gradient(to bottom,#F7D794, #BE5605);
                                 width : 300px;
-                                height : 45px;
+                                height : 34px;
+                                color: black;
 
                                 border-radius : 5px;
                             }
                             #wrapper #event_help span{
                                margin-top : 10px;
                                margin-left : 10px;
-                               line-height : 45px;
+                               line-height : 34px;
                             }
                             #wrapper #showeventbody{
                                display : none;
@@ -344,13 +366,16 @@
 
                             }
 
-                            #wrapper .each_event {
+                            #wrapper .events {
                                 padding: 10px 10px 10px 10px;
                             }
 
                             #wrapper .event_num {
                                 color: #BFACE0;
                                 font-size: 12pt;
+                                position: absolute;
+                                left: -4px;
+                                top: 2px;
                             }
 
                     #content .row{
@@ -668,12 +693,17 @@
                 display: none;
                 width: 350px; height: 100px;
                 z-index: 9999;
+                color: black;
 
             }
 
-            div.date_help_animation_box div{
+            .whitesmoke_color {
                 color: whitesmoke;
                 font-weight: bold;
+            }
+
+            div.date_help_animation_box div{
+
                 padding: 15px;
 
 
