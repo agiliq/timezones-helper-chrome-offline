@@ -32,7 +32,6 @@ $(document).ready ->
   $.ajax
     url : "tz/tz.csv"
     success : (tz) ->
-      window.ttt = tz
       tzdata = tz
       tzdatalower = tz.toLowerCase()
       cities_data_arr = []
@@ -40,7 +39,6 @@ $(document).ready ->
 
       full_data_arr = tzdatalower.split "\n"
       full_data_original_arr = tzdata.split "\n"
-      console.log full_data_arr
       full_data_arr.forEach (each_line) ->
         each_line_arr = each_line.split ";"
         cities_data_arr.push each_line_arr[0]
@@ -49,13 +47,6 @@ $(document).ready ->
       countries_data_arr.pop()
       full_data_original_arr.pop()
       full_data_arr.pop()
-      window.ci = cities_data_arr
-      window.countries_data_arr = countries_data_arr
-      window.fo = full_data_original_arr
-
-      console.log cities_data_arr
-      console.log countries_data_arr
-
 
       #console.log "tzdata loaded successfully"
       renderRows()
@@ -111,7 +102,6 @@ $("#search_input").live
     $("#search_result").html ""
     updateUtc()
     locations = getCities(st)
-    console.log locations
     $("#search_result").html locations
     if $("#search_result").css("display") == "none"
       $("#search_result").slideDown()
@@ -167,8 +157,6 @@ $("#vband").live
     $("#content").sortable('enable')
 
   click : (e) ->
-    #console.log e
-
     $(".canhide").css "opacity","0.1"
 
     idx = $(e.target).attr "idx"
@@ -318,7 +306,6 @@ $("#dateinput").live
 
 $("#setdate_go").live
   click : (e) ->
-    #console.log "clicked"
     errormsg = "mm-dd-yyyy format only"
 
     datestr = $("#dateinput").val().trim()
@@ -380,7 +367,6 @@ $(".date_help_animation_box").live
   click: ->
     that = @
     if $(@).find("input[type='checkbox']").attr("checked")
-      console.log $(@).find("input[type='checkbox']").attr("checked")
       localStorage.display_date_animation = "false"
     else
       localStorage.display_date_animation = "true"
