@@ -151,8 +151,8 @@
       idx = $(e.target).attr("idx");
       if (typeof idx !== "undefined") {
         $("#vband").attr("idx", idx);
-        $("#vband").css("height", parseInt($("#content .row").length) * 72 - 41);
-        left = parseInt(idx) * 28 + 320;
+        $("#vband").css("height", ($("#content .row").length) * 72 - 41);
+        left = Number(idx) * 28 + 320;
         return $("#vband").css("left", left);
       }
     }
@@ -161,7 +161,7 @@
   $("#content").live({
     mouseleave: function(e) {
       var left;
-      left = parseInt($("#selectedband").css("left"));
+      left = Number($("#selectedband").css("left"));
       return $("#vband").css("left", left - 2);
     }
   });
@@ -291,7 +291,7 @@
   $("#content .row .icons_homedelete .icon_delete").live({
     click: function(e) {
       var defaultidx, i, key, len, newobj, oldobj, rowindex, val;
-      rowindex = parseInt($(e.target).parent().parent().attr("rowindex"));
+      rowindex = Number($(e.target).parent().parent().attr("rowindex"));
       oldobj = JSON.parse(localStorage.addedLocations);
       len = 0;
       for (key in oldobj) {
@@ -320,7 +320,7 @@
   $("#content .row .icons_homedelete .icon_home").live({
     click: function(e) {
       var rowindex;
-      rowindex = parseInt($(e.target).parent().parent().attr("rowindex"));
+      rowindex = Number($(e.target).parent().parent().attr("rowindex"));
       localStorage["default"] = rowindex;
       return renderRows();
     }
@@ -491,7 +491,7 @@
           tabl += "<tr><td>" + city[i] + "</td><td>" + country[i] + "</td><td>" + yeardetails[i] + " " + t[i] + "</td></tr>";
         }
         tabl += "</tbody></table>";
-        data += "<div class='each_event_header'><span class='event_name_desc'><span class='event_num'># " + (parseInt(key) + 1) + "</span><span class='event_name'> " + oldobj[key].name + "</span> - <span class='event_desc'>" + oldobj[key].desc + "</span></span><span class='deleteEvent' key='" + key + "'>X&nbsp;</span></div>" + tabl + "<br>";
+        data += "<div class='each_event_header'><span class='event_name_desc'><span class='event_num'># " + (parseInt(key, 10) + 1) + "</span><span class='event_name'> " + oldobj[key].name + "</span> - <span class='event_desc'>" + oldobj[key].desc + "</span></span><span class='deleteEvent' key='" + key + "'>X&nbsp;</span></div>" + tabl + "<br>";
         if (hr_i !== objlen) data += "<hr>";
         hr_i++;
       }
@@ -516,7 +516,7 @@
       var i, len, oldobj, r, rowindex;
       r = confirm("Do you really want to delete this event ? ");
       if (r !== true) return;
-      rowindex = parseInt($(e.target).attr("key"));
+      rowindex = parseInt($(e.target).attr("key"), 10);
       oldobj = JSON.parse(localStorage.events);
       len = Object.keys(oldobj).length;
       if (i !== len - 1) {
@@ -727,8 +727,8 @@
         } else {
           cl = "li_n";
         }
-        tval = convertOffsetToFloat(parseInt(i) + ":" + tempstr);
-        hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='" + tval + "'  details='" + datedetailstr + "'><div class='span_hl' idx='" + idx + "'><span class='medium' idx='" + idx + "'>" + parseInt(i) + "</span><br><span class='small' idx='" + idx + "'>" + tempstr + "</span></div></li>";
+        tval = convertOffsetToFloat(parseInt(i, 10) + ":" + tempstr);
+        hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='" + tval + "'  details='" + datedetailstr + "'><div class='span_hl' idx='" + idx + "'><span class='medium' idx='" + idx + "'>" + parseInt(i, 10) + "</span><br><span class='small' idx='" + idx + "'>" + tempstr + "</span></div></li>";
         if (tempstr === " ") {
           hourline = hourline.replace("<span class='medium' idx='" + idx + "'>", "<span idx='" + idx + "' class='box_center' >");
         }
@@ -748,7 +748,7 @@
         i = 1;
         idx++;
       }
-      while (i < parseInt(hourstart)) {
+      while (i < parseInt(hourstart, 10)) {
         if (i < 6) {
           cl = "li_n";
         } else if (i > 5 && i < 8) {
@@ -760,13 +760,13 @@
         } else {
           cl = "li_n";
         }
-        tval = convertOffsetToFloat(parseInt(i) + ":" + tempstr);
+        tval = convertOffsetToFloat(parseInt(i, 10) + ":" + tempstr);
         if (diffoffset >= 0) {
           datedetailstr = nextDayStr;
         } else {
           datedetailstr = presdatestr;
         }
-        hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='" + tval + "' details='" + datedetailstr + "' ><div class='span_hl' idx='" + idx + "'><span class='medium' idx='" + idx + "'>" + parseInt(i) + "</span><br><span class='small' idx='" + idx + "'>" + tempstr + "</span></div></li>";
+        hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='" + tval + "' details='" + datedetailstr + "' ><div class='span_hl' idx='" + idx + "'><span class='medium' idx='" + idx + "'>" + parseInt(i, 10) + "</span><br><span class='small' idx='" + idx + "'>" + tempstr + "</span></div></li>";
         if (tempstr === " ") {
           hourline = hourline.replace("<span class='medium' idx='" + idx + "'>", "<span idx='" + idx + "' class='box_center' >");
         }
@@ -782,18 +782,18 @@
     $("#content").prepend("<div id='vband'></div><div id='selectedband'></div>");
     icons_homedelete = "<div class='icons_homedelete'><div class='icon_delete'>x</div><div class='icon_home'  ></div></div>";
     $("#content .row").append(icons_homedelete);
-    defaultind = parseInt(localStorage["default"]);
+    defaultind = parseInt(localStorage["default"], 10);
     $("#content #row_" + defaultind + " .icons_homedelete").html("");
     $("#content #row_" + defaultind + " .tzdetails .offset").html("<div class='homeicon'></div>");
     $(".row .dates li").first().css("position", "relative");
-    height = parseInt($("#content .row").length) * 72 - 41;
+    height = $("#content .row").length * 72 - 41;
     left = $("#content #row_" + defaultind).attr("time");
     left = left.substr(0, left.indexOf(":"));
-    left = parseInt(left);
+    left = Number(left);
     left = left * 28 + 322;
     $("#selectedband").css("height", height);
     $("#selectedband").css("left", left);
-    left = parseInt($("#selectedband").css("left"));
+    left = parseInt($("#selectedband").css("left"), 10);
     $("#vband").css("left", left - 2);
     $("#vband").css("height", $("#selectedband").css("height"));
     return $("#content").sortable({
@@ -826,7 +826,7 @@
     }
     if (str.indexOf(".") > -1) {
       first = str.substr(0, str.indexOf("."));
-      second = parseInt(str.substr(str.indexOf(".") + 1)) * 6 + "";
+      second = parseInt(str.substr(str.indexOf(".") + 1), 10) * 6 + "";
       if (first.length === 1) first = "0" + first;
       if (second.length === 1) second = "0" + second;
     } else {

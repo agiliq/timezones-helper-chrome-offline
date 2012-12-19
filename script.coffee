@@ -132,14 +132,14 @@ $("#content .row .dates ul li").live
     idx = $(e.target).attr("idx")
     if typeof(idx) != "undefined"
       $("#vband").attr "idx",idx
-      $("#vband").css "height",parseInt($("#content .row").length)*72-41
-      left = parseInt(idx)*28 + 320
+      $("#vband").css "height",($("#content .row").length)*72-41
+      left = Number(idx)*28 + 320
       $("#vband").css "left",left
 
 #$("#content .row .dates").live
 $("#content").live
   mouseleave : (e) ->
-    left = parseInt($("#selectedband").css("left"))
+    left = Number($("#selectedband").css("left"))
     $("#vband").css "left",(left-2)
 
 
@@ -262,7 +262,7 @@ $("body").live
 
 $("#content .row .icons_homedelete .icon_delete").live
   click : (e) ->
-    rowindex = parseInt($(e.target).parent().parent().attr("rowindex"))
+    rowindex = Number($(e.target).parent().parent().attr("rowindex"))
     oldobj = JSON.parse localStorage.addedLocations
 
     len = 0
@@ -288,7 +288,7 @@ $("#content .row .icons_homedelete .icon_delete").live
 
 $("#content .row .icons_homedelete .icon_home").live
   click : (e) ->
-    rowindex = parseInt($(e.target).parent().parent().attr("rowindex"))
+    rowindex = Number($(e.target).parent().parent().attr("rowindex"))
     localStorage.default = rowindex
     renderRows()
 
@@ -458,7 +458,7 @@ $("#wrapper #showevents .eventheader").live
       for i of city
         tabl+="<tr><td>"+city[i]+"</td><td>"+country[i]+"</td><td>"+yeardetails[i]+" "+t[i]+"</td></tr>"
       tabl+="</tbody></table>"
-      data+= "<div class='each_event_header'><span class='event_name_desc'><span class='event_num'># "+(parseInt(key)+1)+"</span><span class='event_name'> "+oldobj[key].name+"</span> - <span class='event_desc'>"+oldobj[key].desc+"</span></span><span class='deleteEvent' key='"+key+"'>X&nbsp;</span></div>"+tabl+"<br>"
+      data+= "<div class='each_event_header'><span class='event_name_desc'><span class='event_num'># "+(parseInt(key, 10)+1)+"</span><span class='event_name'> "+oldobj[key].name+"</span> - <span class='event_desc'>"+oldobj[key].desc+"</span></span><span class='deleteEvent' key='"+key+"'>X&nbsp;</span></div>"+tabl+"<br>"
       if hr_i != objlen
         data += "<hr>"
       hr_i++
@@ -484,7 +484,7 @@ $(".deleteEvent").live
     r = confirm "Do you really want to delete this event ? "
     unless r is true
       return
-    rowindex = parseInt($(e.target).attr("key"))
+    rowindex = parseInt($(e.target).attr("key"), 10)
 
     #console.log rowindex
 
@@ -740,11 +740,11 @@ renderRows = ->
         cl = "li_n"
 
 
-      tval = convertOffsetToFloat(parseInt(i)+":"+tempstr)
+      tval = convertOffsetToFloat(parseInt(i, 10)+":"+tempstr)
       #console.log "tval : "+tval+" ------- "+tempstr
 
 
-      hourline+=" <li class='"+cl+"' id='lihr_"+idx+"' idx='"+idx+"' t='"+tval+"'  details='"+datedetailstr+"'><div class='span_hl' idx='"+idx+"'><span class='medium' idx='"+idx+"'>"+parseInt(i)+"</span><br><span class='small' idx='"+idx+"'>"+tempstr+"</span></div></li>"
+      hourline+=" <li class='"+cl+"' id='lihr_"+idx+"' idx='"+idx+"' t='"+tval+"'  details='"+datedetailstr+"'><div class='span_hl' idx='"+idx+"'><span class='medium' idx='"+idx+"'>"+parseInt(i, 10)+"</span><br><span class='small' idx='"+idx+"'>"+tempstr+"</span></div></li>"
 
       if tempstr is " "
         hourline = hourline.replace "<span class='medium' idx='"+idx+"'>","<span idx='"+idx+"' class='box_center' >"
@@ -771,7 +771,7 @@ renderRows = ->
     # third, loop upto hourstart-1
 
     #console.log "Before while : "+i
-    while i<parseInt(hourstart)
+    while i<parseInt(hourstart, 10)
       if i<6
         cl="li_n"
       else if i>5 and i<8
@@ -785,7 +785,7 @@ renderRows = ->
 
 
       #console.log i
-      tval = convertOffsetToFloat(parseInt(i)+":"+tempstr)
+      tval = convertOffsetToFloat(parseInt(i, 10)+":"+tempstr)
       #console.log "tval : "+tval+" ------- "+tempstr
 
       if diffoffset >=0
@@ -793,7 +793,7 @@ renderRows = ->
       else
         datedetailstr =  presdatestr
 
-      hourline+=" <li class='"+cl+"' id='lihr_"+idx+"' idx='"+idx+"' t='"+tval+"' details='"+datedetailstr+"' ><div class='span_hl' idx='"+idx+"'><span class='medium' idx='"+idx+"'>"+parseInt(i)+"</span><br><span class='small' idx='"+idx+"'>"+tempstr+"</span></div></li>"
+      hourline+=" <li class='"+cl+"' id='lihr_"+idx+"' idx='"+idx+"' t='"+tval+"' details='"+datedetailstr+"' ><div class='span_hl' idx='"+idx+"'><span class='medium' idx='"+idx+"'>"+parseInt(i, 10)+"</span><br><span class='small' idx='"+idx+"'>"+tempstr+"</span></div></li>"
       if tempstr is " "
         hourline = hourline.replace "<span class='medium' idx='"+idx+"'>","<span idx='"+idx+"' class='box_center' >"
       i++
@@ -817,23 +817,24 @@ renderRows = ->
   $("#content .row").append icons_homedelete
 
   #modifying style of default location row
-  defaultind = parseInt localStorage.default
+  defaultind = parseInt localStorage.default, 10
 
   $("#content #row_"+defaultind+" .icons_homedelete").html ""
 
   $("#content #row_"+defaultind+" .tzdetails .offset").html "<div class='homeicon'></div>"
 
   $(".row .dates li").first().css "position","relative"
-  height = parseInt($("#content .row").length)*72-41
+  height =$("#content .row").length*72-41
   left   = $("#content #row_"+defaultind).attr("time")
   left = left.substr 0,left.indexOf(":")
-  left = parseInt left
+  left = Number left
+
   #console.log "left : "+left
   left = left*28 + 322
   #console.log left+" : "+height
   $("#selectedband").css "height",height
   $("#selectedband").css "left",left
-  left = parseInt($("#selectedband").css("left"))
+  left = parseInt($("#selectedband").css("left"), 10)
   $("#vband").css "left",(left-2)
   $("#vband").css "height",$("#selectedband").css("height")
   $("#content").sortable({'containment':'parent', 'items':'.row'})
@@ -860,7 +861,7 @@ convertOffset = (ad_offset) ->
   if str.indexOf(".") > -1
 
     first = str.substr(0,str.indexOf("."))
-    second = parseInt(str.substr(str.indexOf(".")+1))*6+""
+    second = parseInt(str.substr(str.indexOf(".")+1), 10)*6+""
     if first.length is 1
       first = "0"+first
     if second.length is 1
