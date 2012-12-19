@@ -319,9 +319,18 @@
 
   $("#content .row .icons_homedelete .icon_home").live({
     click: function(e) {
-      var rowindex;
+      var i, oldobj, rowindex, temp;
       rowindex = Number($(e.target).parent().parent().attr("rowindex"));
-      localStorage["default"] = rowindex;
+      oldobj = JSON.parse(localStorage.addedLocations);
+      i = rowindex;
+      temp = oldobj[rowindex];
+      while (i > 0) {
+        oldobj[i] = oldobj[i - 1];
+        i--;
+      }
+      oldobj[0] = temp;
+      localStorage.addedLocations = JSON.stringify(oldobj);
+      localStorage["default"] = 0;
       return renderRows();
     }
   });
