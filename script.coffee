@@ -56,7 +56,6 @@ $(document).ready ->
 
 
 generate_meeting_link = ->
-    #console.log "Genrat meeting lik starte"
     search = decodeURI window.location.search
     search = search.substr 1, search.length
     params_arr = search.split("&")
@@ -66,7 +65,6 @@ generate_meeting_link = ->
       temp = key.split("=")
       param_obj[temp[0]] = temp[1]
     oldobj = JSON.parse localStorage.addedLocations
-    #console.log JSON.stringify oldobj
     keys = Object.keys
     old_keys = keys(oldobj)
     param_keys = keys(param_obj)
@@ -171,7 +169,6 @@ $("#search_input").live
     st = $(e.target).val().trim().toLowerCase()
     st.toLowerCase()
     if st.length < 1
-      #$("#search_result").hide(200)
       $("#search_result").slideUp()
       return
     locations = "<br><ul class='searchresult_ul'>"
@@ -184,7 +181,6 @@ $("#search_input").live
       $("#search_result").slideDown()
 
   focusout : ->
-    #$("#search_result").hide(1000)
     setTimeout (->
       $("#search_result").slideUp()
     ), 300
@@ -302,15 +298,12 @@ $("#newevent_table input[type='checkbox']").live
     for ele in $("#newevent_table tr")
       if $($(ele).find("input[type='checkbox']")).attr("checked")
         available_timezones.push j-1
-        #console.log "push"
       j++
-    #console.log available_timezones
 
     param_idx = 0
     for ele in $(".row")
       tText = convertOffset $("#"+ele.id+" #lihr_"+idx).attr("t")
       t.push tText.substr(1)
-      #console.log t[0]
       city = $("#"+ele.id+" .city").text()
       country = $("#"+ele.id+" .country").text()
       yeardetails = $("#"+ele.id+" #lihr_"+idx).attr("details")
@@ -324,7 +317,6 @@ $("#newevent_table input[type='checkbox']").live
       param_string = ""
     else
       param_string += "time="+$($('.row')[0]).attr('original_offset')+";"+t[0]
-      #console.log param_string
       param_string = encodeURI param_string
 
     $(".meeting_link").html "<span class='add-on'>Link </span><input type='text' value='"+domain_name+param_string+"' class='input-xxlarge' />"
@@ -493,12 +485,10 @@ $("#setdate_go").live
 
     for key in datestr
       lenofdash++ if key is "-"
-    #console.log lenofdash
     unless lenofdash is 2
       $("#error_inputdate").html errormsg
       $("#error_inputdate").show()
       return
-    #console.log (datestr.substr(0,2))
     mm = Number datestr.substr(0,2)
     dd = Number datestr.substr(3,2)
 
@@ -508,10 +498,7 @@ $("#setdate_go").live
       $("#error_inputdate").show()
       return
 
-    #console.log "---"
     year = Number datestr.substr(6,4)
-    #console.log mm+" : "+dd+" : "+year
-    #console.log (mm >12 or mm<1 or dd<0 or dd>31)
     if (mm >12 or mm<1 or dd<0 or dd>31)
       $("#error_inputdate").html errormsg
       $("#error_inputdate").show()
@@ -601,9 +588,7 @@ $("#content").live
 $("#wrapper #showevents .eventheader").live
 
   click : (e) ->
-    #console.log "cloic"
     prev = $("#wrapper #showevents #showeventbody").css "display"
-    #console.log prev
     unless prev is "none"
       $("#wrapper #showevents #showeventbody").slideUp()
       return
@@ -615,12 +600,10 @@ $("#wrapper #showevents .eventheader").live
 
       return
     oldobj = JSON.parse localStorage.events
-    #console.log oldobj
     data = ""
     objlen = Object.keys(oldobj).length
     hr_i = 1
     for key of oldobj
-      #console.log oldobj[key]
       city = new Array()
       country = new Array()
       yeardetails = new Array()
@@ -661,7 +644,6 @@ $(".deleteEvent").live
       return
     rowindex = parseInt($(e.target).attr("key"), 10)
 
-    #console.log rowindex
 
     oldobj = JSON.parse localStorage.events
     len = Object.keys(oldobj).length
@@ -695,9 +677,6 @@ sr_click = (e, k) ->
   clicked_tz = full_data_original_arr[clicked_ind].split(";")[4]
   both = $("#lisr_"+k+" span.litz").text()
   botharr = both.split ","
-  #console.log both
-  #botharr[0] country
-  #botharr[1] city
   oldobj = JSON.parse localStorage.addedLocations
   len = 0
   key_arr = []
@@ -710,20 +689,9 @@ sr_click = (e, k) ->
       return
 
   newobj = {}
-  #i = 0
-  #for key, val of oldobj
-  #  newobj[i] = val
-  #  i += 1
-  #console.log JSON.stringify newobj
-  #newobj[i] = {}
-  #newobj[i].country = botharr[0]
-  #newobj[i].city = botharr[1]
-  #newobj[i].offset = offset
-  #localStorage.addedLocations = JSON.stringify newobj
   oldobj[len] = {}
   oldobj[len].country = botharr[0]
   oldobj[len].city = botharr[1]
-  #oldobj[len].offset = offset
   oldobj[len].timezone = clicked_tz
   localStorage.addedLocations = JSON.stringify oldobj
   renderRows()
@@ -740,11 +708,9 @@ getRequiredOffset = (original) ->
       second = (second+"").substr(1)
       finaloff = parseFloat(first+second)
 
-      #console.log "final : "+finaloff
     else
       finaloff = 0
     timestr = getNewTime(finaloff)
-    #console.log timestr.toLocaleString()
     timearr = timestr.split(" ")
     timearr[4] = (timearr[4]).substr(0,5)
     return [timestr, timearr[4], finaloff]
@@ -759,8 +725,6 @@ getCities = (term) ->
       break
     if val.indexOf(term) > -1
       temp_arr = full_data_original_arr[key].split(";")
-      #required_offset = getRequiredOffset temp_arr[3]
-      #console.log required_offset
       try
         cur_time = new timezoneJS.Date(temp_arr[4])
       catch err
@@ -955,13 +919,6 @@ renderRows = (callback) ->
 
 
       tval = convertOffsetToFloat(parseInt(i, 10)+":"+tempstr)
-      #console.log "tval : "+tval+" ------- "+tempstr
-
-
-      #next_day = new Date(timestr)
-      #
-      #next_day.setDate(next_day.getDate()+1)
-      #next_day_arr = next_day.toLocaleString().split(" ")
 
       next_day = new Date(default_time_obj._dateProxy)
       next_day.setDate(next_day.getDate()+1)
@@ -975,8 +932,6 @@ renderRows = (callback) ->
         req_mon = next_day_arr[1]
         req_date = next_day_arr[2]
       else
-        #req_mon = timearr[1]
-        #req_date = timearr[2]
         req_mon = today_arr[1]
         req_date = today_arr[2]
 
@@ -1006,7 +961,6 @@ renderRows = (callback) ->
 
     # third, loop upto hourstart-1
 
-    #console.log "Before while : "+i
     while i<parseInt(hourstart, 10)
       if i<6
         cl="li_n"
@@ -1020,9 +974,7 @@ renderRows = (callback) ->
         cl = "li_n"
 
 
-      #console.log i
       tval = convertOffsetToFloat(parseInt(i, 10)+":"+tempstr)
-      #console.log "tval : "+tval+" ------- "+tempstr
 
       if diffoffset >=0
         datedetailstr = nextDayStr
@@ -1065,9 +1017,7 @@ renderRows = (callback) ->
   left = left.substr 0,left.indexOf(":")
   left = Number left
 
-  #console.log "left : "+left
   left = left*28 + 322
-  #console.log left+" : "+height
   $("#selectedband").css "height",height
   $("#selectedband").css "left",left
   left = parseInt($("#selectedband").css("left"), 10)
@@ -1076,17 +1026,13 @@ renderRows = (callback) ->
   $("#content").sortable({'containment':'parent', 'items':'.row'})
 
   if typeof(callback) == "function"
-    #console.log "calling"
     callback()
   else
     #console.log callback
-    #console.log "not calling"
   if callback == "a"
-    #console.log "yes a"
     generate_meeting_link()
   else
     #console.log "not a"
-    #console.log callback
 
 
 convertOffsetToFloat = (str) ->
@@ -1151,7 +1097,6 @@ setSelectedDate = (options) ->
   if options
     selecteddate = options
     selecteddate.mText = getMonth selecteddate.m,{"type":"str"}
-    #dnew = new Date(selecteddate.m+"-"+selecteddate.d+"-"+selecteddate.year)
     dnew = new Date()
     dnew.setMonth(selecteddate.m)
     dnew.setDate(selecteddate.d)
@@ -1171,7 +1116,6 @@ setSelectedDate = (options) ->
     selecteddate.d = d.getDate()
     selecteddate.year = d.getYear()+1900
     selecteddate.mText = getMonth selecteddate.m,{"type":"str"}
-    #dnew = new Date((parseInt(selecteddate.m+1))+"-"+selecteddate.d+"-"+selecteddate.year)
     dnew = new Date()
     dnew.setMonth(selecteddate.m)
     dnew.setDate(selecteddate.d)
@@ -1217,7 +1161,6 @@ $(".link_export_google_cal").live
     #floatoffset =$( $("#newevent_table tr")[1]).attr "floatoffset"
     gmt_str = $($(gmt_str).find('.yeardetails')).text().trim()+" "+$($(gmt_str).find('.selected_time')).text().trim()
     d = new Date(gmt_str)
-    #d.setHours(d.getHours()+Number(floatoffset))
     d = new timezoneJS.Date(d.getFullYear(), d.getMonth()+1, d.getDate(), d.getHours(), d.getMinutes(), timezone)
     d.setDate(d.getUTCDate())
 
