@@ -58,11 +58,13 @@
         full_data_arr.pop();
         renderRows();
         d = new Date();
-        rem = 62 - d.getSeconds();
-        renderRows();
-        setInterval((function() {
-          return renderRows();
-        }), 60000);
+        rem = 60 - d.getSeconds();
+        setTimeout((function() {
+          renderRows();
+          return setInterval((function() {
+            return renderRows();
+          }), 60000);
+        }), rem * 1000);
         if (window.location.search !== "") {
           return renderRows(generate_meeting_link);
         }

@@ -44,11 +44,14 @@ $(document).ready ->
 
       renderRows()
       d = new Date()
-      rem = 62-d.getSeconds()
-      renderRows()
-      setInterval (->
+      rem = 60-d.getSeconds()
+
+      setTimeout (->
         renderRows()
-      ), 60000
+        setInterval (->
+          renderRows()
+        ), 60000
+      ), rem*1000
       if window.location.search != ""
         renderRows(generate_meeting_link)
     error : (e) ->
