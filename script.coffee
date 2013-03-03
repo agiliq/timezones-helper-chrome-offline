@@ -15,22 +15,14 @@ full_data_original_arr = []
 #first set selecteddate to current date, later user can change
 
 $(document).ready ->
-  updateUtc()
-  d = new Date()
-  dstr=d.toLocaleString()
-  datearr = dstr.split(" ")
-  localtime = d.getTime()
-  localoffset = d.getTimezoneOffset()*60000
-  utc = localtime + localoffset
-  bombayoff = 5.5
-  bt = utc + (3600000*bombayoff)
-  nd = new Date(bt)
-  ndstr = nd.toLocaleString()
-  ndarr = ndstr.split(" ")
+
+  timezoneJS.timezone.zoneFileBasePath = '/olson'
+  timezoneJS.timezone.init()
   setSelectedDate()
+  
 
   $.ajax
-    url : "tz/tz.csv"
+    url : "tzdata.csv"
     success : (tz) ->
       tzdata = tz
       tzdatalower = tz.toLowerCase()
@@ -50,6 +42,12 @@ $(document).ready ->
 
       #console.log "tzdata loaded successfully"
       renderRows()
+      d = new Date()
+      rem = 62-d.getSeconds()
+      renderRows()
+      setInterval (->
+        renderRows()
+      ), 60000
     error : (e) ->
       #console.log "Error loading tz data"
 
@@ -167,6 +165,7 @@ $("#vband").live
     country = new Array()
     yeardetails = new Array()
     original_offset = new Array()
+    timezones = new Array()
     for ele in $(".row")
       tText = convertOffset $("#"+ele.id+" #lihr_"+idx).attr("t")
       t.push tText.substr(1)
@@ -174,6 +173,7 @@ $("#vband").live
       country.push $("#"+ele.id+" .country").text()
       yeardetails.push $("#"+ele.id+" #lihr_"+idx).attr("details")
       original_offset.push $(ele).attr "floatoffset"
+      timezones.push $(ele).attr "timezone"
 
 
     $("#newevent").show()
@@ -184,7 +184,7 @@ $("#vband").live
 
     for ind of t
 
-      tabl+="<tr floatoffset='"+original_offset[ind]+"'><td><input type='checkbox' checked /></td><td>"+city[ind]+"</td><td>"+country[ind]+"</td><td><span class='yeardetails'>"+yeardetails[ind]+"</span><span class='selected_time'>, "+t[ind]+"</td></tr>"
+      tabl+="<tr floatoffset='"+original_offset[ind]+"' timezone='"+timezones[ind]+"'><td><input type='checkbox' checked /></td><td>"+city[ind]+"</td><td>"+country[ind]+"</td><td><span class='yeardetails'>"+yeardetails[ind]+"</span><span class='selected_time'>, "+t[ind]+"</td></tr>"
     tabl+="</table>"
 
     $("#newevent_time").html tabl
@@ -370,6 +370,7 @@ $("#setdate_go").live
     options.d = dd
     options.year = year
     setSelectedDate options
+    renderRows()
 
 
 $(".date_help_animation_box").live
@@ -517,10 +518,19 @@ $(".deleteEvent").live
 sr_click = (e, k) ->
   if typeof(k) == "undefined"
     k = $(e.target).attr "k"
-  offset = $("#lisr_"+k).attr "offset"
-  timestr = $("#lisr_"+k).attr "timestr"
-  both = $("#lisr_"+k+" span").text()
+  #offset = $("#lisr_"+k).attr "offset"
+  #timestr = $("#lisr_"+k).attr "timestr"
+  city_country = $("#lisr_"+k).attr "city_country"
+  clicked_ind = full_data_original_arr.indexOf(city_country)
+  for each_line,line_ind in full_data_original_arr
+    if each_line.indexOf(city_country) > -1
+      clicked_ind = line_ind
+      break
+
+  clicked_tz = full_data_original_arr[clicked_ind].split(";")[4]
+  both = $("#lisr_"+k+" span.litz").text()
   botharr = both.split ","
+  console.log both
   #botharr[0] country
   #botharr[1] city
   oldobj = JSON.parse localStorage.addedLocations
@@ -548,7 +558,8 @@ sr_click = (e, k) ->
   oldobj[len] = {}
   oldobj[len].country = botharr[0]
   oldobj[len].city = botharr[1]
-  oldobj[len].offset = offset
+  #oldobj[len].offset = offset
+  oldobj[len].timezone = clicked_tz
   localStorage.addedLocations = JSON.stringify oldobj
   renderRows()
 
@@ -576,27 +587,43 @@ getRequiredOffset = (original) ->
 
 getCities = (term) ->
   term = term.toLowerCase()
+  max_items = 7
   len = 1
   for key, val of cities_data_arr
-    if len > 7
+    if len > max_items
       break
     if val.indexOf(term) > -1
       temp_arr = full_data_original_arr[key].split(";")
-      required_offset = getRequiredOffset temp_arr[3]
+      #required_offset = getRequiredOffset temp_arr[3]
+      #console.log required_offset
+      try
+        cur_time = new timezoneJS.Date(temp_arr[4])
+      catch err
+        continue
+      
 
 
-      locations += "<li class='searchresult_li' offset='"+required_offset[2]+"' timestr='"+required_offset[0]+"' id='lisr_"+len+"' k='"+len+"'>"+
-        "<span class='litz' k='"+len+"'>"+temp_arr[1]+", "+temp_arr[0]+"<span class='invisible_comma_search_result'>,</span> </span><span class='litime' k='"+len+"'>"+required_offset[1]+"</span></li>"
+      #locations += "<li class='searchresult_li' offset='"+required_offset[2]+"' timestr='"+required_offset[0]+"' id='lisr_"+len+"' k='"+len+"' city_country='"+temp_arr[0]+";"+temp_arr[1]+"'>"+
+      #  "<span class='litz' k='"+len+"'>"+temp_arr[1]+", "+temp_arr[0]+"<span class='invisible_comma_search_result'>,</span> </span><span class='litime' k='"+len+"'>"+required_offset[1]+"</span></li>"
+      locations += "<li class='searchresult_li' id='lisr_"+len+"' k='"+len+"' city_country='"+temp_arr[0]+";"+temp_arr[1]+"'>"+
+        "<span class='litz' k='"+len+"'>"+temp_arr[1]+", "+temp_arr[0]+" </span><span class='litime' k='"+len+"'>"+cur_time.getHours()+":"+cur_time.getMinutes()+"</span></li>"
       len++
-  if len < 8
+  if len < max_items+1
     for key, val of countries_data_arr
-      if len > 7
+      if len > max_items
         break
       if val.indexOf(term) > -1
         temp_arr = full_data_original_arr[key].split(";")
-        required_offset = getRequiredOffset temp_arr[3]
-        locations += "<li class='searchresult_li' offset='"+required_offset[2]+"' timestr='"+required_offset[0]+"' id='lisr_"+len+"' k='"+len+"'>"+
-          "<span class='litz' k='"+len+"'>"+temp_arr[1]+", "+temp_arr[0]+"<span class='invisible_comma_search_result'>,</span> </span><span class='litime' k='"+len+"'>"+required_offset[1]+"</span></li>"
+        try
+          cur_time = new timezoneJS.Date(temp_arr[4])
+        catch err
+          continue
+
+        #required_offset = getRequiredOffset temp_arr[3]
+        #locations += "<li class='searchresult_li' offset='"+required_offset[2]+"' timestr='"+required_offset[0]+"' id='lisr_"+len+"' k='"+len+"'  city_country='"+temp_arr[0]+";"+temp_arr[1]+"'   >"+
+        #  "<span class='litz' k='"+len+"'>"+temp_arr[1]+", "+temp_arr[0]+"<span class='invisible_comma_search_result'>,</span> </span><span class='litime' k='"+len+"'>"+required_offset[1]+"</span></li>"
+        locations += "<li class='searchresult_li' id='lisr_"+len+"' k='"+len+"' city_country='"+temp_arr[0]+";"+temp_arr[1]+"'>"+
+          "<span class='litz' k='"+len+"'>"+temp_arr[1]+", "+temp_arr[0]+" </span><span class='litime' k='"+len+"'>"+cur_time.getHours()+":"+cur_time.getMinutes()+"</span></li>"
         len++
   return locations
 
@@ -606,55 +633,67 @@ renderRows = ->
   if "addedLocations" of localStorage and "default" of localStorage
 
     oldobj = JSON.parse localStorage.addedLocations
+    if oldobj[0].timezone == undefined
+      delete localStorage.addedLocations
+      window.location.reload()
   else
     #autodetect
-    d = new Date()
-    ad_utc = d.getTime() + (d.getTimezoneOffset()*60000)
-    ad_offset = (d.getTime()-ad_utc)/3600000
-
-    formattedOffset = convertOffset ad_offset
-    pi = tzdata.indexOf formattedOffset
-    if pi == -1
-      #do something if offset not found in our tz data
-
-      return
-    subTillPi = tzdata.substr 0,pi
-
-    prevline = subTillPi.lastIndexOf "\n"
-    prevline = 0 if prevline is -1
-    presline = tzdata.indexOf "\n",pi
-    req = tzdata.substr prevline+1,presline-prevline-1
-    reqArr = req.split ";"
+    
+    current_timezone = jstz.determine().name()
+    current_city = current_timezone.split("/")[1]
+    first_find_index = cities_data_arr.indexOf(current_city.toLowerCase())
+    current_details_arr = full_data_original_arr[first_find_index].split(';')
+    
     newobj = {}
 
     newobj[0] = {}
-    newobj[0].city = reqArr[0]
-    newobj[0].country = reqArr[1]
-    floatOffset = convertOffsetToFloat reqArr[3].substr(3)
+    newobj[0].city = current_details_arr[0]
+    newobj[0].country = current_details_arr[1]
+    newobj[0].timezone = current_timezone
 
-    if (floatOffset+"").indexOf("-") is -1
-      if (floatOffset+"").indexOf("+") is -1
-        floatOffset = "+"+floatOffset
-    newobj[0].offset = floatOffset
     localStorage.addedLocations = JSON.stringify newobj
     localStorage.default = "0"
     oldobj = JSON.parse localStorage.addedLocations
 
 
-  updateUtc()
-
-
   defaultind = localStorage.default
 
   defaultobj = oldobj[defaultind]
-  defaultoffset = parseFloat defaultobj.offset
+  default_time_obj = new timezoneJS.Date(defaultobj.timezone)
+  default_time_obj = new timezoneJS.Date(selecteddate.year, selecteddate.m, selecteddate.d, default_time_obj.getHours(), default_time_obj.getMinutes(), defaultobj.timezone)
+
   row = ""
   for ind of oldobj
-    floatOffset = parseFloat oldobj[ind].offset
-    timestr = getNewTime floatOffset
+    time_obj = new timezoneJS.Date(default_time_obj, oldobj[ind].timezone)
+    hours = time_obj.getHours() - default_time_obj.getHours()
+    min = time_obj.getMinutes() - default_time_obj.getMinutes()
+    diff = hours + (min/60)
+    if time_obj.getDate() != default_time_obj.getDate()
+      if default_time_obj.getFullYear() != time_obj.getFullYear()
+        if default_time_obj.getFullYear() > time_obj.getFullYear()
+          diff = -(24-diff)
+        else
+          diff = 24+diff
+      else if default_time_obj.getMonth() != time_obj.getMonth()
+        if default_time_obj.getMonth() > time_obj.getMonth()
+          diff = -(24-diff)
+        else
+          diff = 24+diff
+
+      else if default_time_obj.getDate() > time_obj.getDate()
+        diff = -(24-diff)
+      else
+        diff = 24+diff
+    oldobj[ind].diff = diff
+    oldobj[ind].timestr = time_obj._dateProxy+""
+
+
+
+  for ind of oldobj 
+    timestr = oldobj[ind].timestr
     timearr = timestr.split " "
-    timearr[4] = timearr[4].substr(0,5)
-    diffoffset = floatOffset-defaultoffset
+    diffoffset = oldobj[ind].diff
+
 
     #now do hourline operation , and finally add it to "dates"
     diffoffsetstr = diffoffset+""
@@ -679,7 +718,8 @@ renderRows = ->
           tempstr=" "
     selectedDateStr = selecteddate.dayInText+", "+selecteddate.mText+" "+selecteddate.d+", "+selecteddate.year
 
-    timeextrastr = selecteddate.dayInText+", "+selecteddate.mText+" "+selecteddate.d+"  "+selecteddate.year
+    #timeextrastr = selecteddate.dayInText+", "+selecteddate.mText+" "+selecteddate.d+"  "+selecteddate.year
+    timeextrastr = timearr[0]+", "+timearr[1]+" "+timearr[2]+" "+timearr[3]
     hourline = "<ul class='hourline_ul'>"
     idx = 0
 
@@ -753,6 +793,28 @@ renderRows = ->
       #console.log "tval : "+tval+" ------- "+tempstr
 
 
+      #next_day = new Date(timestr)
+      #
+      #next_day.setDate(next_day.getDate()+1)
+      #next_day_arr = next_day.toLocaleString().split(" ")
+
+      next_day = new Date(default_time_obj._dateProxy)
+      next_day.setDate(next_day.getDate()+1)
+      next_day_arr = next_day.toLocaleString().split(" ")
+
+      today_str = new Date(default_time_obj._dateProxy)
+      today_arr = today_str.toLocaleString().split " "
+      req_mon = ""
+      req_date = ""
+      if diffoffset > 0
+        req_mon = next_day_arr[1]
+        req_date = next_day_arr[2]
+      else
+        #req_mon = timearr[1]
+        #req_date = timearr[2]
+        req_mon = today_arr[1]
+        req_date = today_arr[2]
+
       hourline+=" <li class='"+cl+"' id='lihr_"+idx+"' idx='"+idx+"' t='"+tval+"'  details='"+datedetailstr+"'><div class='span_hl' idx='"+idx+"'><span class='medium' idx='"+idx+"'>"+parseInt(i, 10)+"</span><br><span class='small' idx='"+idx+"'>"+tempstr+"</span></div></li>"
 
       if tempstr is " "
@@ -769,7 +831,7 @@ renderRows = ->
 
       cl = "li_24"
       if iorig != 0.5
-        hourline+=" <li class='"+cl+"' id='lihr_"+idx+"' idx='"+idx+"' t='"+iorig+"' details='"+dayusedstr+"' ><div class='span_hl' idx='"+idx+"'><span idx='"+idx+"'  class='small small-top'> "+dayusedarr[1]+"</span><br><span idx='"+idx+"' class='small' >"+dayusedarr[2]+"</span></div></li>"
+        hourline+=" <li class='"+cl+"' id='lihr_"+idx+"' idx='"+idx+"' t='"+(24-i)+"' x="+i+"  details='"+dayusedstr+"' ><div class='span_hl' idx='"+idx+"'><span idx='"+idx+"'  class='small small-top'> "+req_mon+"</span><br><span idx='"+idx+"' class='small' >"+req_date+"</span></div></li>"
       if timestr is " "
         i=1
       else
@@ -815,7 +877,7 @@ renderRows = ->
       sym = "+"
 
 
-    row+= "<div class='row' id='row_"+ind+"' rowindex='"+ind+"' time='"+timearr[4]+"' floatoffset='"+floatOffset+"'><div class='tzdetails'><div class='offset'>"+sym+(floatOffset-defaultoffset)+"<br><span class='small' >Hours</span></div><div class='location'><span class='city'>"+oldobj[ind].city+"</span><br><span class='country'>"+oldobj[ind].country+"</span></div><div class='timedata'><span class='time'>"+timearr[4]+"</span><br><span class='timeextra'>"+timeextrastr+"</span></div></div><div class='dates'>"+hourline+"</div></div> "
+    row+= "<div class='row' id='row_"+ind+"' rowindex='"+ind+"' time='"+timearr[4].substr(0, 5)+"' floatoffset='"+diffoffset+"' timezone='"+oldobj[ind].timezone+"' ><div class='tzdetails'><div class='offset'>"+sym+(diffoffset)+"<br><span class='small' >Hours</span></div><div class='location'><span class='city'>"+oldobj[ind].city+"</span><br><span class='country'>"+oldobj[ind].country+"</span></div><div class='timedata'><span class='time'>"+timearr[4].substr(0, 5)+"</span><br><span class='timeextra'>"+timeextrastr+"</span></div></div><div class='dates'>"+hourline+"</div></div> "
 
   #$("#content").html "<div id='vband'></div><div id='selectedband'></div>"
   $("#content").html row
@@ -918,6 +980,9 @@ setSelectedDate = (options) ->
     dnew = dnew.toLocaleString()
     dnewarr = dnew.split " "
     selecteddate.dayInText = dnewarr[0]
+    selecteddate.m = options.m
+    selecteddate.d = options.d
+    selecteddate.year = options.year
 
 
 
@@ -935,7 +1000,7 @@ setSelectedDate = (options) ->
     dnew = dnew.toLocaleString()
     dnewarr = dnew.split " "
     selecteddate.dayInText = dnewarr[0]
-  renderRows()
+  #renderRows()
 
 updateUtc = ->
   d = new Date()
@@ -947,17 +1012,10 @@ updateUtc = ->
   utc = localtime + localoffset
 
 getNewTime = (offset) ->
-  #console.log "utc ccc : "+utc
   newtime = utc + (3600000*offset)
-  #newtime = newtime.toLocaleString()
-  #console.log newtime
   nd = new Date(newtime)
-  #console.log nd
   ndstr = nd.toLocaleString()
   return ndstr
-  #ndarr = ndstr.split(" ")
-  #console.log ndarr[4].substr(0,5)
-  #
 
 open_in_new_tab = (url) ->
   window.open url, '_blank'
@@ -974,11 +1032,19 @@ $(".link_export_google_cal").live
         link_desc += $(td_arr[1]).text().trim()+", "+$(td_arr[2]).text().trim()+", "+$(td_arr[3]).find('.yeardetails').text().trim()+" "+$(td_arr[3]).find('.selected_time').text().trim()+"\n"
 
     #calculating utc
+    #d = timezoneJS.Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(), timezone)
+    #d = timezoneJS.Date(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(), timezone)
     gmt_str = $($("#newevent_table tr")[1]).find("td")[3]
-    floatoffset =$( $("#newevent_table tr")[1]).attr "floatoffset"
+    timezone = $($("#newevent_table tr")[1]).attr "timezone"
+    #floatoffset =$( $("#newevent_table tr")[1]).attr "floatoffset"
     gmt_str = $($(gmt_str).find('.yeardetails')).text().trim()+" "+$($(gmt_str).find('.selected_time')).text().trim()
     d = new Date(gmt_str)
-    d.setHours(d.getHours()-Number(floatoffset))
+    #d.setHours(d.getHours()+Number(floatoffset))
+    d = new timezoneJS.Date(d.getFullYear(), d.getMonth()+1, d.getDate(), d.getHours(), d.getMinutes(), timezone)
+    d.setDate(d.getUTCDate())
+
+    d.setHours(d.getUTCHours())
+    d.setMinutes(d.getUTCMinutes())
 
     google_cal_dates_param = get_google_cal_dates_param(d)
 

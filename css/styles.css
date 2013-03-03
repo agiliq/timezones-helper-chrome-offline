@@ -706,12 +706,13 @@
 
             }
 
+            .bottom-content {margin-top: 150px; margin-bottom: 50px;}
+
             .gplay {
-                margin-left: 83%;
-                margin-top: 150px;
-                margin-bottom: 50px;
+                margin-right: 7%;
             }
 
+            .help_text {width: 420px; margin-left:38%;}
 
 
             div.date_help_animation_box {
