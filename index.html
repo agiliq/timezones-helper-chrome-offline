@@ -30,6 +30,16 @@
 
                         <div id='controls' class='pull-right'>
 
+                        <div class='show_meeting_modal pull-left margin-right-15px' >
+
+                            <div class='help_meeting_schedule help_style arrow_box well well-small'>
+                                Click this to re-open the schedule
+                            </div>
+                            <span>
+                                Show Meeting Schedule
+                            </span>
+
+                        </div>
                              <div id='error_inputdate' class='well well-small'></div>
                              <div id='date_help' class='well'>Enter the date on which you wish to schedule</div>
                              <input type='text' placeholder='mm-dd-yyyy' id='dateinput'  maxlength=10 /><span style=';display:inline-block;width : 10px' ></span>
@@ -60,6 +70,7 @@
 
                             <div class='event-body'>
                                 <div id='event_close'><strong>X</strong></div>
+                                <div class='meeting_link input-prepend'></div>
                                 <h3 class='backcolor'>Add New Event </h3>
                                 <input type='text' id='event_name' placeholder='Enter Event name here' class='input-xxlarge'/>
                                 <textarea id='newevent_msg' placeholder='Enter description' class='input-xxlarge' ></textarea><br><br>
@@ -85,6 +96,18 @@
 
 
                         </div> <!-- end of showevents -->
+
+                        <div id="meeting_details" class="modal">
+                            <div class='modal-header'>
+                                <div class='pull-right'>
+                                <a class='icon-move meeting_details_move pull-left margin-right-15px' ></a>
+                                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            </div>
+                                <h3>Meeting Schedule</h3>
+                            </div>
+                            <div class='modal-body'></div>
+
+                        </div>
                         <div class='bottom-content'>
                             <div class='help_text pull-left'>
                                 <ul>

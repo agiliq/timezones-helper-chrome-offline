@@ -6,8 +6,10 @@ k=0
 locations=""
 utc = 0
 selecteddate = {}
+selected_idx = ""
 rowsortstart = ""
 rowsortstop = ""
+domain_name = window.location.protocol+"//"+window.location.host+window.location.pathname
 cities_data_arr = []
 countries_data_arr = []
 full_data_arr = []
@@ -16,10 +18,10 @@ full_data_original_arr = []
 
 $(document).ready ->
 
-  timezoneJS.timezone.zoneFileBasePath = '/olson'
+  timezoneJS.timezone.zoneFileBasePath = '/ts/olson'
   timezoneJS.timezone.init()
   setSelectedDate()
-  
+
 
   $.ajax
     url : "tzdata.csv"
@@ -40,7 +42,6 @@ $(document).ready ->
       full_data_original_arr.pop()
       full_data_arr.pop()
 
-      #console.log "tzdata loaded successfully"
       renderRows()
       d = new Date()
       rem = 62-d.getSeconds()
@@ -48,10 +49,88 @@ $(document).ready ->
       setInterval (->
         renderRows()
       ), 60000
+      if window.location.search != ""
+        renderRows(generate_meeting_link)
     error : (e) ->
-      #console.log "Error loading tz data"
+      console.log "Error loading tz data"
 
 
+generate_meeting_link = ->
+    #console.log "Genrat meeting lik starte"
+    search = decodeURI window.location.search
+    search = search.substr 1, search.length
+    params_arr = search.split("&")
+    time_arr = params_arr.pop()
+    param_obj = {}
+    for key in params_arr
+      temp = key.split("=")
+      param_obj[temp[0]] = temp[1]
+    oldobj = JSON.parse localStorage.addedLocations
+    #console.log JSON.stringify oldobj
+    keys = Object.keys
+    old_keys = keys(oldobj)
+    param_keys = keys(param_obj)
+    duplicate_keys = []
+    i = 0
+
+    original_param_obj = {}
+    while i<param_keys.length
+      temp_arr = param_obj[i].split(";")
+      temp_obj = 
+        'city': temp_arr[0]
+        'country': temp_arr[1]
+        'timezone': temp_arr[2]
+        'time': temp_arr[3]
+      param_obj[i] = temp_obj
+      original_param_obj[i] = temp_obj
+      j = 0
+      while j<old_keys.length
+        if param_obj[i].city.trim() == oldobj[j].city.trim() and param_obj[i].country.trim() == oldobj[j].country.trim()
+          duplicate_keys += [i]
+          break
+        j++
+      i++
+
+    
+    for key in duplicate_keys
+      delete param_obj[key]
+
+    temp_param_obj = {}
+    i = 0
+    for key, val of param_obj
+      temp_param_obj[i] = val
+      i++
+    
+    param_obj = temp_param_obj
+    param_keys = keys(param_obj)
+    i = old_keys.length
+    j = 0
+    while j<param_keys.length
+      oldobj[i] = param_obj[j]
+      i++
+      j++
+
+    localStorage.addedLocations = JSON.stringify oldobj
+    renderRows()
+
+    #Show on Modal
+    html = "<table class='table table-striped'>"
+    for key, val of original_param_obj
+      html += "<tr><td>"+val.city+"</td><td>"+val.country+"</td><td>"+val.time+"</td></tr>"
+    $("#meeting_details .modal-body").html(html).parent().show()
+    $("#meeting_details").draggable 
+      handle: '.meeting_details_move'
+
+
+
+remove_key = (obj, pos) ->
+  i = pos
+  len = Object.keys(obj).length
+  while i<len-1
+    obj[i] = obj[i+1]
+    i++
+  delete obj[len-1]
+  return obj
 
 
 $("#search_input").live
@@ -148,6 +227,11 @@ $("#selectedband").live
     $("#content").sortable('enable')
 
 
+$(".meeting_link input").live
+  click: () ->
+    $(this).select()
+
+
 $("#vband").live
   mouseenter: (e) ->
     $("#content").sortable('disable')
@@ -160,12 +244,15 @@ $("#vband").live
     idx = $(e.target).attr "idx"
     if idx is undefined
       return
+    selected_idx =idx
     t = new Array()
     city = new Array()
     country = new Array()
     yeardetails = new Array()
     original_offset = new Array()
     timezones = new Array()
+    param_string = "?"
+    i = 0
     for ele in $(".row")
       tText = convertOffset $("#"+ele.id+" #lihr_"+idx).attr("t")
       t.push tText.substr(1)
@@ -174,9 +261,17 @@ $("#vband").live
       yeardetails.push $("#"+ele.id+" #lihr_"+idx).attr("details")
       original_offset.push $(ele).attr "floatoffset"
       timezones.push $(ele).attr "timezone"
+      param_string += i+"="+city[i]+";"+country[i]+";"+$("#"+ele.id).attr('timezone')+";"+yeardetails[i]+", "+t[i]+"&"
+      #param_string += i+"="+city[i]+";"+country[i]+";"+t[i]+"&"
+      i++
 
+    #param_string += "time="+$($('.row')[0]).attr('timezone')+";"+t[0]
+    param_string += "time="+t[0]
+    #param_string = param_string.substr 0, param_string.length-1
+    param_string = encodeURI param_string
 
     $("#newevent").show()
+    $(".meeting_link").html "<span class='add-on'>Link </span><input type='text' value='"+domain_name+param_string+"' class='input-xxlarge' />"
     $("#newevent_time").text ""
     $("#newevent_msg").text ""
     $("#event_name").text ""
@@ -193,7 +288,50 @@ $("#vband").live
     $("#newevent_time").attr "time",t
     $("#newevent_time").attr "yeardetails",yeardetails.join(";")
 
-$("#wrapper button#saveevent").live
+
+$("#newevent_table input[type='checkbox']").live
+  change: ->
+    idx = selected_idx
+    if idx is undefined or idx == ""
+      return
+    param_string = "?"
+    i = 0
+    t = new Array()
+    j = 0
+    available_timezones = []
+    for ele in $("#newevent_table tr")
+      if $($(ele).find("input[type='checkbox']")).attr("checked")
+        available_timezones.push j-1
+        #console.log "push"
+      j++
+    #console.log available_timezones
+
+    param_idx = 0
+    for ele in $(".row")
+      tText = convertOffset $("#"+ele.id+" #lihr_"+idx).attr("t")
+      t.push tText.substr(1)
+      #console.log t[0]
+      city = $("#"+ele.id+" .city").text()
+      country = $("#"+ele.id+" .country").text()
+      yeardetails = $("#"+ele.id+" #lihr_"+idx).attr("details")
+      original_offset = $(ele).attr "floatoffset"
+      if i in available_timezones
+        param_string += param_idx+"="+city+";"+country+";"+$("#"+ele.id).attr('timezone')+";"+yeardetails+", "+t[i]+"&"
+        param_idx++
+      i++
+
+    if param_idx == 0
+      param_string = ""
+    else
+      param_string += "time="+$($('.row')[0]).attr('original_offset')+";"+t[0]
+      #console.log param_string
+      param_string = encodeURI param_string
+
+    $(".meeting_link").html "<span class='add-on'>Link </span><input type='text' value='"+domain_name+param_string+"' class='input-xxlarge' />"
+
+
+
+$("#wrapper button#saveeventttt").live
   click : (e) ->
     msg= $("#wrapper #newevent #newevent_msg").val().trim()
     evname =  $("#wrapper #newevent #event_name").val().trim()
@@ -250,6 +388,33 @@ $("#event_close").live
   click : (e) ->
     $("#newevent").hide()
     $(".canhide").css "opacity","1"
+
+
+$("#meeting_details .close").live
+  click : ->
+    hide_meeting_details()
+
+$("body").live
+  keyup : (e) ->
+    if e.keyCode == 27
+      hide_meeting_details()
+
+
+
+hide_meeting_details = ->
+  $("#meeting_details").slideUp()
+  $(".show_meeting_modal").show()
+  $(".help_meeting_schedule").show()
+  setTimeout (->
+    $(".help_meeting_schedule").fadeOut(4000)
+  ), 4000
+
+
+$(".show_meeting_modal span").live
+  click: ->
+    $("#meeting_details").slideDown()
+
+
 
 $("body").live
   keydown: (e) ->
@@ -530,7 +695,7 @@ sr_click = (e, k) ->
   clicked_tz = full_data_original_arr[clicked_ind].split(";")[4]
   both = $("#lisr_"+k+" span.litz").text()
   botharr = both.split ","
-  console.log both
+  #console.log both
   #botharr[0] country
   #botharr[1] city
   oldobj = JSON.parse localStorage.addedLocations
@@ -628,7 +793,7 @@ getCities = (term) ->
   return locations
 
 
-renderRows = ->
+renderRows = (callback) ->
   oldobj = {}
   if "addedLocations" of localStorage and "default" of localStorage
 
@@ -910,6 +1075,20 @@ renderRows = ->
   $("#vband").css "height",$("#selectedband").css("height")
   $("#content").sortable({'containment':'parent', 'items':'.row'})
 
+  if typeof(callback) == "function"
+    #console.log "calling"
+    callback()
+  else
+    #console.log callback
+    #console.log "not calling"
+  if callback == "a"
+    #console.log "yes a"
+    generate_meeting_link()
+  else
+    #console.log "not a"
+    #console.log callback
+
+
 convertOffsetToFloat = (str) ->
   first = str.substr(0,str.indexOf(":"))
   second = parseFloat(str.substr(str.indexOf(":")+1))/60
@@ -1006,7 +1185,6 @@ updateUtc = ->
   d = new Date()
   dstr=d.toLocaleString()
   datearr = dstr.split(" ")
-  #console.log "time : "+datearr[4]+" off : "+datearr[5]+" stand : "+datearr[6]
   localtime = d.getTime()
   localoffset = d.getTimezoneOffset()*60000
   utc = localtime + localoffset
