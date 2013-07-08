@@ -33,7 +33,7 @@
   full_data_original_arr = [];
 
   $(document).ready(function() {
-    timezoneJS.timezone.zoneFileBasePath = '/olson';
+    timezoneJS.timezone.zoneFileBasePath = 'olson';
     timezoneJS.timezone.init();
     setSelectedDate();
     return $.ajax({
