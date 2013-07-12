@@ -973,7 +973,7 @@
       if (hourstart !== 0) {
         cl = "li_24";
         if (iorig !== 0.5) {
-          hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='" + (24 - i) + "' x=" + i + "  details='" + dayusedstr + "' ><div class='span_hl' idx='" + idx + "'><span idx='" + idx + "'  class='small small-top'> " + req_mon + "</span><br><span idx='" + idx + "' class='small' >" + req_date + "</span></div></li>";
+          hourline += " <li class='" + cl + "' id='lihr_" + idx + "' idx='" + idx + "' t='" + (24 - i) + "' x=" + i + "  details='" + dayusedstr + "' ><div class='span_hl' idx='" + idx + "'><span idx='" + idx + "'  class='small small-top'> " + dayusedarr[1] + "</span><br><span idx='" + idx + "' class='small' >" + dayusedarr[2] + "</span></div></li>";
         }
         if (timestr === " ") {
           i = 1;
