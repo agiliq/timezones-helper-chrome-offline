@@ -4,7 +4,7 @@
 
 	           background-repeat:repeat-y;
 	           */
-	            background-color: #AAAA71;
+	            background-color: rgb(41, 39, 39);
 	            font-family: arial;
 
             }
@@ -452,6 +452,7 @@
                             left: 6px;
                             font-size: 14pt;
                             font-weight: bold;
+                            color: white;
                         }
 
                         #content .row .icons_homedelete .icon_home{
@@ -723,7 +724,7 @@
                 margin-right: 7%;
             }
 
-            .help_text {width: 420px; margin-left:38%;}
+            .help_text {width: 420px; margin-left:143px; color: white; }
 
 
             div.date_help_animation_box {
@@ -867,3 +868,4 @@
                 left: 50%;
                 margin-left: -30px;
             }  
+            .footer { margin-bottom: 20px; text-align: center; color: white;}
