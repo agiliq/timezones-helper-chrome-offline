@@ -19,7 +19,7 @@ full_data_original_arr = []
 $(document).ready ->
 
   timezoneJS.timezone.zoneFileBasePath = 'olson'
-  timezoneJS.timezone.init()
+  timezoneJS.timezone.init({async: false})
   setSelectedDate()
 
 

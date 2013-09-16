@@ -34,7 +34,7 @@
 
   $(document).ready(function() {
     timezoneJS.timezone.zoneFileBasePath = 'olson';
-    timezoneJS.timezone.init();
+    timezoneJS.timezone.init({async: false});
     setSelectedDate();
     return $.ajax({
       url: "tzdata.csv",
