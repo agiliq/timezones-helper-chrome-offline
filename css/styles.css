@@ -274,8 +274,15 @@
 
                 #content{
                       position : relative;
-                        top : 0px;
+                      top : 0px;
+                      background-color: #504949;
+                      border-radius: 6px;
+                      min-height: 216px;
 
+                }
+                #ajax-loader { background-color: #E4E4E4; min-height: 216px;}
+                #ajax-loader img{
+                      margin-left: 49%; margin-top: 100px;
                 }
                     #wrapper #newevent, .mymodal{
                         position : absolute;
